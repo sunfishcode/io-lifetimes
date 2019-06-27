@@ -1,0 +1,18 @@
+[package]
+name = "fd-lock"
+version = "1.0.0"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yoshuawuyts/fd-lock"
+documentation = "https://docs.rs/fd-lock"
+description = "Advisory cross-platform lock on a file using a file descriptor to it."
+keywords = ["file", "fd", "lock", "windows", "unix"]
+categories = ["filesystem", "os", "os::macos-apis", "os::unix-apis", "os::windows-apis"]
+authors = ["Yoshua Wuyts <yoshuawuyts@gmail.com>"]
+readme = "README.md"
+edition = "2018"
+
+[dependencies]
+libc = "0.2.58"
+winapi = "0.3.7"
+
+[dev-dependencies]
