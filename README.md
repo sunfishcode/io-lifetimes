@@ -34,6 +34,8 @@ look at some of these issues:
 - [Issues labeled "help wanted"][help-wanted]
 
 ## References
+- [Windows Dev Center: LockFile function](https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-lockfile)
+- [flock(2) - Linux Man Page](https://linux.die.net/man/2/flock)
 - [`libc::flock`](https://docs.rs/libc/0.2.58/libc/struct.flock.html)
 - [`winapi::um::fileapi::LockFile`](https://docs.rs/winapi/0.3.7/x86_64-pc-windows-msvc/winapi/um/fileapi/fn.LockFile.html)
 
