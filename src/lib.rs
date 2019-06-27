@@ -14,10 +14,10 @@
 //! # fn main() -> Result<(), failure::Error> {
 //! // Lock a file and write to it.
 //! let mut f = FdLock::new(tempfile()?);
-//! f.lock()?.write_all(b"chashu cat")?;
+//! f.try_lock()?.write_all(b"chashu cat")?;
 //!
 //! // Locks can also be held for extended durations.
-//! let mut f = f.lock()?;
+//! let mut f = f.try_lock()?;
 //! f.write_all(b"nori cat")?;
 //! f.write_all(b"bird!")?;
 //! # Ok(())}

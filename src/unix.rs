@@ -48,20 +48,6 @@ impl<T: AsRawFd> FdLock<T> {
         FdLock { t }
     }
 
-    /// Acquires a new lock, blocking the current thread until it's able to do so.
-    ///
-    /// This function will block the local thread until it is available to acquire the lock. Upon
-    /// returning, the thread is the only thread with the lock held. An RAII guard is returned to allow
-    /// scoped unlock of the lock. When the guard goes out of scope, the lock will be unlocked.
-    #[inline]
-    pub fn lock(&mut self) -> Result<FdLockGuard<'_, T>, Error> {
-        let fd = self.t.as_raw_fd();
-        match unsafe { flock(fd, LOCK_EX) } {
-            0 => Ok(FdLockGuard { lock: self }),
-            _ => Err(ErrorKind::Other.into()),
-        }
-    }
-
     /// Attempts to acquire this lock.
     ///
     /// If the lock could not be acquired at this time, then `Err` is returned. Otherwise, an RAII
