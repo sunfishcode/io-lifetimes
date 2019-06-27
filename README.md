@@ -2,12 +2,12 @@
 [![crates.io version][1]][2] [![build status][3]][4]
 [![downloads][5]][6] [![docs.rs docs][7]][8]
 
-Advisory cross-platform lock on a file using a file descriptor to it. Adapted
-from [mafintosh/fd-lock].
+Advisory cross-platform file locks using file descriptors. Adapted from
+[mafintosh/fd-lock].
 
-Note that advisory lock compliance is opt-in, and can be ignored by components.
-This means this crate can be used to coordinate file access, but not as a
-security measure.
+Note that advisory lock compliance is opt-in, and can freely be ignored by other
+parties. This means this crate __should never be used for security purposes__,
+but solely to coordinate file access.
 
 [mafintosh/fd-lock]: https://github.com/mafintosh/fd-lock
 

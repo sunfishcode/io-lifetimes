@@ -14,5 +14,7 @@ edition = "2018"
 [dependencies]
 libc = "0.2.58"
 winapi = "0.3.7"
+failure = "0.1.5"
 
 [dev-dependencies]
+tempfile = "3.0.8"
