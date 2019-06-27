@@ -5,52 +5,76 @@ use std::ops;
 
 /// A guard that unlocks the file descriptor when it goes out of scope.
 #[derive(Debug)]
-pub struct LockGuard<T: AsRawFd> {
-    t: T,
+pub struct FdLockGuard<'fdlock, T: AsRawFd> {
+    lock: &'fdlock mut FdLock<T>,
 }
 
-impl<T: AsRawFd> ops::Deref for LockGuard<T> {
+impl<T: AsRawFd> ops::Deref for FdLockGuard<'_, T> {
     type Target = T;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
-        &self.t
+        &self.lock.t
     }
 }
 
-impl<T: AsRawFd> ops::DerefMut for LockGuard<T> {
+impl<T: AsRawFd> ops::DerefMut for FdLockGuard<'_, T> {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.t
+        &mut self.lock.t
     }
 }
 
-impl <T: AsRawFd>Drop for LockGuard<T> {
+impl<T: AsRawFd> Drop for FdLockGuard<'_, T> {
     #[inline]
     fn drop(&mut self) {
-        let fd = self.t.as_raw_fd();
+        let fd = self.lock.t.as_raw_fd();
         if unsafe { flock(fd, LOCK_UN | LOCK_NB) } != 0 {
             panic!("Could not unlock the file descriptor");
         }
     }
 }
 
-/// Lock a file descriptor.
-#[inline]
-pub fn lock<T: AsRawFd>(t: T) -> Result<LockGuard<T>, Error> {
-    let fd = t.as_raw_fd();
-    match unsafe { flock(fd, LOCK_EX | LOCK_NB) } {
-        0 => Ok(LockGuard { t }),
-        EWOULDBLOCK => Err(ErrorKind::Locked.into()),
-        _ => Err(ErrorKind::Other.into()),
-    }
+/// A file descriptor lock.
+#[derive(Debug)]
+pub struct FdLock<T: AsRawFd> {
+    t: T
 }
 
-/// Extend `AsRawFd` with advisory locking capabilities.
-pub trait AsRawFdExt: AsRawFd + Sized {
-    /// Lock the current file descriptor.
+impl<T: AsRawFd> FdLock<T> {
+    /// Create a new instance.
     #[inline]
-    fn lock_file(self) -> Result<LockGuard<Self>, Error> {
-        lock(self)
+    pub fn new(t: T) -> Self {
+        FdLock { t }
+    }
+
+    /// Acquires a new lock, blocking the current thread until it's able to do so.
+    ///
+    /// This function will block the local thread until it is available to acquire the lock. Upon
+    /// returning, the thread is the only thread with the lock held. An RAII guard is returned to allow
+    /// scoped unlock of the lock. When the guard goes out of scope, the lock will be unlocked.
+    #[inline]
+    pub fn lock(&mut self) -> Result<FdLockGuard<'_, T>, Error> {
+        let fd = self.t.as_raw_fd();
+        match unsafe { flock(fd, LOCK_EX) } {
+            0 => Ok(FdLockGuard { lock: self }),
+            _ => Err(ErrorKind::Other.into()),
+        }
+    }
+
+    /// Attempts to acquire this lock.
+    ///
+    /// If the lock could not be acquired at this time, then `Err` is returned. Otherwise, an RAII
+    /// guard is returned. The lock will be unlocked when the guard is dropped.
+    ///
+    /// This function does not block.
+    #[inline]
+    pub fn try_lock(&mut self) -> Result<FdLockGuard<'_, T>, Error> {
+        let fd = self.t.as_raw_fd();
+        match unsafe { flock(fd, LOCK_EX | LOCK_NB) } {
+            0 => Ok(FdLockGuard { lock: self }),
+            EWOULDBLOCK => Err(ErrorKind::Locked.into()),
+            _ => Err(ErrorKind::Other.into()),
+        }
     }
 }
-
-impl<T: AsRawFd> AsRawFdExt for T {}
