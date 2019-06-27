@@ -5,6 +5,10 @@
 Advisory cross-platform lock on a file using a file descriptor to it. Adapted
 from [mafintosh/fd-lock].
 
+Note that advisory lock compliance is opt-in, and can be ignored by components.
+This means this crate can be used to coordinate file access, but not as a
+security measure.
+
 [mafintosh/fd-lock]: https://github.com/mafintosh/fd-lock
 
 - [Documentation][8]
@@ -23,8 +27,8 @@ $ cargo add fd-lock
 ```
 
 ## Safety
-This crate uses ``#![deny(unsafe_code)]`` to ensure everything is implemented in
-100% Safe Rust.
+This crate uses `unsafe` to interface with `libc` and `winapi`. All invariants
+have been carefully checked, and are manually enforced.
 
 ## Contributing
 Want to join us? Check out our ["Contributing" guide][contributing] and take a
@@ -34,9 +38,9 @@ look at some of these issues:
 - [Issues labeled "help wanted"][help-wanted]
 
 ## References
-- [Windows Dev Center: LockFile function](https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-lockfile)
+- [LockFile function - WDC](https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-lockfile)
 - [flock(2) - Linux Man Page](https://linux.die.net/man/2/flock)
-- [`libc::flock`](https://docs.rs/libc/0.2.58/libc/struct.flock.html)
+- [`libc::flock`](https://docs.rs/libc/0.2.58/libc/fn.flock.html)
 - [`winapi::um::fileapi::LockFile`](https://docs.rs/winapi/0.3.7/x86_64-pc-windows-msvc/winapi/um/fileapi/fn.LockFile.html)
 
 ## License
