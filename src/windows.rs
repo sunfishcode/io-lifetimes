@@ -1,5 +1,5 @@
 use std::os::windows::io::{AsRawHandle, RawHandle};
-use winapi::um::fileapi::{LockFile, UnlockFile};
+use winapi::um::fileapi::{LockFile, LockFileEx, UnlockFile, LOCKFILE_EXCLUSIVE_LOCK};
 use std::ops;
 
 /// Lock a file descriptor.
@@ -65,6 +65,21 @@ impl<T: AsRawHandle> FdLock<T> {
     #[inline]
     pub fn new(t: T) -> Self {
         FdLock { t }
+    }
+
+    /// Acquires a new lock, blocking the current thread until it's able to do so.
+    ///
+    /// This function will block the local thread until it is available to acquire the lock. Upon
+    /// returning, the thread is the only thread with the lock held. An RAII guard is returned to allow
+    /// scoped unlock of the lock. When the guard goes out of scope, the lock will be unlocked.
+    #[inline]
+    pub fn lock(&mut self) -> Result<FdLockGuard<'_, T>, Error> {
+        let fd = self.t.as_raw_fd();
+        if unsafe { LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, 1, 0) } {
+            Ok(FdLockGuard { lock: self })
+        } else {
+            Err(ErrorKind::Other.into())
+        }
     }
 
     /// Attempts to acquire this lock.
