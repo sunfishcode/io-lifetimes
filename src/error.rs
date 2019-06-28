@@ -1,7 +1,7 @@
 use failure::{self, Backtrace, Context, Fail};
 use std::fmt;
 
-/// A list enumerating the error categories.
+/// Error categories.
 ///
 /// This list is intended to grow over time and it is not recommended to
 /// exhaustively match against it. It is used with the [`Error`] struct.
