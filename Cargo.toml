@@ -1,0 +1,22 @@
+[package]
+name = "io-experiment"
+version = "0.0.0"
+description = "An experimental low-level I/O library"
+authors = ["Dan Gohman <dev@sunfishcode.online>"]
+license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
+keywords = ["api", "io"]
+categories = ["os", "rust-patterns"]
+edition = "2018"
+repository = "https://github.com/sunfishcode/io-experiment"
+exclude = ["/.github"]
+
+[dependencies]
+
+[target.'cfg(not(windows))'.dependencies]
+libc = "0.2.81"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3.9", features = ["handleapi", "std", "winsock2"] }
+
+[badges]
+maintenance = { status = "actively-developed" }
