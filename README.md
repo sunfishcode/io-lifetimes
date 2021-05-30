@@ -1,5 +1,8 @@
 This is an experiment.
 
+It requires nightly Rust, so that it can use `rustc_attrs` outside of `std`
+for now.
+
 Here's an API summary. `OptionFd` is a `RawFd` which may be either valid or -1.
 For Windows, there are `Handle` and `Socket` versions of every `Fd` thing.
 
@@ -38,7 +41,7 @@ hold `RawFd` values, so they can be used in FFI directly:
 extern "C" {
     pub fn open(pathname: *const u8, flags: c_int, ...) -> OptionFd;
     pub fn write(fd: BorrowedFd, ptr: *const u8, size: size_t) -> isize;
-    pub fn close(fd: OptionFd) -> c_int;
+    pub fn close(fd: OwnedFd) -> c_int;
 }
 ```
 
@@ -48,9 +51,3 @@ is what motivates having `BorrowedFd` instead of just using `&OwnedFd`.
 
 Note the use of `OptionFd` as the return value of `open`, representing the
 fact that it can either succeed or fail.
-
-And as an even more subtle detail, `close` also takes an `OptionFd`, even
-though the main use case is to pass it an owned fd. This is because `OwnedFd`
-is not `repr(transparent)` so it can do niche optimizations. And there's a
-sense in which `OptionFd` is technically accurate, since `close` does have
-defined behavior if passed -1.

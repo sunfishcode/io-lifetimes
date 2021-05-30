@@ -24,6 +24,7 @@
 //!  - More advanced convenience features are possible in the future.
 
 #![deny(missing_docs)]
+#![feature(rustc_attrs)]
 
 mod traits;
 mod types;

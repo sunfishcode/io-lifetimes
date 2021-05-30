@@ -60,10 +60,13 @@ pub struct BorrowedSocket<'owned> {
 /// An owned file descriptor.
 ///
 /// This closes the file descriptor on drop.
-//
-// TODO: This doesn't use `repr(transparent)` because it's intended to use
-// `rustc_layout_scalar_valid_range_*` optimizations in `std`.
 #[cfg(unix)]
+#[repr(transparent)]
+#[rustc_layout_scalar_valid_range_start(0)]
+// libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
+// 32-bit c_int. Below is -2, in two's complement, but that only works out
+// because c_int is 32 bits.
+#[rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)]
 pub struct OwnedFd {
     raw: RawFd,
 }
@@ -72,6 +75,7 @@ pub struct OwnedFd {
 ///
 /// This closes the handle on drop.
 #[cfg(windows)]
+#[repr(transparent)]
 pub struct OwnedHandle {
     raw: RawHandle,
 }
@@ -80,6 +84,7 @@ pub struct OwnedHandle {
 ///
 /// This closes the socket on drop.
 #[cfg(windows)]
+#[repr(transparent)]
 pub struct OwnedSocket {
     raw: RawSocket,
 }
@@ -212,7 +217,7 @@ impl TryFrom<OptionFd> for OwnedFd {
         let raw = option.raw;
         mem::forget(option);
         if raw != -1 {
-            Ok(Self { raw })
+            unsafe { Ok(Self { raw }) }
         } else {
             Err(())
         }

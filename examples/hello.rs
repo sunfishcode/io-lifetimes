@@ -29,7 +29,7 @@ use winapi::{
 extern "C" {
     pub fn open(pathname: *const c_char, flags: c_int, ...) -> OptionFd;
     pub fn write(fd: BorrowedFd, ptr: *const c_void, size: size_t) -> isize;
-    pub fn close(fd: OptionFd) -> c_int;
+    pub fn close(fd: OwnedFd) -> c_int;
 }
 
 /// The Windows analogs of the above.
@@ -51,7 +51,7 @@ extern "C" {
         lpNumberOfBytesWritten: LPDWORD,
         lpOverlapped: LPOVERLAPPED,
     ) -> BOOL;
-    pub fn CloseHandle(handle: OptionHandle) -> BOOL;
+    pub fn CloseHandle(handle: OwnedHandle) -> BOOL;
 }
 
 /// A simple testcase that prints a few messages to the console, demonstrating
@@ -101,7 +101,7 @@ fn main() -> io::Result<()> {
         // This isn't needed, since `fd` is owned and would close itself on
         // drop automatically, but it makes a nice demo of passing an `OwnedFd`
         // into an FFI call.
-        close(fd.into());
+        close(fd);
     }
 
     Ok(())
@@ -171,7 +171,7 @@ fn main() -> io::Result<()> {
         // This isn't needed, since `handle` is owned and would close itself on
         // drop automatically, but it makes a nice demo of passing an `OwnedHandle`
         // into an FFI call.
-        CloseHandle(handle.into());
+        CloseHandle(handle);
     }
 
     Ok(())
