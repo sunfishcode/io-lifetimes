@@ -11,7 +11,7 @@ use io_experiment::{
 };
 
 #[cfg(unix)]
-use libc::{c_char, c_int, c_void, size_t};
+use libc::{c_char, c_int, c_void, size_t, ssize_t};
 
 #[cfg(windows)]
 use std::ptr;
@@ -28,7 +28,7 @@ use winapi::{
 #[cfg(unix)]
 extern "C" {
     pub fn open(pathname: *const c_char, flags: c_int, ...) -> OptionFd;
-    pub fn write(fd: BorrowedFd, ptr: *const c_void, size: size_t) -> isize;
+    pub fn write(fd: BorrowedFd, ptr: *const c_void, size: size_t) -> ssize_t;
     pub fn close(fd: OwnedFd) -> c_int;
 }
 

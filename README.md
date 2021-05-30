@@ -39,8 +39,8 @@ hold `RawFd` values, so they can be used in FFI directly:
 
 ```rust
 extern "C" {
-    pub fn open(pathname: *const u8, flags: c_int, ...) -> OptionFd;
-    pub fn write(fd: BorrowedFd, ptr: *const u8, size: size_t) -> isize;
+    pub fn open(pathname: *const c_char, flags: c_int, ...) -> OptionFd;
+    pub fn write(fd: BorrowedFd, ptr: *const c_void, size: size_t) -> ssize_t;
     pub fn close(fd: OwnedFd) -> c_int;
 }
 ```
