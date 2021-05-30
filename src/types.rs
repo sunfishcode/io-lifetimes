@@ -20,6 +20,11 @@ use std::os::windows::io::{
 #[cfg(unix)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
+#[rustc_layout_scalar_valid_range_start(0)]
+// libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
+// 32-bit c_int. Below is -2, in two's complement, but that only works out
+// because c_int is 32 bits.
+#[rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)]
 pub struct BorrowedFd<'owned> {
     raw: RawFd,
     _phantom: PhantomData<&'owned ()>,
@@ -137,9 +142,10 @@ impl<'owned> BorrowedFd<'owned> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
-    /// the returned `BorrowedFd`.
+    /// the returned `BorrowedFd`, and it must not have the value `-1`.
     #[inline]
     pub unsafe fn borrow_raw_fd(raw: RawFd) -> Self {
+        debug_assert_ne!(raw, -1);
         Self {
             raw,
             _phantom: PhantomData,
@@ -152,9 +158,11 @@ impl<'owned> BorrowedHandle<'owned> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
-    /// the returned `BorrowedFd`.
+    /// the returned `BorrowedFd`, and it must not have the value
+    /// [`INVALID_HANDLE_VALUE`].
     #[inline]
     pub unsafe fn borrow_raw_handle(raw: RawHandle) -> Self {
+        debug_assert_ne!(raw, winapi::um::handleapi::INVALID_HANDLE_VALUE);
         Self {
             raw,
             _phantom: PhantomData,
@@ -167,9 +175,11 @@ impl<'owned> BorrowedSocket<'owned> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
-    /// the returned `BorrowedFd`.
+    /// the returned `BorrowedFd`, and it must not have the value
+    /// [`INVALID_SOCKET`].
     #[inline]
     pub unsafe fn borrow_raw_socket(raw: RawSocket) -> Self {
+        debug_assert_ne!(raw, winapi::um::winsock2::INVALID_SOCKET as RawSocket);
         Self {
             raw,
             _phantom: PhantomData,
