@@ -8,6 +8,8 @@ use std::os::windows::io::{
     AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
     RawHandle, RawSocket,
 };
+#[cfg(windows)]
+use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
 
 /// A borrowed file descriptor.
 ///
@@ -16,7 +18,8 @@ use std::os::windows::io::{
 ///
 /// This uses `repr(transparent)` and has the representation of a host file
 /// descriptor, so it can be used in FFI in places where a file descriptor is
-/// passed as an argument and is not captured or consumed.
+/// passed as an argument, it is not captured or consumed, and it never has
+/// the value `-1`.
 #[cfg(unix)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
@@ -36,8 +39,9 @@ pub struct BorrowedFd<'owned> {
 /// owns the handle.
 ///
 /// This uses `repr(transparent)` and has the representation of a host handle,
-/// so it can be used in FFI in places where a handle is passed as an argument
-/// and is not captured or consumed.
+/// so it can be used in FFI in places where a handle is passed as an argument,
+/// it is not captured or consumed, and it never has the value
+/// [`INVALID_HANDLE_VALUE`].
 #[cfg(windows)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
@@ -52,8 +56,9 @@ pub struct BorrowedHandle<'owned> {
 /// owns the socket.
 ///
 /// This uses `repr(transparent)` and has the representation of a host socket,
-/// so it can be used in FFI in places where a socket is passed as an argument
-/// and is not captured or consumed.
+/// so it can be used in FFI in places where a socket is passed as an argument,
+/// it is not captured or consumed, and it never has the value
+/// [`INVALID_SOCKET`].
 #[cfg(windows)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
@@ -65,6 +70,11 @@ pub struct BorrowedSocket<'owned> {
 /// An owned file descriptor.
 ///
 /// This closes the file descriptor on drop.
+///
+/// This uses `repr(transparent)` and has the representation of a host file
+/// descriptor, so it can be used in FFI in places where a file descriptor is
+/// passed as a consumed argument or returned as an owned value, and it never
+/// has the value `-1`.
 #[cfg(unix)]
 #[repr(transparent)]
 #[rustc_layout_scalar_valid_range_start(0)]
@@ -79,6 +89,11 @@ pub struct OwnedFd {
 /// An owned handle.
 ///
 /// This closes the handle on drop.
+///
+/// This uses `repr(transparent)` and has the representation of a host handle,
+/// so it can be used in FFI in places where a handle is passed as a consumed
+/// argument or returned as an owned value, and it never has the value
+/// [`INVALID_HANDLE_VALUE`].
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OwnedHandle {
@@ -88,6 +103,11 @@ pub struct OwnedHandle {
 /// An owned socket.
 ///
 /// This closes the socket on drop.
+///
+/// This uses `repr(transparent)` and has the representation of a host socket,
+/// so it can be used in FFI in places where a socket is passed as a consumed
+/// argument or returned as an owned value, and it never has the value
+/// [`INVALID_SOCKET`].
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OwnedSocket {
@@ -102,7 +122,8 @@ pub struct OwnedSocket {
 ///
 /// This uses `repr(transparent)` and has the representation of a host file
 /// descriptor, so it can be used in FFI in places where a file descriptor is
-/// returned and which may fail.
+/// passed as a consumed argument or returned as an own value, or it is
+/// `-1` indicating an error or an otherwise absent value.
 #[cfg(unix)]
 #[repr(transparent)]
 pub struct OptionFd {
@@ -115,8 +136,9 @@ pub struct OptionFd {
 /// If this holds an owned handle, it closes the handle on drop.
 ///
 /// This uses `repr(transparent)` and has the representation of a host handle,
-/// so it can be used in FFI in places where a handle is returned and which may
-/// fail.
+/// so it can be used in FFI in places where a handle is passed as a consumed
+/// argument or returned as an owned value, or it is [`INVALID_HANDLE_VALUE`]
+/// indicating an error or an otherwise absent value.
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OptionHandle {
@@ -129,8 +151,9 @@ pub struct OptionHandle {
 /// If this holds an owned socket, it closes the socket on drop.
 ///
 /// This uses `repr(transparent)` and has the representation of a host socket,
-/// so it can be used in FFI in places where a socket is returned and which may
-/// fail.
+/// so it can be used in FFI in places where a socket is passed as a consumed
+/// argument or returned as an owned value, or it is [`INVALID_SOCKET`]
+/// indicating an error or an otherwise absent value.
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OptionSocket {
@@ -162,7 +185,7 @@ impl<'owned> BorrowedHandle<'owned> {
     /// [`INVALID_HANDLE_VALUE`].
     #[inline]
     pub unsafe fn borrow_raw_handle(raw: RawHandle) -> Self {
-        debug_assert_ne!(raw, winapi::um::handleapi::INVALID_HANDLE_VALUE);
+        debug_assert_ne!(raw, INVALID_HANDLE_VALUE);
         Self {
             raw,
             _phantom: PhantomData,
@@ -179,7 +202,7 @@ impl<'owned> BorrowedSocket<'owned> {
     /// [`INVALID_SOCKET`].
     #[inline]
     pub unsafe fn borrow_raw_socket(raw: RawSocket) -> Self {
-        debug_assert_ne!(raw, winapi::um::winsock2::INVALID_SOCKET as RawSocket);
+        debug_assert_ne!(raw, INVALID_SOCKET as RawSocket);
         Self {
             raw,
             _phantom: PhantomData,
@@ -202,7 +225,7 @@ impl OptionHandle {
     #[inline]
     pub const fn none() -> Self {
         Self {
-            raw: winapi::um::handleapi::INVALID_HANDLE_VALUE,
+            raw: INVALID_HANDLE_VALUE,
         }
     }
 }
@@ -213,7 +236,7 @@ impl OptionSocket {
     /// Return an empty `OptionSocket` with no resource.
     pub const fn none() -> Self {
         Self {
-            raw: winapi::um::winsock2::INVALID_SOCKET,
+            raw: INVALID_SOCKET,
         }
     }
 }
@@ -242,7 +265,7 @@ impl TryFrom<OptionHandle> for OwnedHandle {
     fn try_from(option: OptionHandle) -> Result<Self, ()> {
         let raw = option.raw;
         mem::forget(option);
-        if raw != winapi::um::handleapi::INVALID_HANDLE_VALUE {
+        if raw != INVALID_HANDLE_VALUE {
             Ok(Self { raw })
         } else {
             Err(())
@@ -258,7 +281,7 @@ impl TryFrom<OptionSocket> for OwnedSocket {
     fn try_from(option: OptionSocket) -> Result<Self, ()> {
         let raw = option.raw;
         mem::forget(option);
-        if raw != winapi::um::winsock2::INVALID_SOCKET {
+        if raw != INVALID_SOCKET {
             Ok(Self {
                 raw: raw as RawSocket,
             })
