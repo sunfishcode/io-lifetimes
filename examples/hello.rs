@@ -1,9 +1,12 @@
-use std::convert::TryInto;
+// Don't lint about `Option<OwnedFd>` apperaing in an FFI signature. In the
+// future rustc will be modified to recognize this case.
+#![allow(improper_ctypes)]
+
 use std::fs::File;
 use std::io::{self, Write};
 
 #[cfg(unix)]
-use io_experiment::{AsBorrowedFd, BorrowedFd, FromOwnedFd, IntoOwnedFd, OptionFd, OwnedFd};
+use io_experiment::{AsBorrowedFd, BorrowedFd, FromOwnedFd, IntoOwnedFd, OwnedFd};
 
 #[cfg(windows)]
 use io_experiment::{
@@ -15,7 +18,7 @@ use io_experiment::{
 use libc::{c_char, c_int, c_void, size_t, ssize_t};
 
 #[cfg(windows)]
-use std::ptr::null_mut;
+use std::{convert::TryInto, ptr::null_mut};
 #[cfg(windows)]
 use winapi::{
     shared::minwindef::{BOOL, DWORD, FALSE, LPCVOID, LPDWORD},
@@ -28,7 +31,7 @@ use winapi::{
 /// Declare a few FFI functions ourselves, to show off the FFI ergonomics.
 #[cfg(unix)]
 extern "C" {
-    pub fn open(pathname: *const c_char, flags: c_int, ...) -> OptionFd;
+    pub fn open(pathname: *const c_char, flags: c_int, ...) -> Option<OwnedFd>;
     pub fn write(fd: BorrowedFd, ptr: *const c_void, size: size_t) -> ssize_t;
     pub fn close(fd: OwnedFd) -> c_int;
 }
@@ -60,11 +63,10 @@ extern "C" {
 #[cfg(unix)]
 fn main() -> io::Result<()> {
     let fd = unsafe {
-        // Open a file, which returns an `OptionFd`, which we can fallibly
-        // convert into an `OwnedFile`.
+        // Open a file, which returns an `Option<OwnedFd>`, which we can
+        // maybe convert into an `OwnedFile`.
         let fd: OwnedFd = open("/dev/stdout\0".as_ptr() as *const _, libc::O_WRONLY)
-            .try_into()
-            .map_err(|()| io::Error::last_os_error())?;
+            .ok_or_else(io::Error::last_os_error)?;
 
         // Borrow the fd to write to it.
         let result = write(

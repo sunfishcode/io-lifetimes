@@ -41,12 +41,9 @@ pub use traits::{
 };
 
 #[cfg(any(unix, target_os = "wasi"))]
-pub use types::{BorrowedFd, OptionFd, OwnedFd};
+pub use types::{BorrowedFd, OwnedFd};
 #[cfg(windows)]
-pub use types::{
-    BorrowedHandle, BorrowedSocket, OptionFileHandle, OptionHandle, OptionSocket, OwnedHandle,
-    OwnedSocket,
-};
+pub use types::{BorrowedHandle, BorrowedSocket, OptionFileHandle, OwnedHandle, OwnedSocket};
 
 pub use portability::{
     AsBorrowedFilelike, AsBorrowedSocketlike, BorrowedFilelike, BorrowedSocketlike,

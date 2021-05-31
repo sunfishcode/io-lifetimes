@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 use std::marker::PhantomData;
 use std::mem::forget;
 #[cfg(unix)]
@@ -7,12 +6,13 @@ use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 #[cfg(windows)]
 use std::{
+    convert::TryFrom,
     ffi::c_void,
     os::windows::io::{
         AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
         RawHandle, RawSocket,
     },
-    ptr::{null_mut, NonNull},
+    ptr::NonNull,
 };
 #[cfg(windows)]
 use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
@@ -148,45 +148,8 @@ pub struct OwnedSocket {
     raw: RawSocket,
 }
 
-/// Either an owned file descriptor, or an empty sentry value which typically
-/// indicates an error.
-///
-/// If this holds an owned file descriptor, it closes the file descriptor on
-/// drop.
-///
-/// This uses `repr(transparent)` and has the representation of a host file
-/// descriptor, so it can be used in FFI in places where a file descriptor is
-/// passed as a consumed argument or returned as an own value, or it is `-1`
-/// indicating an error or an otherwise absent value.
-#[cfg(any(unix, target_os = "wasi"))]
-#[repr(transparent)]
-pub struct OptionFd {
-    raw: RawFd,
-}
-
-/// Either an owned handle, or an empty sentry value which typically indicates
-/// an error.
-///
-/// If this holds an owned handle, it closes the handle on drop.
-///
-/// This uses `repr(transparent)` and has the representation of a host handle,
-/// so it can be used in FFI in places where a handle is passed as a consumed
-/// argument or returned as an owned value, or it is null indicating an error
-/// or an otherwise absent value.
-///
-/// Note that it *may* have the value [`INVALID_HANDLE_VALUE`]. Use
-/// [`OptionFileHandle`] for values where `INVALID_HANDLE_VALUE` is used to
-/// report errors. See [here] for the full story.
-///
-/// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
-#[cfg(windows)]
-#[repr(transparent)]
-pub struct OptionHandle {
-    raw: RawHandle,
-}
-
-/// Similar to `OptionHandle`, but intended for use in FFI interfaces where
-/// [`INVALID_HANDLE_VALUE`] is used as the sentry value.
+/// Similar to `Option<OwnedHandle>`, but intended for use in FFI interfaces
+/// where [`INVALID_HANDLE_VALUE`] is used as the sentry value.
 ///
 /// If this holds an owned handle, it closes the handle on drop.
 ///
@@ -198,21 +161,6 @@ pub struct OptionHandle {
 #[repr(transparent)]
 pub struct OptionFileHandle {
     raw: NonNull<c_void>,
-}
-
-/// Either an owned socket, or an empty sentry value which typically indicates
-/// an error.
-///
-/// If this holds an owned socket, it closes the socket on drop.
-///
-/// This uses `repr(transparent)` and has the representation of a host socket,
-/// so it can be used in FFI in places where a socket is passed as a consumed
-/// argument or returned as an owned value, or it is [`INVALID_SOCKET`]
-/// indicating an error or an otherwise absent value.
-#[cfg(windows)]
-#[repr(transparent)]
-pub struct OptionSocket {
-    raw: RawSocket,
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -270,26 +218,6 @@ impl BorrowedSocket<'_> {
     }
 }
 
-#[cfg(any(unix, target_os = "wasi"))]
-impl OptionFd {
-    /// Return an empty `OptionFd` with no resource.
-    #[inline]
-    pub const fn none() -> Self {
-        Self {
-            raw: -1_i32 as RawFd,
-        }
-    }
-}
-
-#[cfg(windows)]
-impl OptionHandle {
-    /// Return an empty `OptionHandle` with no resource.
-    #[inline]
-    pub const fn none() -> Self {
-        Self { raw: null_mut() }
-    }
-}
-
 #[cfg(windows)]
 impl OptionFileHandle {
     /// Return an empty `OptionFileHandle` with no resource.
@@ -297,49 +225,6 @@ impl OptionFileHandle {
     pub const fn none() -> Self {
         let non_null = unsafe { NonNull::new_unchecked(INVALID_HANDLE_VALUE) };
         Self { raw: non_null }
-    }
-}
-
-#[cfg(windows)]
-impl OptionSocket {
-    #[inline]
-    /// Return an empty `OptionSocket` with no resource.
-    pub const fn none() -> Self {
-        Self {
-            raw: INVALID_SOCKET as RawSocket,
-        }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl TryFrom<OptionFd> for OwnedFd {
-    type Error = ();
-
-    #[inline]
-    fn try_from(option: OptionFd) -> Result<Self, ()> {
-        let raw = option.raw;
-        forget(option);
-        if raw != -1_i32 as RawFd {
-            unsafe { Ok(Self { raw }) }
-        } else {
-            Err(())
-        }
-    }
-}
-
-#[cfg(windows)]
-impl TryFrom<OptionHandle> for OwnedHandle {
-    type Error = ();
-
-    #[inline]
-    fn try_from(option: OptionHandle) -> Result<Self, ()> {
-        let raw = option.raw;
-        forget(option);
-        if let Some(non_null) = NonNull::new(raw) {
-            Ok(Self { raw: non_null })
-        } else {
-            Err(())
-        }
     }
 }
 
@@ -360,55 +245,9 @@ impl TryFrom<OptionFileHandle> for OwnedHandle {
 }
 
 #[cfg(windows)]
-impl TryFrom<OptionSocket> for OwnedSocket {
-    type Error = ();
-
-    #[inline]
-    fn try_from(option: OptionSocket) -> Result<Self, ()> {
-        let raw = option.raw as RawSocket;
-        forget(option);
-        if raw != INVALID_SOCKET as RawSocket {
-            unsafe { Ok(Self { raw }) }
-        } else {
-            Err(())
-        }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl From<OwnedFd> for OptionFd {
-    #[inline]
-    fn from(owned: OwnedFd) -> Self {
-        let raw = owned.raw;
-        forget(owned);
-        Self { raw }
-    }
-}
-
-#[cfg(windows)]
-impl From<OwnedHandle> for OptionHandle {
-    #[inline]
-    fn from(owned: OwnedHandle) -> Self {
-        let raw = owned.raw.as_ptr();
-        forget(owned);
-        Self { raw }
-    }
-}
-
-#[cfg(windows)]
 impl From<OwnedHandle> for OptionFileHandle {
     #[inline]
     fn from(owned: OwnedHandle) -> Self {
-        let raw = owned.raw;
-        forget(owned);
-        Self { raw }
-    }
-}
-
-#[cfg(windows)]
-impl From<OwnedSocket> for OptionSocket {
-    #[inline]
-    fn from(owned: OwnedSocket) -> Self {
         let raw = owned.raw;
         forget(owned);
         Self { raw }
@@ -540,34 +379,6 @@ impl FromRawSocket for OwnedSocket {
     }
 }
 
-#[cfg(any(unix, target_os = "wasi"))]
-impl FromRawFd for OptionFd {
-    /// Constructs a new instance of `Self` from the given raw file descriptor.
-    ///
-    /// # Safety
-    ///
-    /// The resource pointed to by `raw` must be either open and otherwise
-    /// unowned, or `-1`.
-    #[inline]
-    unsafe fn from_raw_fd(raw: RawFd) -> Self {
-        Self { raw }
-    }
-}
-
-#[cfg(windows)]
-impl FromRawHandle for OptionHandle {
-    /// Constructs a new instance of `Self` from the given raw handle.
-    ///
-    /// # Safety
-    ///
-    /// The resource pointed to by `raw` must be either open and otherwise
-    /// unowned, or null.
-    #[inline]
-    unsafe fn from_raw_handle(raw: RawHandle) -> Self {
-        Self { raw }
-    }
-}
-
 #[cfg(windows)]
 impl FromRawHandle for OptionFileHandle {
     /// Constructs a new instance of `Self` from the given raw handle.
@@ -586,20 +397,6 @@ impl FromRawHandle for OptionFileHandle {
         Self {
             raw: NonNull::new_unchecked(raw),
         }
-    }
-}
-
-#[cfg(windows)]
-impl FromRawSocket for OptionSocket {
-    /// Constructs a new instance of `Self` from the given raw socket.
-    ///
-    /// # Safety
-    ///
-    /// The resource pointed to by `raw` must be either open and otherwise
-    /// unowned, or [`INVALID_SOCKET`].
-    #[inline]
-    unsafe fn from_raw_socket(raw: RawSocket) -> Self {
-        Self { raw }
     }
 }
 
@@ -633,42 +430,12 @@ impl Drop for OwnedSocket {
     }
 }
 
-#[cfg(any(unix, target_os = "wasi"))]
-impl Drop for OptionFd {
-    #[inline]
-    fn drop(&mut self) {
-        unsafe {
-            let _ = libc::close(self.raw as libc::c_int);
-        }
-    }
-}
-
-#[cfg(windows)]
-impl Drop for OptionHandle {
-    #[inline]
-    fn drop(&mut self) {
-        unsafe {
-            let _ = winapi::um::handleapi::CloseHandle(self.raw);
-        }
-    }
-}
-
 #[cfg(windows)]
 impl Drop for OptionFileHandle {
     #[inline]
     fn drop(&mut self) {
         unsafe {
             let _ = winapi::um::handleapi::CloseHandle(self.raw.as_ptr());
-        }
-    }
-}
-
-#[cfg(windows)]
-impl Drop for OptionSocket {
-    #[inline]
-    fn drop(&mut self) {
-        unsafe {
-            let _ = winapi::um::winsock2::closesocket(self.raw as winapi::um::winsock2::SOCKET);
         }
     }
 }
