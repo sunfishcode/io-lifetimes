@@ -214,7 +214,7 @@ pub struct OptionSocket {
 }
 
 #[cfg(unix)]
-impl<'owned> BorrowedFd<'owned> {
+impl BorrowedFd<'_> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
@@ -230,7 +230,7 @@ impl<'owned> BorrowedFd<'owned> {
 }
 
 #[cfg(windows)]
-impl<'owned> BorrowedHandle<'owned> {
+impl BorrowedHandle<'_> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
@@ -246,7 +246,7 @@ impl<'owned> BorrowedHandle<'owned> {
 }
 
 #[cfg(windows)]
-impl<'owned> BorrowedSocket<'owned> {
+impl BorrowedSocket<'_> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
@@ -415,7 +415,7 @@ impl From<OwnedSocket> for OptionSocket {
 }
 
 #[cfg(unix)]
-impl<'owned> AsRawFd for BorrowedFd<'owned> {
+impl AsRawFd for BorrowedFd<'_> {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
         self.raw
@@ -423,7 +423,7 @@ impl<'owned> AsRawFd for BorrowedFd<'owned> {
 }
 
 #[cfg(windows)]
-impl<'owned> AsRawHandle for BorrowedHandle<'owned> {
+impl AsRawHandle for BorrowedHandle<'_> {
     #[inline]
     fn as_raw_handle(&self) -> RawHandle {
         self.raw.as_ptr()
@@ -431,7 +431,7 @@ impl<'owned> AsRawHandle for BorrowedHandle<'owned> {
 }
 
 #[cfg(windows)]
-impl<'owned> AsRawSocket for BorrowedSocket<'owned> {
+impl AsRawSocket for BorrowedSocket<'_> {
     #[inline]
     fn as_raw_socket(&self) -> RawSocket {
         self.raw

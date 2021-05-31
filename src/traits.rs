@@ -16,21 +16,21 @@ use std::os::windows::io::{
 #[cfg(unix)]
 pub trait AsBorrowedFd {
     /// Extracts the file descriptor.
-    fn as_borrowed_fd(&self) -> BorrowedFd;
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_>;
 }
 
 /// A trait to borrow the handle from an underlying object.
 #[cfg(windows)]
 pub trait AsBorrowedHandle {
     /// Extracts the handle.
-    fn as_borrowed_handle(&self) -> BorrowedHandle;
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_>;
 }
 
 /// A trait to borrow the socket from an underlying object.
 #[cfg(windows)]
 pub trait AsBorrowedSocket {
     /// Extracts the socket.
-    fn as_borrowed_socket(&self) -> BorrowedSocket;
+    fn as_borrowed_socket(&self) -> BorrowedSocket<'_>;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership
@@ -80,25 +80,25 @@ pub trait FromOwnedSocket {
 }
 
 #[cfg(unix)]
-impl<'owned> AsBorrowedFd for BorrowedFd<'owned> {
+impl AsBorrowedFd for BorrowedFd<'_> {
     #[inline]
-    fn as_borrowed_fd(&self) -> BorrowedFd {
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl<'owned> AsBorrowedHandle for BorrowedHandle<'owned> {
+impl AsBorrowedHandle for BorrowedHandle<'_> {
     #[inline]
-    fn as_borrowed_handle(&self) -> BorrowedHandle {
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(windows)]
-impl<'owned> AsBorrowedSocket for BorrowedSocket<'owned> {
+impl AsBorrowedSocket for BorrowedSocket<'_> {
     #[inline]
-    fn as_borrowed_socket(&self) -> BorrowedSocket {
+    fn as_borrowed_socket(&self) -> BorrowedSocket<'_> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -106,7 +106,7 @@ impl<'owned> AsBorrowedSocket for BorrowedSocket<'owned> {
 #[cfg(unix)]
 impl AsBorrowedFd for OwnedFd {
     #[inline]
-    fn as_borrowed_fd(&self) -> BorrowedFd {
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -114,7 +114,7 @@ impl AsBorrowedFd for OwnedFd {
 #[cfg(windows)]
 impl AsBorrowedHandle for OwnedHandle {
     #[inline]
-    fn as_borrowed_handle(&self) -> BorrowedHandle {
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -122,7 +122,7 @@ impl AsBorrowedHandle for OwnedHandle {
 #[cfg(windows)]
 impl AsBorrowedSocket for OwnedSocket {
     #[inline]
-    fn as_borrowed_socket(&self) -> BorrowedSocket {
+    fn as_borrowed_socket(&self) -> BorrowedSocket<'_> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -210,7 +210,7 @@ impl FromOwnedSocket for OptionSocket {
 #[cfg(unix)]
 impl AsBorrowedFd for std::fs::File {
     #[inline]
-    fn as_borrowed_fd(&self) -> BorrowedFd {
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -218,7 +218,7 @@ impl AsBorrowedFd for std::fs::File {
 #[cfg(windows)]
 impl AsBorrowedHandle for std::fs::File {
     #[inline]
-    fn as_borrowed_handle(&self) -> BorrowedHandle {
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -258,7 +258,7 @@ impl FromOwnedHandle for std::fs::File {
 #[cfg(unix)]
 impl AsBorrowedFd for std::net::TcpStream {
     #[inline]
-    fn as_borrowed_fd(&self) -> BorrowedFd {
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -266,7 +266,7 @@ impl AsBorrowedFd for std::net::TcpStream {
 #[cfg(windows)]
 impl AsBorrowedSocket for std::net::TcpStream {
     #[inline]
-    fn as_borrowed_socket(&self) -> BorrowedSocket {
+    fn as_borrowed_socket(&self) -> BorrowedSocket<'_> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
