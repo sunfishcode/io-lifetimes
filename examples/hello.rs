@@ -69,7 +69,7 @@ fn main() -> io::Result<()> {
         // Borrow the fd to write to it.
         let result = write(
             fd.as_borrowed_fd(),
-            "hello, world\n\0".as_ptr() as *const _,
+            "hello, world\n".as_ptr() as *const _,
             13,
         );
         match result {
@@ -87,7 +87,7 @@ fn main() -> io::Result<()> {
 
     // We can borrow a `BorrowedFd` from a `File`.
     unsafe {
-        let result = write(file.as_borrowed_fd(), "sup?\n\0".as_ptr() as *const _, 5);
+        let result = write(file.as_borrowed_fd(), "sup?\n".as_ptr() as *const _, 5);
         match result {
             -1 => return Err(io::Error::last_os_error()),
             5 => (),
@@ -130,7 +130,7 @@ fn main() -> io::Result<()> {
         let mut number_of_bytes_written: DWORD = 0;
         let result = WriteFile(
             handle.as_borrowed_handle(),
-            "hello, world\n\0".as_ptr() as *const _,
+            "hello, world\n".as_ptr() as *const _,
             13,
             &mut number_of_bytes_written as *mut _,
             ptr::null_mut(),
@@ -153,7 +153,7 @@ fn main() -> io::Result<()> {
         let mut number_of_bytes_written: DWORD = 0;
         let result = WriteFile(
             file.as_borrowed_handle(),
-            "sup?\n\0".as_ptr() as *const _,
+            "sup?\n".as_ptr() as *const _,
             5,
             &mut number_of_bytes_written as *mut _,
             ptr::null_mut(),
