@@ -217,6 +217,8 @@ pub struct OptionSocket {
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl BorrowedFd<'_> {
+    /// Return a `BorrowedFd` holding the given raw file descriptor.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
@@ -233,6 +235,8 @@ impl BorrowedFd<'_> {
 
 #[cfg(windows)]
 impl BorrowedHandle<'_> {
+    /// Return a `BorrowedHandle` holding the given raw handle.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
@@ -249,6 +253,8 @@ impl BorrowedHandle<'_> {
 
 #[cfg(windows)]
 impl BorrowedSocket<'_> {
+    /// Return a `BorrowedSocket` holding the given raw socket.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
@@ -489,6 +495,8 @@ impl IntoRawSocket for OwnedSocket {
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl FromRawFd for OwnedFd {
+    /// Constructs a new instance of `Self` from the given raw file descriptor.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must be open and suitable for assuming
@@ -502,6 +510,8 @@ impl FromRawFd for OwnedFd {
 
 #[cfg(windows)]
 impl FromRawHandle for OwnedHandle {
+    /// Constructs a new instance of `Self` from the given raw handle.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must be open and suitable for assuming
@@ -517,6 +527,8 @@ impl FromRawHandle for OwnedHandle {
 
 #[cfg(windows)]
 impl FromRawSocket for OwnedSocket {
+    /// Constructs a new instance of `Self` from the given raw socket.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must be open and suitable for assuming
@@ -530,6 +542,8 @@ impl FromRawSocket for OwnedSocket {
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl FromRawFd for OptionFd {
+    /// Constructs a new instance of `Self` from the given raw file descriptor.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must be either open and otherwise
@@ -542,6 +556,8 @@ impl FromRawFd for OptionFd {
 
 #[cfg(windows)]
 impl FromRawHandle for OptionHandle {
+    /// Constructs a new instance of `Self` from the given raw handle.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must be either open and otherwise
@@ -554,6 +570,8 @@ impl FromRawHandle for OptionHandle {
 
 #[cfg(windows)]
 impl FromRawHandle for OptionFileHandle {
+    /// Constructs a new instance of `Self` from the given raw handle.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must be either open and otherwise
@@ -573,6 +591,8 @@ impl FromRawHandle for OptionFileHandle {
 
 #[cfg(windows)]
 impl FromRawSocket for OptionSocket {
+    /// Constructs a new instance of `Self` from the given raw socket.
+    ///
     /// # Safety
     ///
     /// The resource pointed to by `raw` must be either open and otherwise
