@@ -15,7 +15,7 @@ use io_experiment::{
 use libc::{c_char, c_int, c_void, size_t, ssize_t};
 
 #[cfg(windows)]
-use std::ptr;
+use std::ptr::null_mut;
 #[cfg(windows)]
 use winapi::{
     shared::minwindef::{BOOL, DWORD, FALSE, LPCVOID, LPDWORD},
@@ -115,13 +115,13 @@ fn main() -> io::Result<()> {
         // Open a file, which returns an `OptionFileHandle`, which we can fallibly
         // convert into an `OwnedFile`.
         let handle: OwnedHandle = CreateFileW(
-            ['C' as u16, 'O' as u16, 'N' as u16, 0].as_ptr(),
+            ['C' as u16, 'O' as _, 'N' as _, 0].as_ptr(),
             FILE_GENERIC_WRITE,
             0,
-            ptr::null_mut(),
+            null_mut(),
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            ptr::null_mut(),
+            null_mut(),
         )
         .try_into()
         .map_err(|()| io::Error::last_os_error())?;
@@ -133,7 +133,7 @@ fn main() -> io::Result<()> {
             "hello, world\n".as_ptr() as *const _,
             13,
             &mut number_of_bytes_written as *mut _,
-            ptr::null_mut(),
+            null_mut(),
         );
         match (result, number_of_bytes_written) {
             (FALSE, _) => return Err(io::Error::last_os_error()),
@@ -156,7 +156,7 @@ fn main() -> io::Result<()> {
             "sup?\n".as_ptr() as *const _,
             5,
             &mut number_of_bytes_written as *mut _,
-            ptr::null_mut(),
+            null_mut(),
         );
         match (result, number_of_bytes_written) {
             (FALSE, _) => return Err(io::Error::last_os_error()),

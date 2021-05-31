@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 use std::marker::PhantomData;
-use std::mem;
+use std::mem::forget;
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 #[cfg(windows)]
@@ -34,7 +34,7 @@ use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
 #[rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)]
 pub struct BorrowedFd<'owned> {
     raw: RawFd,
-    _phantom: PhantomData<&'owned ()>,
+    _phantom: PhantomData<&'owned OwnedFd>,
 }
 
 /// A borrowed handle.
@@ -55,7 +55,7 @@ pub struct BorrowedFd<'owned> {
 #[repr(transparent)]
 pub struct BorrowedHandle<'owned> {
     raw: NonNull<c_void>,
-    _phantom: PhantomData<&'owned ()>,
+    _phantom: PhantomData<&'owned OwnedHandle>,
 }
 
 /// A borrowed socket.
@@ -82,7 +82,7 @@ pub struct BorrowedHandle<'owned> {
 )]
 pub struct BorrowedSocket<'owned> {
     raw: RawSocket,
-    _phantom: PhantomData<&'owned ()>,
+    _phantom: PhantomData<&'owned OwnedSocket>,
 }
 
 /// An owned file descriptor.
@@ -285,11 +285,8 @@ impl OptionFileHandle {
     /// Return an empty `OptionFileHandle` with no resource.
     #[inline]
     pub const fn none() -> Self {
-        unsafe {
-            Self {
-                raw: NonNull::new_unchecked(INVALID_HANDLE_VALUE),
-            }
-        }
+        let non_null = unsafe { NonNull::new_unchecked(INVALID_HANDLE_VALUE) };
+        Self { raw: non_null }
     }
 }
 
@@ -311,7 +308,7 @@ impl TryFrom<OptionFd> for OwnedFd {
     #[inline]
     fn try_from(option: OptionFd) -> Result<Self, ()> {
         let raw = option.raw;
-        mem::forget(option);
+        forget(option);
         if raw != -1 {
             unsafe { Ok(Self { raw }) }
         } else {
@@ -327,7 +324,7 @@ impl TryFrom<OptionHandle> for OwnedHandle {
     #[inline]
     fn try_from(option: OptionHandle) -> Result<Self, ()> {
         let raw = option.raw;
-        mem::forget(option);
+        forget(option);
         if let Some(non_null) = NonNull::new(raw) {
             Ok(Self { raw: non_null })
         } else {
@@ -343,7 +340,7 @@ impl TryFrom<OptionFileHandle> for OwnedHandle {
     #[inline]
     fn try_from(option: OptionFileHandle) -> Result<Self, ()> {
         let raw = option.raw;
-        mem::forget(option);
+        forget(option);
         if raw.as_ptr() != INVALID_HANDLE_VALUE {
             Ok(Self { raw })
         } else {
@@ -358,14 +355,10 @@ impl TryFrom<OptionSocket> for OwnedSocket {
 
     #[inline]
     fn try_from(option: OptionSocket) -> Result<Self, ()> {
-        let raw = option.raw;
-        mem::forget(option);
-        if raw != INVALID_SOCKET {
-            unsafe {
-                Ok(Self {
-                    raw: raw as RawSocket,
-                })
-            }
+        let raw = option.raw as RawSocket;
+        forget(option);
+        if raw != INVALID_SOCKET as RawSocket {
+            unsafe { Ok(Self { raw }) }
         } else {
             Err(())
         }
@@ -377,7 +370,7 @@ impl From<OwnedFd> for OptionFd {
     #[inline]
     fn from(owned: OwnedFd) -> Self {
         let raw = owned.raw;
-        mem::forget(owned);
+        forget(owned);
         Self { raw }
     }
 }
@@ -387,7 +380,7 @@ impl From<OwnedHandle> for OptionHandle {
     #[inline]
     fn from(owned: OwnedHandle) -> Self {
         let raw = owned.raw.as_ptr();
-        mem::forget(owned);
+        forget(owned);
         Self { raw }
     }
 }
@@ -397,7 +390,7 @@ impl From<OwnedHandle> for OptionFileHandle {
     #[inline]
     fn from(owned: OwnedHandle) -> Self {
         let raw = owned.raw;
-        mem::forget(owned);
+        forget(owned);
         Self { raw }
     }
 }
@@ -406,11 +399,9 @@ impl From<OwnedHandle> for OptionFileHandle {
 impl From<OwnedSocket> for OptionSocket {
     #[inline]
     fn from(owned: OwnedSocket) -> Self {
-        let raw = owned.raw;
-        mem::forget(owned);
-        Self {
-            raw: raw as winapi::um::winsock2::SOCKET,
-        }
+        let raw = owned.raw as winapi::um::winsock2::SOCKET;
+        forget(owned);
+        Self { raw }
     }
 }
 
@@ -467,7 +458,7 @@ impl IntoRawFd for OwnedFd {
     #[inline]
     fn into_raw_fd(self) -> RawFd {
         let raw = self.raw;
-        mem::forget(self);
+        forget(self);
         raw
     }
 }
@@ -477,7 +468,7 @@ impl IntoRawHandle for OwnedHandle {
     #[inline]
     fn into_raw_handle(self) -> RawHandle {
         let raw = self.raw.as_ptr();
-        mem::forget(self);
+        forget(self);
         raw
     }
 }
@@ -487,7 +478,7 @@ impl IntoRawSocket for OwnedSocket {
     #[inline]
     fn into_raw_socket(self) -> RawSocket {
         let raw = self.raw;
-        mem::forget(self);
+        forget(self);
         raw
     }
 }
@@ -584,9 +575,8 @@ impl FromRawSocket for OptionSocket {
     /// unowned, or [`INVALID_SOCKET`].
     #[inline]
     unsafe fn from_raw_socket(raw: RawSocket) -> Self {
-        Self {
-            raw: raw as winapi::um::winsock2::SOCKET,
-        }
+        let raw = raw as winapi::um::winsock2::SOCKET;
+        Self { raw }
     }
 }
 
