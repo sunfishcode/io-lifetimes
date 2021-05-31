@@ -65,6 +65,16 @@ pub trait IntoOwnedSocket {
 pub trait FromOwnedFd {
     /// Constructs a new instance of `Self` from the given file descriptor.
     fn from_owned_fd(owned: OwnedFd) -> Self;
+
+    /// Constructs a new instance of `Self` from the given file descriptor
+    /// converted from `into_owned`.
+    #[inline]
+    fn from_into_owned_fd<Owned: IntoOwnedFd>(into_owned: Owned) -> Self
+    where
+        Self: Sized,
+    {
+        Self::from_owned_fd(into_owned.into_owned_fd())
+    }
 }
 
 /// A trait to express the ability to construct an object from a handle.
@@ -72,6 +82,16 @@ pub trait FromOwnedFd {
 pub trait FromOwnedHandle {
     /// Constructs a new instance of `Self` from the given handle.
     fn from_owned_handle(owned: OwnedHandle) -> Self;
+
+    /// Constructs a new instance of `Self` from the given handle
+    /// converted from `into_owned`.
+    #[inline]
+    fn from_into_owned_handle<Owned: IntoOwnedHandle>(into_owned: Owned) -> Self
+    where
+        Self: Sized,
+    {
+        Self::from_owned_handle(into_owned.into_owned_handle())
+    }
 }
 
 /// A trait to express the ability to construct an object from a socket.
@@ -79,6 +99,16 @@ pub trait FromOwnedHandle {
 pub trait FromOwnedSocket {
     /// Constructs a new instance of `Self` from the given socket.
     fn from_owned_socket(owned: OwnedSocket) -> Self;
+
+    /// Constructs a new instance of `Self` from the given socket
+    /// converted from `into_owned`.
+    #[inline]
+    fn from_into_owned_socket<Owned: IntoOwnedSocket>(into_owned: Owned) -> Self
+    where
+        Self: Sized,
+    {
+        Self::from_owned_socket(into_owned.into_owned_socket())
+    }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
