@@ -27,6 +27,7 @@
 #![feature(rustc_attrs)]
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
+mod portability;
 mod traits;
 mod types;
 
@@ -44,4 +45,10 @@ pub use types::{BorrowedFd, OptionFd, OwnedFd};
 pub use types::{
     BorrowedHandle, BorrowedSocket, OptionFileHandle, OptionHandle, OptionSocket, OwnedHandle,
     OwnedSocket,
+};
+
+pub use portability::{
+    AsBorrowedFilelike, AsBorrowedSocketlike, BorrowedFilelike, BorrowedSocketlike,
+    FromOwnedFilelike, FromOwnedSocketlike, IntoOwnedFilelike, IntoOwnedSocketlike, OwnedFilelike,
+    OwnedSocketlike,
 };
