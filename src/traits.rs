@@ -307,3 +307,379 @@ impl FromOwnedSocket for std::net::TcpStream {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::net::TcpListener {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedSocket for std::net::TcpListener {
+    #[inline]
+    fn as_borrowed_socket(&self) -> BorrowedSocket<'_> {
+        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl IntoOwnedFd for std::net::TcpListener {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoOwnedSocket for std::net::TcpListener {
+    #[inline]
+    fn into_owned_socket(self) -> OwnedSocket {
+        unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl FromOwnedFd for std::net::TcpListener {
+    #[inline]
+    fn from_owned_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl FromOwnedSocket for std::net::TcpListener {
+    #[inline]
+    fn from_owned_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::net::UdpSocket {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedSocket for std::net::UdpSocket {
+    #[inline]
+    fn as_borrowed_socket(&self) -> BorrowedSocket<'_> {
+        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl IntoOwnedFd for std::net::UdpSocket {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoOwnedSocket for std::net::UdpSocket {
+    #[inline]
+    fn into_owned_socket(self) -> OwnedSocket {
+        unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl FromOwnedFd for std::net::UdpSocket {
+    #[inline]
+    fn from_owned_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl FromOwnedSocket for std::net::UdpSocket {
+    #[inline]
+    fn from_owned_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::io::Stdin {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::io::Stdin {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::io::StdinLock<'_> {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::io::StdinLock<'_> {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::io::Stdout {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::io::Stdout {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::io::StdoutLock<'_> {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::io::StdoutLock<'_> {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::io::Stderr {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::io::Stderr {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsBorrowedFd for std::io::StderrLock<'_> {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::io::StderrLock<'_> {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
+impl AsBorrowedFd for std::process::ChildStdin {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::process::ChildStdin {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoOwnedFd for std::process::ChildStdin {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoOwnedHandle for std::process::ChildStdin {
+    #[inline]
+    fn into_owned_handle(self) -> OwnedHandle {
+        unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
+impl AsBorrowedFd for std::process::ChildStdout {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::process::ChildStdout {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoOwnedFd for std::process::ChildStdout {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoOwnedHandle for std::process::ChildStdout {
+    #[inline]
+    fn into_owned_handle(self) -> OwnedHandle {
+        unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
+impl AsBorrowedFd for std::process::ChildStderr {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsBorrowedHandle for std::process::ChildStderr {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoOwnedFd for std::process::ChildStderr {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoOwnedHandle for std::process::ChildStderr {
+    #[inline]
+    fn into_owned_handle(self) -> OwnedHandle {
+        unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
+impl AsBorrowedFd for std::os::unix::net::UnixStream {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoOwnedFd for std::os::unix::net::UnixStream {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl FromOwnedFd for std::os::unix::net::UnixStream {
+    #[inline]
+    fn from_owned_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl AsBorrowedFd for std::os::unix::net::UnixListener {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoOwnedFd for std::os::unix::net::UnixListener {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl FromOwnedFd for std::os::unix::net::UnixListener {
+    #[inline]
+    fn from_owned_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl AsBorrowedFd for std::os::unix::net::UnixDatagram {
+    #[inline]
+    fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoOwnedFd for std::os::unix::net::UnixDatagram {
+    #[inline]
+    fn into_owned_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl FromOwnedFd for std::os::unix::net::UnixDatagram {
+    #[inline]
+    fn from_owned_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl<T> AsBorrowedHandle for std::thread::JoinHandle<T> {
+    #[inline]
+    fn as_borrowed_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl<T> IntoOwnedHandle for std::thread::JoinHandle<T> {
+    #[inline]
+    fn into_owned_handle(self) -> OwnedHandle {
+        unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
+    }
+}
