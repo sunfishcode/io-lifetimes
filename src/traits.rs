@@ -1,4 +1,4 @@
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 use crate::{BorrowedFd, OptionFd, OwnedFd};
 #[cfg(windows)]
 use crate::{
@@ -7,13 +7,15 @@ use crate::{
 };
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
+#[cfg(target_os = "wasi")]
+use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(windows)]
 use std::os::windows::io::{
     AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
 };
 
 /// A trait to borrow the file descriptor from an underlying object.
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 pub trait AsBorrowedFd {
     /// Extracts the file descriptor.
     fn as_borrowed_fd(&self) -> BorrowedFd<'_>;
@@ -35,7 +37,7 @@ pub trait AsBorrowedSocket {
 
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its file descriptor.
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 pub trait IntoOwnedFd {
     /// Consumes this object, returning the underlying file descriptor.
     fn into_owned_fd(self) -> OwnedFd;
@@ -59,7 +61,7 @@ pub trait IntoOwnedSocket {
 
 /// A trait to express the ability to construct an object from a file
 /// descriptor.
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 pub trait FromOwnedFd {
     /// Constructs a new instance of `Self` from the given file descriptor.
     fn from_owned_fd(owned: OwnedFd) -> Self;
@@ -79,7 +81,7 @@ pub trait FromOwnedSocket {
     fn from_owned_socket(owned: OwnedSocket) -> Self;
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl AsBorrowedFd for BorrowedFd<'_> {
     #[inline]
     fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
@@ -103,7 +105,7 @@ impl AsBorrowedSocket for BorrowedSocket<'_> {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl AsBorrowedFd for OwnedFd {
     #[inline]
     fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
@@ -127,7 +129,7 @@ impl AsBorrowedSocket for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl IntoOwnedFd for OwnedFd {
     #[inline]
     fn into_owned_fd(self) -> OwnedFd {
@@ -151,7 +153,7 @@ impl IntoOwnedSocket for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl FromOwnedFd for OwnedFd {
     #[inline]
     fn from_owned_fd(owned: OwnedFd) -> Self {
@@ -175,7 +177,7 @@ impl FromOwnedSocket for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl FromOwnedFd for OptionFd {
     #[inline]
     fn from_owned_fd(owned: OwnedFd) -> Self {
@@ -207,7 +209,7 @@ impl FromOwnedSocket for OptionSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl AsBorrowedFd for std::fs::File {
     #[inline]
     fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
@@ -223,7 +225,7 @@ impl AsBorrowedHandle for std::fs::File {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl IntoOwnedFd for std::fs::File {
     #[inline]
     fn into_owned_fd(self) -> OwnedFd {
@@ -239,7 +241,7 @@ impl IntoOwnedHandle for std::fs::File {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl FromOwnedFd for std::fs::File {
     #[inline]
     fn from_owned_fd(owned: OwnedFd) -> Self {
@@ -255,7 +257,7 @@ impl FromOwnedHandle for std::fs::File {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl AsBorrowedFd for std::net::TcpStream {
     #[inline]
     fn as_borrowed_fd(&self) -> BorrowedFd<'_> {
@@ -271,7 +273,7 @@ impl AsBorrowedSocket for std::net::TcpStream {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl IntoOwnedFd for std::net::TcpStream {
     #[inline]
     fn into_owned_fd(self) -> OwnedFd {
@@ -287,7 +289,7 @@ impl IntoOwnedSocket for std::net::TcpStream {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl FromOwnedFd for std::net::TcpStream {
     #[inline]
     fn from_owned_fd(owned: OwnedFd) -> Self {

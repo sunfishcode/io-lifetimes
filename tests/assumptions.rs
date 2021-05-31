@@ -1,9 +1,25 @@
+#![cfg_attr(target_os = "wasi", feature(wasi_ext))]
+
 use std::mem::size_of;
 
 #[cfg(unix)]
 #[test]
 fn test_assumptions() {
     assert_eq!(size_of::<std::os::unix::io::RawFd>(), size_of::<i32>());
+    assert_eq!(
+        size_of::<std::os::unix::io::RawFd>(),
+        size_of::<libc::c_int>()
+    );
+}
+
+#[cfg(target_os = "wasi")]
+#[test]
+fn test_assumptions() {
+    assert_eq!(size_of::<std::os::wasi::io::RawFd>(), size_of::<i32>());
+    assert_eq!(
+        size_of::<std::os::wasi::io::RawFd>(),
+        size_of::<libc::c_int>()
+    );
 }
 
 #[cfg(windows)]

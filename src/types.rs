@@ -3,6 +3,8 @@ use std::marker::PhantomData;
 use std::mem::forget;
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+#[cfg(target_os = "wasi")]
+use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 #[cfg(windows)]
 use std::{
     ffi::c_void,
@@ -24,7 +26,7 @@ use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
 /// descriptor, so it can be used in FFI in places where a file descriptor is
 /// passed as an argument, it is not captured or consumed, and it never has the
 /// value `-1`.
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
 #[rustc_layout_scalar_valid_range_start(0)]
@@ -93,7 +95,7 @@ pub struct BorrowedSocket<'owned> {
 /// descriptor, so it can be used in FFI in places where a file descriptor is
 /// passed as a consumed argument or returned as an owned value, and it never
 /// has the value `-1`.
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 #[repr(transparent)]
 #[rustc_layout_scalar_valid_range_start(0)]
 // libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
@@ -156,10 +158,10 @@ pub struct OwnedSocket {
 /// descriptor, so it can be used in FFI in places where a file descriptor is
 /// passed as a consumed argument or returned as an own value, or it is `-1`
 /// indicating an error or an otherwise absent value.
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 #[repr(transparent)]
 pub struct OptionFd {
-    raw: libc::c_int,
+    raw: RawFd,
 }
 
 /// Either an owned handle, or an empty sentry value which typically indicates
@@ -180,7 +182,7 @@ pub struct OptionFd {
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OptionHandle {
-    raw: winapi::um::winnt::HANDLE,
+    raw: RawHandle,
 }
 
 /// Similar to `OptionHandle`, but intended for use in FFI interfaces where
@@ -210,10 +212,10 @@ pub struct OptionFileHandle {
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OptionSocket {
-    raw: winapi::um::winsock2::SOCKET,
+    raw: RawSocket,
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl BorrowedFd<'_> {
     /// # Safety
     ///
@@ -221,7 +223,7 @@ impl BorrowedFd<'_> {
     /// the returned `BorrowedFd`, and it must not have the value `-1`.
     #[inline]
     pub unsafe fn borrow_raw_fd(raw: RawFd) -> Self {
-        debug_assert_ne!(raw, -1);
+        debug_assert_ne!(raw, -1_i32 as RawFd);
         Self {
             raw,
             _phantom: PhantomData,
@@ -262,12 +264,14 @@ impl BorrowedSocket<'_> {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl OptionFd {
     /// Return an empty `OptionFd` with no resource.
     #[inline]
     pub const fn none() -> Self {
-        Self { raw: -1 }
+        Self {
+            raw: -1_i32 as RawFd,
+        }
     }
 }
 
@@ -296,12 +300,12 @@ impl OptionSocket {
     /// Return an empty `OptionSocket` with no resource.
     pub const fn none() -> Self {
         Self {
-            raw: INVALID_SOCKET,
+            raw: INVALID_SOCKET as RawSocket,
         }
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl TryFrom<OptionFd> for OwnedFd {
     type Error = ();
 
@@ -309,7 +313,7 @@ impl TryFrom<OptionFd> for OwnedFd {
     fn try_from(option: OptionFd) -> Result<Self, ()> {
         let raw = option.raw;
         forget(option);
-        if raw != -1 {
+        if raw != -1_i32 as RawFd {
             unsafe { Ok(Self { raw }) }
         } else {
             Err(())
@@ -365,7 +369,7 @@ impl TryFrom<OptionSocket> for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl From<OwnedFd> for OptionFd {
     #[inline]
     fn from(owned: OwnedFd) -> Self {
@@ -399,13 +403,13 @@ impl From<OwnedHandle> for OptionFileHandle {
 impl From<OwnedSocket> for OptionSocket {
     #[inline]
     fn from(owned: OwnedSocket) -> Self {
-        let raw = owned.raw as winapi::um::winsock2::SOCKET;
+        let raw = owned.raw;
         forget(owned);
         Self { raw }
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl AsRawFd for BorrowedFd<'_> {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
@@ -429,7 +433,7 @@ impl AsRawSocket for BorrowedSocket<'_> {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl AsRawFd for OwnedFd {
     #[inline]
     fn as_raw_fd(&self) -> RawFd {
@@ -453,7 +457,7 @@ impl AsRawSocket for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl IntoRawFd for OwnedFd {
     #[inline]
     fn into_raw_fd(self) -> RawFd {
@@ -483,7 +487,7 @@ impl IntoRawSocket for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl FromRawFd for OwnedFd {
     /// # Safety
     ///
@@ -491,7 +495,7 @@ impl FromRawFd for OwnedFd {
     /// ownership.
     #[inline]
     unsafe fn from_raw_fd(raw: RawFd) -> Self {
-        debug_assert_ne!(raw, -1);
+        debug_assert_ne!(raw, -1_i32 as RawFd);
         Self { raw }
     }
 }
@@ -524,7 +528,7 @@ impl FromRawSocket for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl FromRawFd for OptionFd {
     /// # Safety
     ///
@@ -575,17 +579,16 @@ impl FromRawSocket for OptionSocket {
     /// unowned, or [`INVALID_SOCKET`].
     #[inline]
     unsafe fn from_raw_socket(raw: RawSocket) -> Self {
-        let raw = raw as winapi::um::winsock2::SOCKET;
         Self { raw }
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl Drop for OwnedFd {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            let _ = libc::close(self.raw);
+            let _ = libc::close(self.raw as libc::c_int);
         }
     }
 }
@@ -610,12 +613,12 @@ impl Drop for OwnedSocket {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 impl Drop for OptionFd {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            let _ = libc::close(self.raw);
+            let _ = libc::close(self.raw as libc::c_int);
         }
     }
 }
@@ -645,7 +648,7 @@ impl Drop for OptionSocket {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            let _ = winapi::um::winsock2::closesocket(self.raw);
+            let _ = winapi::um::winsock2::closesocket(self.raw as winapi::um::winsock2::SOCKET);
         }
     }
 }

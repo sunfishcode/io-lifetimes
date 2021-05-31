@@ -25,11 +25,12 @@
 
 #![deny(missing_docs)]
 #![feature(rustc_attrs)]
+#![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
 mod traits;
 mod types;
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 pub use traits::{AsBorrowedFd, FromOwnedFd, IntoOwnedFd};
 #[cfg(windows)]
 pub use traits::{
@@ -37,7 +38,7 @@ pub use traits::{
     IntoOwnedSocket,
 };
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 pub use types::{BorrowedFd, OptionFd, OwnedFd};
 #[cfg(windows)]
 pub use types::{
