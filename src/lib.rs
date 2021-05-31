@@ -41,5 +41,6 @@ pub use traits::{
 pub use types::{BorrowedFd, OptionFd, OwnedFd};
 #[cfg(windows)]
 pub use types::{
-    BorrowedHandle, BorrowedSocket, OptionHandle, OptionSocket, OwnedHandle, OwnedSocket,
+    BorrowedHandle, BorrowedSocket, OptionFileHandle, OptionHandle, OptionSocket, OwnedHandle,
+    OwnedSocket,
 };

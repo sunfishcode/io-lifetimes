@@ -1,7 +1,10 @@
 #[cfg(unix)]
 use crate::{BorrowedFd, OptionFd, OwnedFd};
 #[cfg(windows)]
-use crate::{BorrowedHandle, BorrowedSocket, OptionHandle, OptionSocket, OwnedHandle, OwnedSocket};
+use crate::{
+    BorrowedHandle, BorrowedSocket, OptionFileHandle, OptionHandle, OptionSocket, OwnedHandle,
+    OwnedSocket,
+};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(windows)]
@@ -182,6 +185,14 @@ impl FromOwnedFd for OptionFd {
 
 #[cfg(windows)]
 impl FromOwnedHandle for OptionHandle {
+    #[inline]
+    fn from_owned_handle(owned: OwnedHandle) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl FromOwnedHandle for OptionFileHandle {
     #[inline]
     fn from_owned_handle(owned: OwnedHandle) -> Self {
         unsafe { Self::from_raw_handle(owned.into_raw_handle()) }

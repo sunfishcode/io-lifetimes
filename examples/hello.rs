@@ -7,7 +7,8 @@ use io_experiment::{AsBorrowedFd, BorrowedFd, FromOwnedFd, IntoOwnedFd, OptionFd
 
 #[cfg(windows)]
 use io_experiment::{
-    AsBorrowedHandle, BorrowedHandle, FromOwnedHandle, IntoOwnedHandle, OptionHandle, OwnedHandle,
+    AsBorrowedHandle, BorrowedHandle, FromOwnedHandle, IntoOwnedHandle, OptionFileHandle,
+    OwnedHandle,
 };
 
 #[cfg(unix)]
@@ -43,7 +44,7 @@ extern "C" {
         dwCreationDisposition: DWORD,
         dwFlagsAndAttributes: DWORD,
         hTemplateFile: HANDLE,
-    ) -> OptionHandle;
+    ) -> OptionFileHandle;
     pub fn WriteFile(
         hFile: BorrowedHandle,
         lpBuffer: LPCVOID,
@@ -111,7 +112,7 @@ fn main() -> io::Result<()> {
 #[cfg(windows)]
 fn main() -> io::Result<()> {
     let handle = unsafe {
-        // Open a file, which returns an `OptionHandle`, which we can fallibly
+        // Open a file, which returns an `OptionFileHandle`, which we can fallibly
         // convert into an `OwnedFile`.
         let handle: OwnedHandle = CreateFileW(
             ['C' as u16, 'O' as u16, 'N' as u16, 0].as_ptr(),
