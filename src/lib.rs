@@ -30,6 +30,7 @@
 mod portability;
 mod traits;
 mod types;
+mod views;
 
 #[cfg(any(unix, target_os = "wasi"))]
 pub use traits::{AsBorrowedFd, FromOwnedFd, IntoOwnedFd};
@@ -52,3 +53,4 @@ pub use portability::{
     FromOwnedFilelike, FromOwnedSocketlike, IntoOwnedFilelike, IntoOwnedSocketlike, OwnedFilelike,
     OwnedSocketlike,
 };
+pub use views::{AsFilelikeView, AsSocketlikeView, FilelikeView, SocketlikeView};
