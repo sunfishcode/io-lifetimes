@@ -115,7 +115,9 @@ pub struct OwnedFd {
 /// argument or returned as an owned value, and is never null.
 ///
 /// Note that it *may* have the value [`INVALID_HANDLE_VALUE`]. See [here] for
-/// the full story.
+/// the full story. For APIs like `CreateFileW` which report errors with
+/// `INVALID_HANDLE_VALUE` instead of null, use [`OptionFileHandle`] instead
+/// of `Option<OwnedHandle>`.
 ///
 /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
 #[cfg(windows)]
