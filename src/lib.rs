@@ -21,7 +21,11 @@
 //!    `RawFd` values that users ought to be able to trust, but aren't unsafe,
 //!    so it's possible to fail to uphold this trust in purely safe Rust.
 //!
-//!  - More advanced convenience features are possible in the future.
+//!  - It enables a number of safe and portable convenience features, such
+//!    as [safe typed views] and [from+into conversions].
+//!
+//! [safe typed views]: AsFilelikeView
+//! [from+into conversions]: FromFilelike::from_into_filelike
 
 #![deny(missing_docs)]
 #![feature(rustc_attrs)]
