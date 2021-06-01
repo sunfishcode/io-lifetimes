@@ -28,6 +28,9 @@ pub trait AsFilelikeView {
 impl<T: AsBorrowedFilelike> AsFilelikeView for T {
     #[inline]
     fn as_filelike_view<Target: FromOwnedFilelike>(&self) -> FilelikeView<'_, Target> {
+        // Safety: The returned `FilelikeView` is scoped to the lifetime of
+        // `self`, which we've borrowed immutably here, so the raw filelike will
+        // remain valid.
         let owned = unsafe {
             OwnedFilelike::from_raw_filelike(self.as_borrowed_filelike().as_raw_filelike())
         };
@@ -58,6 +61,9 @@ pub trait AsSocketlikeView {
 impl<T: AsBorrowedSocketlike> AsSocketlikeView for T {
     #[inline]
     fn as_socketlike_view<Target: FromOwnedSocketlike>(&self) -> SocketlikeView<'_, Target> {
+        // Safety: The returned `SocketlikeView` is scoped to the lifetime of
+        // `self`, which we've borrowed immutably here, so the raw socketlike
+        // will remain valid.
         let owned = unsafe {
             OwnedSocketlike::from_raw_socketlike(self.as_borrowed_socketlike().as_raw_socketlike())
         };
