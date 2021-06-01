@@ -15,7 +15,7 @@ use crate::{BorrowedHandle, OptionFileHandle, OwnedHandle};
 use libc::{c_char, c_int, c_void, size_t, ssize_t};
 #[cfg(windows)]
 use winapi::{
-    shared::minwindef::{BOOL, DWORD, LPCVOID, LPDWORD},
+    shared::minwindef::{BOOL, DWORD, LPCVOID, LPDWORD, LPVOID},
     shared::ntdef::{HANDLE, LPCWSTR},
     um::minwinbase::{LPOVERLAPPED, LPSECURITY_ATTRIBUTES},
 };
@@ -24,6 +24,7 @@ use winapi::{
 #[cfg(any(unix, target_os = "wasi"))]
 extern "C" {
     pub fn open(pathname: *const c_char, flags: c_int, ...) -> Option<OwnedFd>;
+    pub fn read(fd: BorrowedFd<'_>, ptr: *mut c_void, size: size_t) -> ssize_t;
     pub fn write(fd: BorrowedFd<'_>, ptr: *const c_void, size: size_t) -> ssize_t;
     pub fn close(fd: OwnedFd) -> c_int;
 }
@@ -42,6 +43,13 @@ extern "C" {
         dwFlagsAndAttributes: DWORD,
         hTemplateFile: HANDLE,
     ) -> OptionFileHandle;
+    pub fn ReadFile(
+        hFile: HANDLE,
+        lpBuffer: LPVOID,
+        nNumberOfBytesToRead: DWORD,
+        lpNumberOfBytesRead: LPDWORD,
+        lpOverlapped: LPOVERLAPPED,
+    ) -> BOOL;
     pub fn WriteFile(
         hFile: BorrowedHandle<'_>,
         lpBuffer: LPCVOID,
