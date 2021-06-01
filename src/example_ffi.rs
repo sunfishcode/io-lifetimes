@@ -31,7 +31,9 @@ extern "C" {
 #[cfg(any(unix, target_os = "wasi"))]
 pub use libc::{O_CREAT, O_RDONLY, O_RDWR, O_WRONLY};
 
-/// The Windows analogs of the above.
+/// The Windows analogs of the above. Note the use of [`OptionFileHandle`] as
+/// the return type for `CreateFileW`, since that function is defined to return
+/// [`INVALID_HANDLE_VALUE`] on error instead of null.
 #[cfg(windows)]
 extern "C" {
     pub fn CreateFileW(
