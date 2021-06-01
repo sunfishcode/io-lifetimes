@@ -17,7 +17,7 @@ fn main() -> io::Result<()> {
     let fd = unsafe {
         // Open a file, which returns an `Option<OwnedFd>`, which we can
         // maybe convert into an `OwnedFile`.
-        let fd: OwnedFd = open("/dev/stdout\0".as_ptr() as *const _, libc::O_WRONLY)
+        let fd: OwnedFd = open("/dev/stdout\0".as_ptr() as *const _, O_WRONLY | O_CLOEXEC)
             .ok_or_else(io::Error::last_os_error)?;
 
         // Borrow the fd to write to it.

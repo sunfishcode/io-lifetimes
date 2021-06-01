@@ -13,7 +13,13 @@ use winapi::{
 #[cfg(unix)]
 #[test]
 fn test_file_not_found() {
-    assert!(unsafe { open("/dev/no/such/file\0".as_ptr() as *const _, O_RDONLY) }.is_none());
+    assert!(unsafe {
+        open(
+            "/dev/no/such/file\0".as_ptr() as *const _,
+            O_RDONLY | O_CLOEXEC,
+        )
+    }
+    .is_none());
 }
 
 #[cfg(windows)]
@@ -41,7 +47,7 @@ fn test_file_not_found() {
 #[cfg(unix)]
 #[test]
 fn test_file_found() {
-    assert!(unsafe { open("Cargo.toml\0".as_ptr() as *const _, O_RDONLY) }.is_some());
+    assert!(unsafe { open("Cargo.toml\0".as_ptr() as *const _, O_RDONLY | O_CLOEXEC) }.is_some());
 }
 
 #[cfg(windows)]
