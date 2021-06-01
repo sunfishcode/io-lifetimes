@@ -90,7 +90,7 @@ pub(crate) type RawSocketlike = RawFd;
 #[cfg(windows)]
 pub(crate) type RawSocketlike = RawSocket;
 
-/// A trait to borrow a filelike reference from an underlying object.
+/// A portable trait to borrow a filelike reference from an underlying object.
 ///
 /// This is a portability abstraction over Unix-like [`AsFd`] and Windows'
 /// `AsHandle`. It also provides the `as_filelike_view` convenience function
@@ -125,7 +125,7 @@ impl<T: AsFd> AsFilelike for T {
     }
 }
 
-/// A trait to borrow a filelike reference from an underlying object.
+/// A portable trait to borrow a filelike reference from an underlying object.
 ///
 /// This is a portability abstraction over Unix-like `AsFd` and Windows'
 /// [`AsHandle`]. It also provides the `as_filelike_view` convenience function
@@ -160,7 +160,8 @@ impl<T: AsHandle> AsFilelike for T {
     }
 }
 
-/// A trait to borrow a socketlike reference from an underlying object.
+/// A portable trait to borrow a socketlike reference from an underlying
+/// object.
 ///
 /// This is a portability abstraction over Unix-like [`AsFd`] and Windows'
 /// `AsSocket`. It also provides the `as_socketlike_view` convenience
@@ -195,7 +196,8 @@ impl<T: AsFd> AsSocketlike for T {
     }
 }
 
-/// A trait to borrow a socketlike reference from an underlying object.
+/// A portable trait to borrow a socketlike reference from an underlying
+/// object.
 ///
 /// This is a portability abstraction over Unix-like `AsFd` and Windows'
 /// [`AsSocket`]. It also provides the `as_socketlike_view` convenience
@@ -230,8 +232,8 @@ impl<T: AsSocket> AsSocketlike for T {
     }
 }
 
-/// A trait to express the ability to consume an object and acquire ownership
-/// of its filelike object.
+/// A portable trait to express the ability to consume an object and acquire
+/// ownership of its filelike object.
 ///
 /// This is a portability abstraction over Unix-like [`IntoFd`] and Windows'
 /// `IntoHandle`.
@@ -249,8 +251,8 @@ impl<T: IntoFd> IntoFilelike for T {
     }
 }
 
-/// A trait to express the ability to consume an object and acquire ownership
-/// of its filelike object.
+/// A portable trait to express the ability to consume an object and acquire
+/// ownership of its filelike object.
 ///
 /// This is a portability abstraction over Unix-like `IntoFd` and Windows'
 /// [`IntoHandle`].
@@ -268,8 +270,8 @@ impl<T: IntoHandle> IntoFilelike for T {
     }
 }
 
-/// A trait to express the ability to consume an object and acquire ownership
-/// of its socketlike object.
+/// A portable trait to express the ability to consume an object and acquire
+/// ownership of its socketlike object.
 ///
 /// This is a portability abstraction over Unix-like [`IntoFd`] and Windows'
 /// `IntoSocket`.
@@ -287,8 +289,8 @@ impl<T: IntoFd> IntoSocketlike for T {
     }
 }
 
-/// A trait to express the ability to consume an object and acquire ownership
-/// of its socketlike object.
+/// A portable trait to express the ability to consume an object and acquire
+/// ownership of its socketlike object.
 ///
 /// This is a portability abstraction over Unix-like `IntoFd` and Windows'
 /// [`IntoSocket`].
@@ -306,8 +308,8 @@ impl<T: IntoSocket> IntoSocketlike for T {
     }
 }
 
-/// A trait to express the ability to construct an object from a filelike
-/// object.
+/// A portable trait to express the ability to construct an object from a
+/// filelike object.
 ///
 /// This is a portability abstraction over Unix-like [`FromFd`] and Windows'
 /// `FromHandle`. It also provides the `from_into_filelike` convenience
@@ -335,8 +337,8 @@ impl<T: FromFd> FromFilelike for T {
     }
 }
 
-/// A trait to express the ability to construct an object from a filelike
-/// object.
+/// A portable trait to express the ability to construct an object from a
+/// filelike object.
 ///
 /// This is a portability abstraction over Unix-like `FromFd` and Windows'
 /// [`FromHandle`]. It also provides the `from_into_filelike` convenience
@@ -364,8 +366,8 @@ impl<T: FromHandle> FromFilelike for T {
     }
 }
 
-/// A trait to express the ability to construct an object from a socketlike
-/// object.
+/// A portable trait to express the ability to construct an object from a
+/// socketlike object.
 ///
 /// This is a portability abstraction over Unix-like [`FromFd`] and Windows'
 /// `FromSocket`. It also provides the `from_into_socketlike` convenience
@@ -393,8 +395,8 @@ impl<T: FromFd> FromSocketlike for T {
     }
 }
 
-/// A trait to express the ability to construct an object from a socketlike
-/// object.
+/// A portable trait to express the ability to construct an object from a
+/// socketlike object.
 ///
 /// This is a portability abstraction over Unix-like `FromFd` and Windows'
 /// [`FromSocket`]. It also provides the `from_into_socketlike` convenience
