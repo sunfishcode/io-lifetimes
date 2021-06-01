@@ -80,8 +80,8 @@ pub trait FromOwnedHandle {
     /// Constructs a new instance of `Self` from the given handle.
     fn from_owned_handle(owned: OwnedHandle) -> Self;
 
-    /// Constructs a new instance of `Self` from the given handle
-    /// converted from `into_owned`.
+    /// Constructs a new instance of `Self` from the given handle converted
+    /// from `into_owned`.
     #[inline]
     fn from_into_owned_handle<Owned: IntoOwnedHandle>(into_owned: Owned) -> Self
     where
@@ -97,8 +97,8 @@ pub trait FromOwnedSocket {
     /// Constructs a new instance of `Self` from the given socket.
     fn from_owned_socket(owned: OwnedSocket) -> Self;
 
-    /// Constructs a new instance of `Self` from the given socket
-    /// converted from `into_owned`.
+    /// Constructs a new instance of `Self` from the given socket converted
+    /// from `into_owned`.
     #[inline]
     fn from_into_owned_socket<Owned: IntoOwnedSocket>(into_owned: Owned) -> Self
     where
