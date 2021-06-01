@@ -59,7 +59,7 @@ FFI-safe, `so they can all be used in FFI [directly]:
 extern "C" {
     pub fn open(pathname: *const c_char, flags: c_int, ...) -> Option<OwnedFd>;
     pub fn read(fd: BorrowedFd<'_>, ptr: *mut c_void, size: size_t) -> ssize_t;
-    pub fn write(fd: BorrowedFd, ptr: *const c_void, size: size_t) -> ssize_t;
+    pub fn write(fd: BorrowedFd<'_>, ptr: *const c_void, size: size_t) -> ssize_t;
     pub fn close(fd: OwnedFd) -> c_int;
 }
 ```
