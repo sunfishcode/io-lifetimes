@@ -51,7 +51,7 @@ See the [full API documentation here](https://io-experiment.sunfishcode.online/i
 
 Here's the fun part. `BorrowedFd` and `OwnedFd` are `repr(transparent)` and
 hold `RawFd` values, and `Option<BorrowedFd>` and `Option<OwnedFd>` are
-FFI-safe, `so they can all be used in FFI [directly]:
+FFI-safe, so they can all be used in FFI [directly]:
 
 [directly]: https://github.com/sunfishcode/io-experiment/blob/main/src/example_ffi.rs
 
