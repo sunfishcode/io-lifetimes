@@ -45,6 +45,8 @@ On Windows, there are `Handle` and `Socket` versions of every `Fd` thing, and
 a special `OptionFileHandle` type to cope with inconsistent error reporting
 in the Windows API.
 
+See the [full API documentation here](https://io-experiment.sunfishcode.online/io_experiment/index.html).
+
 ## The magic of transparency
 
 Here's the fun part. `BorrowedFd` and `OwnedFd` are `repr(transparent)` and
