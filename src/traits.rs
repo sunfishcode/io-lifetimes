@@ -12,9 +12,25 @@ use std::os::windows::io::{
 };
 
 /// A trait to borrow the file descriptor from an underlying object.
+///
+/// This is only available on unix platforms and must be imported in order to
+/// call the method. Windows platforms have a corresponding `AsBorrowedHandle`
+/// and `AsBorrowedSocket` set of traits.
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsBorrowedFd {
     /// Extracts the file descriptor.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{AsBorrowedFd, BorrowedFd};
+    ///
+    /// let mut f = File::open("foo.txt")?;
+    /// let borrowed_fd: BorrowedFd<'_> = f.as_borrowed_fd();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn as_borrowed_fd(&self) -> BorrowedFd<'_>;
 }
 
@@ -37,6 +53,18 @@ pub trait AsBorrowedSocket {
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait IntoOwnedFd {
     /// Consumes this object, returning the underlying file descriptor.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{IntoOwnedFd, OwnedFd};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_fd: OwnedFd = f.into_owned_fd();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn into_owned_fd(self) -> OwnedFd;
 }
 
@@ -61,10 +89,35 @@ pub trait IntoOwnedSocket {
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait FromOwnedFd {
     /// Constructs a new instance of `Self` from the given file descriptor.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromOwnedFd, IntoOwnedFd, OwnedFd};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_fd: OwnedFd = f.into_owned_fd();
+    /// let f = File::from_owned_fd(owned_fd);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn from_owned_fd(owned: OwnedFd) -> Self;
 
     /// Constructs a new instance of `Self` from the given file descriptor
     /// converted from `into_owned`.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromOwnedFd, IntoOwnedFd};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let f = File::from_into_owned_fd(f);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     #[inline]
     fn from_into_owned_fd<Owned: IntoOwnedFd>(into_owned: Owned) -> Self
     where
