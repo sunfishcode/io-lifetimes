@@ -3,10 +3,10 @@ use std::fs::File;
 use std::io::{self, Write};
 
 #[cfg(unix)]
-use io_experiment::{AsBorrowedFd, FromOwnedFd, IntoOwnedFd, OwnedFd};
+use io_experiment::{AsFd, FromFd, IntoFd, OwnedFd};
 
 #[cfg(windows)]
-use io_experiment::{AsBorrowedHandle, FromOwnedHandle, IntoOwnedHandle, OwnedHandle};
+use io_experiment::{AsHandle, FromHandle, IntoHandle, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, ptr::null_mut};
 
@@ -21,11 +21,7 @@ fn main() -> io::Result<()> {
             .ok_or_else(io::Error::last_os_error)?;
 
         // Borrow the fd to write to it.
-        let result = write(
-            fd.as_borrowed_fd(),
-            "hello, world\n".as_ptr() as *const _,
-            13,
-        );
+        let result = write(fd.as_fd(), "hello, world\n".as_ptr() as *const _, 13);
         match result {
             -1 => return Err(io::Error::last_os_error()),
             13 => (),
@@ -36,12 +32,12 @@ fn main() -> io::Result<()> {
     };
 
     // Convert into a `File`. No `unsafe` here!
-    let mut file = File::from_owned_fd(fd);
+    let mut file = File::from_fd(fd);
     writeln!(&mut file, "greetings, y'all")?;
 
     // We can borrow a `BorrowedFd` from a `File`.
     unsafe {
-        let result = write(file.as_borrowed_fd(), "sup?\n".as_ptr() as *const _, 5);
+        let result = write(file.as_fd(), "sup?\n".as_ptr() as *const _, 5);
         match result {
             -1 => return Err(io::Error::last_os_error()),
             5 => (),
@@ -50,7 +46,7 @@ fn main() -> io::Result<()> {
     }
 
     // Now back to `OwnedFd`.
-    let fd = file.into_owned_fd();
+    let fd = file.into_fd();
 
     unsafe {
         // This isn't needed, since `fd` is owned and would close itself on
@@ -83,7 +79,7 @@ fn main() -> io::Result<()> {
         // Borrow the handle to write to it.
         let mut number_of_bytes_written = 0;
         let result = WriteFile(
-            handle.as_borrowed_handle(),
+            handle.as_handle(),
             "hello, world\n".as_ptr() as *const _,
             13,
             &mut number_of_bytes_written,
@@ -99,14 +95,14 @@ fn main() -> io::Result<()> {
     };
 
     // Convert into a `File`. No `unsafe` here!
-    let mut file = File::from_owned_handle(handle);
+    let mut file = File::from_handle(handle);
     writeln!(&mut file, "greetings, y'all")?;
 
     // We can borrow a `BorrowedFd` from a `File`.
     unsafe {
         let mut number_of_bytes_written = 0;
         let result = WriteFile(
-            file.as_borrowed_handle(),
+            file.as_handle(),
             "sup?\n".as_ptr() as *const _,
             5,
             &mut number_of_bytes_written,
@@ -120,7 +116,7 @@ fn main() -> io::Result<()> {
     }
 
     // Now back to `OwnedFd`.
-    let handle = file.into_owned_handle();
+    let handle = file.into_handle();
 
     unsafe {
         // This isn't needed, since `handle` is owned and would close itself on

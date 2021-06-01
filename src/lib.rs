@@ -7,9 +7,9 @@
 //! | `Raw` API  | This experimental API    |
 //! | ---------- | ------------------------ |
 //! | `Raw*`     | `Borrowed*` and `Owned*` |
-//! | `AsRaw*`   | `AsBorrowed*`            |
-//! | `IntoRaw*` | `IntoOwned*`             |
-//! | `FromRaw*` | `FromOwned*`             |
+//! | `AsRaw*`   | `As*`                    |
+//! | `IntoRaw*` | `Into*`                  |
+//! | `FromRaw*` | `From*`                  |
 //!
 //! This gives it several advantages:
 //!
@@ -33,12 +33,9 @@ mod types;
 mod views;
 
 #[cfg(any(unix, target_os = "wasi"))]
-pub use traits::{AsBorrowedFd, FromOwnedFd, IntoOwnedFd};
+pub use traits::{AsFd, FromFd, IntoFd};
 #[cfg(windows)]
-pub use traits::{
-    AsBorrowedHandle, AsBorrowedSocket, FromOwnedHandle, FromOwnedSocket, IntoOwnedHandle,
-    IntoOwnedSocket,
-};
+pub use traits::{AsHandle, AsSocket, FromHandle, FromSocket, IntoHandle, IntoSocket};
 
 #[cfg(any(unix, target_os = "wasi"))]
 pub use types::{BorrowedFd, OwnedFd};
@@ -46,9 +43,8 @@ pub use types::{BorrowedFd, OwnedFd};
 pub use types::{BorrowedHandle, BorrowedSocket, OptionFileHandle, OwnedHandle, OwnedSocket};
 
 pub use portability::{
-    AsBorrowedFilelike, AsBorrowedSocketlike, BorrowedFilelike, BorrowedSocketlike,
-    FromOwnedFilelike, FromOwnedSocketlike, IntoOwnedFilelike, IntoOwnedSocketlike, OwnedFilelike,
-    OwnedSocketlike,
+    AsFilelike, AsSocketlike, BorrowedFilelike, BorrowedSocketlike, FromFilelike, FromSocketlike,
+    IntoFilelike, IntoSocketlike, OwnedFilelike, OwnedSocketlike,
 };
 pub use views::{AsFilelikeView, AsSocketlikeView, FilelikeView, SocketlikeView};
 

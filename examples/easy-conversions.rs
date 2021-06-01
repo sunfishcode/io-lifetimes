@@ -1,4 +1,4 @@
-use io_experiment::FromOwnedFilelike;
+use io_experiment::FromFilelike;
 use std::fs::File;
 use std::io::{self, Read};
 use std::process::{Command, Stdio};
@@ -12,7 +12,7 @@ fn main() -> io::Result<()> {
 
     // Convert from `ChildStderr` into `File` without any platform-specific
     // code or `unsafe`!
-    let mut file = File::from_into_owned_filelike(child.stdout.take().unwrap());
+    let mut file = File::from_into_filelike(child.stdout.take().unwrap());
 
     // Well, this example is not actually that cool, because `File` doesn't let
     // you do anything that you couldn't already do with `ChildStderr` etc., but

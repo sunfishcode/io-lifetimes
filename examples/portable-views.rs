@@ -6,9 +6,9 @@ fn main() -> io::Result<()> {
     let stdout = stdout();
 
     // With `AsFilelikeView`, any type implementing
-    // `AsBorrowedFd`/`AsBorrowedHandle` can be viewed as any type
-    // supporting `FromOwnedFilelike`, so you can call `File` methods
-    // on `Stdout` or other things.
+    // `AsFd`/`AsHandle` can be viewed as any type supporting
+    // `FromFilelike`, so you can call `File` methods on `Stdout` or other
+    // things.
     //
     // Whether or not you can actually do this is up to the OS, of course.
     // In this case, Unix can do this, but it appears Windows can't.

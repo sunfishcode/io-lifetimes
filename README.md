@@ -8,7 +8,7 @@ For a quick taste, check out the code examples:
  - [hello], a basic demo of this API, doing low-level I/O manually, using the
    [provided example FFI bindings]
  - [easy-conversions], demonstrating the `from_into` convenience feature for
-   converting from an `impl IntoOwned*` into an `impl FromOwned*`.
+   converting from an `impl Into*` into an `impl From*`.
  - [portable-views], demonstrating the convenience feature which allows one
    to temporarily "view" a file descriptor as any owning type such as `File`
 
@@ -24,9 +24,9 @@ main traits:
 pub struct BorrowedFd<'owned> { ... }
 pub struct OwnedFd { ... }
 
-pub trait AsBorrowedFd { ... }
-pub trait IntoOwnedFd { ... }
-pub trait FromOwnedFd { ... }
+pub trait AsFd { ... }
+pub trait IntoFd { ... }
+pub trait FromFd { ... }
 
 impl<'owned> AsRawFd for BorrowedFd<'owned> { ... }
 impl AsRawFd for OwnedFd { ... }
@@ -35,10 +35,10 @@ impl FromRawFd for OwnedFd { ... }
 
 impl Drop for OwnedFd { ... }
 
-impl<'owned> AsBorrowedFd for BorrowedFd<'owned> { ... }
-impl AsBorrowedFd for OwnedFd { ... }
-impl IntoOwnedFd for OwnedFd { ... }
-impl FromOwnedFd for OwnedFd { ... }
+impl<'owned> AsFd for BorrowedFd<'owned> { ... }
+impl AsFd for OwnedFd { ... }
+impl IntoFd for OwnedFd { ... }
+impl FromFd for OwnedFd { ... }
 ```
 
 On Windows, there are `Handle` and `Socket` versions of every `Fd` thing, and
