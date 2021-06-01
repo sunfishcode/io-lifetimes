@@ -1,3 +1,4 @@
+use std::fmt;
 use std::marker::PhantomData;
 use std::mem::forget;
 #[cfg(unix)]
@@ -446,5 +447,71 @@ impl Drop for OptionFileHandle {
         unsafe {
             let _ = winapi::um::handleapi::CloseHandle(self.raw.as_ptr());
         }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl fmt::Debug for BorrowedFd<'_> {
+    #[allow(clippy::missing_inline_in_public_items)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BorrowedFd").field("fd", &self.raw).finish()
+    }
+}
+
+#[cfg(windows)]
+impl fmt::Debug for BorrowedHandle<'_> {
+    #[allow(clippy::missing_inline_in_public_items)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BorrowedHandle")
+            .field("handle", &self.raw)
+            .finish()
+    }
+}
+
+#[cfg(windows)]
+impl fmt::Debug for BorrowedSocket<'_> {
+    #[allow(clippy::missing_inline_in_public_items)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BorrowedSocket")
+            .field("socket", &self.raw)
+            .finish()
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl fmt::Debug for OwnedFd {
+    #[allow(clippy::missing_inline_in_public_items)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("OwnedFd").field("fd", &self.raw).finish()
+    }
+}
+
+#[cfg(windows)]
+impl fmt::Debug for OwnedHandle {
+    #[allow(clippy::missing_inline_in_public_items)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("OwnedHandle")
+            .field("handle", &self.raw)
+            .finish()
+    }
+}
+
+#[cfg(windows)]
+impl fmt::Debug for OwnedSocket {
+    #[allow(clippy::missing_inline_in_public_items)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("OwnedSocket")
+            .field("socket", &self.raw)
+            .finish()
+    }
+}
+
+#[cfg(windows)]
+impl fmt::Debug for OptionFileHandle {
+    #[allow(clippy::missing_inline_in_public_items)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("OptionFileHandle")
+            .field("handle", &self.raw)
+            .finish()
     }
 }
