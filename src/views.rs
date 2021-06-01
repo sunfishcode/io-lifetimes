@@ -28,9 +28,13 @@ pub trait AsFilelikeView {
 impl<T: AsBorrowedFilelike> AsFilelikeView for T {
     #[inline]
     fn as_filelike_view<Target: FromOwnedFilelike>(&self) -> FilelikeView<'_, Target> {
-        FilelikeView::new(Target::from_owned_filelike(unsafe {
+        let owned = unsafe {
             OwnedFilelike::from_raw_filelike(self.as_borrowed_filelike().as_raw_filelike())
-        }))
+        };
+        FilelikeView {
+            target: ManuallyDrop::new(Target::from_owned_filelike(owned)),
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -54,9 +58,13 @@ pub trait AsSocketlikeView {
 impl<T: AsBorrowedSocketlike> AsSocketlikeView for T {
     #[inline]
     fn as_socketlike_view<Target: FromOwnedSocketlike>(&self) -> SocketlikeView<'_, Target> {
-        SocketlikeView::new(Target::from_owned_socketlike(unsafe {
+        let owned = unsafe {
             OwnedSocketlike::from_raw_socketlike(self.as_borrowed_socketlike().as_raw_socketlike())
-        }))
+        };
+        SocketlikeView {
+            target: ManuallyDrop::new(Target::from_owned_socketlike(owned)),
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -67,9 +75,8 @@ pub struct FilelikeView<'owned, Target: FromOwnedFilelike> {
     /// this is a non-owning view over the underlying resource.
     target: ManuallyDrop<Target>,
 
-    /// This field exists because we don't otherwise explicitly use
-    /// `'owned`.
-    _phantom_data: PhantomData<&'owned ()>,
+    /// This field exists because we don't otherwise explicitly use `'owned`.
+    _phantom: PhantomData<&'owned OwnedFilelike>,
 }
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
@@ -85,34 +92,8 @@ pub struct SocketlikeView<'owned, Target: FromOwnedSocketlike> {
     /// this is a non-owning view over the underlying resource.
     target: ManuallyDrop<Target>,
 
-    /// This field exists because we don't otherwise explicitly use
-    /// `'owned`.
-    _phantom_data: PhantomData<&'owned ()>,
-}
-
-impl<Target: FromOwnedFilelike> FilelikeView<'_, Target> {
-    /// Creates a new `FilelikeView` which nominally takes ownership of
-    /// `target` but does not own the underlying resource.
-    #[inline]
-    pub(crate) fn new(target: Target) -> Self {
-        Self {
-            target: ManuallyDrop::new(target),
-            _phantom_data: PhantomData,
-        }
-    }
-}
-
-#[cfg(windows)]
-impl<Target: FromOwnedSocketlike> SocketlikeView<'_, Target> {
-    /// Creates a new `SocketlikeView` which nominally takes ownership of
-    /// `target` but does not own the underlying resource.
-    #[inline]
-    pub(crate) fn new(target: Target) -> Self {
-        Self {
-            target: ManuallyDrop::new(target),
-            _phantom_data: PhantomData,
-        }
-    }
+    /// This field exists because we don't otherwise explicitly use `'owned`.
+    _phantom: PhantomData<&'owned OwnedSocketlike>,
 }
 
 impl<Target: FromOwnedFilelike> Deref for FilelikeView<'_, Target> {
