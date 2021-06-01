@@ -45,7 +45,9 @@ On Windows, there are `Handle` and `Socket` versions of every `Fd` thing, and
 a special `OptionFileHandle` type to cope with inconsistent error reporting
 in the Windows API.
 
-See the [full API documentation here](https://io-experiment.sunfishcode.online/io_experiment/index.html).
+Full API documentation:
+ - [for `x86_64-unknown-linux-gnu`](https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_experiment/index.html)
+ - [for `x86_64-pc-windows-msvc`](https://io-experiment.sunfishcode.online/x86_64-pc-windows-msvc/io_experiment/index.html)
 
 ## The magic of transparency
 
