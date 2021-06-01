@@ -11,6 +11,7 @@ use crate::{
     AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, FromHandle, FromSocket, IntoHandle,
     IntoSocket, OwnedHandle, OwnedSocket,
 };
+use crate::{FilelikeView, SocketlikeView};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 #[cfg(target_os = "wasi")]
@@ -70,6 +71,17 @@ pub(crate) type RawSocketlike = RawSocket;
 pub trait AsFilelike: AsFd {
     /// Extracts the filelike reference.
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
+
+    /// Return a borrowing view of a resource which dereferences to a `&Target`
+    /// or `&mut Target`.
+    ///
+    /// This creates a temporary instance of a `Target` within a
+    /// `ManuallyDrop`, so any additional resources held by `Target` are
+    /// leaked. Consequently, this function should only be used with types
+    /// like [`File`] which do not acquire any additional resources.
+    ///
+    /// [`File`]: std::fs::File
+    fn as_filelike_view<Target: FromFilelike>(&self) -> FilelikeView<'_, Target>;
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -78,6 +90,11 @@ impl<T: AsFd> AsFilelike for T {
     fn as_filelike(&self) -> BorrowedFilelike<'_> {
         self.as_fd()
     }
+
+    #[inline]
+    fn as_filelike_view<Target: FromFilelike>(&self) -> FilelikeView<'_, Target> {
+        FilelikeView::new(self)
+    }
 }
 
 /// A trait to borrow a filelike reference from an underlying object.
@@ -85,6 +102,17 @@ impl<T: AsFd> AsFilelike for T {
 pub trait AsFilelike: AsHandle {
     /// Extracts the filelike reference.
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
+
+    /// Return a borrowing view of a resource which dereferences to a `&Target`
+    /// or `&mut Target`.
+    ///
+    /// This creates a temporary instance of a `Target` within a
+    /// `ManuallyDrop`, so any additional resources held by `Target` are
+    /// leaked. Consequently, this function should only be used with types
+    /// like [`File`] which do not acquire any additional resources.
+    ///
+    /// [`File`]: std::fs::File
+    fn as_filelike_view<Target: FromFilelike>(&self) -> FilelikeView<'_, Target>;
 }
 
 #[cfg(windows)]
@@ -93,6 +121,11 @@ impl<T: AsHandle> AsFilelike for T {
     fn as_filelike(&self) -> BorrowedFilelike<'_> {
         self.as_handle()
     }
+
+    #[inline]
+    fn as_filelike_view<Target: FromFilelike>(&self) -> FilelikeView<'_, Target> {
+        FilelikeView::new(self)
+    }
 }
 
 /// A trait to borrow a socketlike reference from an underlying object.
@@ -100,6 +133,17 @@ impl<T: AsHandle> AsFilelike for T {
 pub trait AsSocketlike: AsFd {
     /// Extracts the socketlike reference.
     fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
+
+    /// Return a borrowing view of a resource which dereferences to a `&Target`
+    /// or `&mut Target`.
+    ///
+    /// This creates a temporary instance of a `Target` within a
+    /// `ManuallyDrop`, so any additional resources held by `Target` are
+    /// leaked. Consequently, this function should only be used with types
+    /// like [`TcpStream`] which do not acquire any additional resources.
+    ///
+    /// [`TcpStream`]: std::net::TcpStream
+    fn as_socketlike_view<Target: FromSocketlike>(&self) -> SocketlikeView<'_, Target>;
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -108,6 +152,11 @@ impl<T: AsFd> AsSocketlike for T {
     fn as_socketlike(&self) -> BorrowedSocketlike<'_> {
         self.as_fd()
     }
+
+    #[inline]
+    fn as_socketlike_view<Target: FromSocketlike>(&self) -> SocketlikeView<'_, Target> {
+        SocketlikeView::new(self)
+    }
 }
 
 /// A trait to borrow a socketlike reference from an underlying object.
@@ -115,6 +164,17 @@ impl<T: AsFd> AsSocketlike for T {
 pub trait AsSocketlike: AsSocket {
     /// Extracts the socketlike reference.
     fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
+
+    /// Return a borrowing view of a resource which dereferences to a `&Target`
+    /// or `&mut Target`.
+    ///
+    /// This creates a temporary instance of a `Target` within a
+    /// `ManuallyDrop`, so any additional resources held by `Target` are
+    /// leaked. Consequently, this function should only be used with types
+    /// like [`TcpStream`] which do not acquire any additional resources.
+    ///
+    /// [`TcpStream`]: std::net::TcpStream
+    fn as_socketlike_view<Target: FromSocketlike>(&self) -> SocketlikeView<'_, Target>;
 }
 
 #[cfg(windows)]
@@ -122,6 +182,11 @@ impl<T: AsSocket> AsSocketlike for T {
     #[inline]
     fn as_socketlike(&self) -> BorrowedSocketlike<'_> {
         self.as_socket()
+    }
+
+    #[inline]
+    fn as_socketlike_view<Target: FromSocketlike>(&self) -> SocketlikeView<'_, Target> {
+        SocketlikeView::new(self)
     }
 }
 

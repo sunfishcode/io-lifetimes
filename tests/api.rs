@@ -1,8 +1,7 @@
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
 use io_experiment::{
-    AsFilelike, AsFilelikeView, AsSocketlike, AsSocketlikeView, FromFilelike, FromSocketlike,
-    IntoFilelike, IntoSocketlike,
+    AsFilelike, AsSocketlike, FromFilelike, FromSocketlike, IntoFilelike, IntoSocketlike,
 };
 
 struct Tester {}

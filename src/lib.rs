@@ -24,7 +24,7 @@
 //!  - It enables a number of safe and portable convenience features, such
 //!    as [safe typed views] and [from+into conversions].
 //!
-//! [safe typed views]: AsFilelikeView
+//! [safe typed views]: AsFilelike::as_filelike_view
 //! [from+into conversions]: FromFilelike::from_into_filelike
 
 #![deny(missing_docs)]
@@ -50,6 +50,6 @@ pub use portability::{
     AsFilelike, AsSocketlike, BorrowedFilelike, BorrowedSocketlike, FromFilelike, FromSocketlike,
     IntoFilelike, IntoSocketlike, OwnedFilelike, OwnedSocketlike,
 };
-pub use views::{AsFilelikeView, AsSocketlikeView, FilelikeView, SocketlikeView};
+pub use views::{FilelikeView, SocketlikeView};
 
 pub mod example_ffi;
