@@ -151,22 +151,24 @@ pub struct OwnedSocket {
 }
 
 /// Similar to `Option<OwnedHandle>`, but intended for use in FFI interfaces
-/// where [`INVALID_HANDLE_VALUE`] is used as the sentry value.
+/// where [`INVALID_HANDLE_VALUE`] is used as the sentry value, and null values
+/// are not used at all, such as in the return value of `CreateFileW`.
 ///
 /// If this holds an owned handle, it closes the handle on drop.
 ///
 /// This uses `repr(transparent)` and has the representation of a host handle,
-/// so it can be used in FFI in places where a handle is passed as a consumed
-/// argument or returned as an owned value, or it is [`INVALID_HANDLE_VALUE`]
-/// indicating an error or an otherwise absent value.
+/// so it can be used in FFI in places where a non-null handle is passed as a
+/// consumed argument or returned as an owned value, or it is
+/// [`INVALID_HANDLE_VALUE`] indicating an error or an otherwise absent value.
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OptionFileHandle {
-    // TODO: There is reason to guess that functions like `CreateFile`
-    // never return NULL, even on success, however I haven't yet found
-    // official documentation mentioning this. If it turns out that NULL
-    // can be a valid value, we'll need to redesign how
-    // `Option<OwnedHandle>` works.
+    // Assume that the pointer is never null. The Win32 documentation doesn't
+    // explicitly guarantee this anywhere, but APIs like [`CreateFileW`] itself
+    // have `HANDLE` arguments where a null handle indicates an absent value,
+    // which wouldn't work if null were a valid handle value.
+    //
+    // [`CreateFileW`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
     raw: NonNull<c_void>,
 }
 
