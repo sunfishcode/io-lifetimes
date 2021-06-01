@@ -167,8 +167,9 @@ pub struct OptionFileHandle {
     raw: RawHandle,
 }
 
-// The Windows [`HANDLE`] type may be transferred across thread boundaries
-// (despite containing a `*mut void`, which in general isn't `Send`).
+// The Windows [`HANDLE`] type may be transferred across and shared between
+// thread boundaries (despite containing a `*mut void`, which in general isn't
+// `Send` or `Sync`).
 //
 // [`HANDLE`]: std::os::windows::raw::HANDLE
 #[cfg(windows)]
@@ -177,6 +178,12 @@ unsafe impl Send for OwnedHandle {}
 unsafe impl Send for OptionFileHandle {}
 #[cfg(windows)]
 unsafe impl Send for BorrowedHandle<'_> {}
+#[cfg(windows)]
+unsafe impl Sync for OwnedHandle {}
+#[cfg(windows)]
+unsafe impl Sync for OptionFileHandle {}
+#[cfg(windows)]
+unsafe impl Sync for BorrowedHandle<'_> {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl BorrowedFd<'_> {
