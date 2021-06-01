@@ -164,13 +164,7 @@ pub struct OwnedSocket {
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OptionFileHandle {
-    // Assume that the pointer is never null. The Win32 documentation doesn't
-    // explicitly guarantee this anywhere, but APIs like [`CreateFileW`] itself
-    // have `HANDLE` arguments where a null handle indicates an absent value,
-    // which wouldn't work if null were a valid handle value.
-    //
-    // [`CreateFileW`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
-    raw: NonNull<c_void>,
+    raw: RawHandle,
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -233,8 +227,9 @@ impl OptionFileHandle {
     /// Return an empty `OptionFileHandle` with no resource.
     #[inline]
     pub const fn none() -> Self {
-        let non_null = unsafe { NonNull::new_unchecked(INVALID_HANDLE_VALUE) };
-        Self { raw: non_null }
+        Self {
+            raw: INVALID_HANDLE_VALUE,
+        }
     }
 }
 
@@ -246,10 +241,25 @@ impl TryFrom<OptionFileHandle> for OwnedHandle {
     fn try_from(option: OptionFileHandle) -> Result<Self, ()> {
         let raw = option.raw;
         forget(option);
-        if raw.as_ptr() != INVALID_HANDLE_VALUE {
-            Ok(Self { raw })
+        if let Some(non_null) = NonNull::new(raw) {
+            if non_null.as_ptr() != INVALID_HANDLE_VALUE {
+                Ok(Self { raw: non_null })
+            } else {
+                Err(())
+            }
         } else {
-            Err(())
+            // In theory, we ought to be able to assume that the pointer here
+            // is never null, change `option.raw` to `NonNull`, and obviate the
+            // the panic path here. Unfortunately, Win32 documentation doesn't
+            // explicitly guarantee this anywhere.
+            //
+            // APIs like [`CreateFileW`] itself have `HANDLE` arguments where a
+            // null handle indicates an absent value, which wouldn't work if
+            // null were a valid handle value, so it seems very unlikely that
+            // it could ever return null. But who knows?
+            //
+            // [`CreateFileW`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
+            panic!("An `OptionFileHandle` was null!");
         }
     }
 }
@@ -260,7 +270,7 @@ impl From<OwnedHandle> for OptionFileHandle {
     fn from(owned: OwnedHandle) -> Self {
         let raw = owned.raw;
         forget(owned);
-        Self { raw }
+        Self { raw: raw.as_ptr() }
     }
 }
 
@@ -404,9 +414,7 @@ impl FromRawHandle for OptionFileHandle {
     #[inline]
     unsafe fn from_raw_handle(raw: RawHandle) -> Self {
         debug_assert!(!raw.is_null());
-        Self {
-            raw: NonNull::new_unchecked(raw),
-        }
+        Self { raw }
     }
 }
 
@@ -445,7 +453,7 @@ impl Drop for OptionFileHandle {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            let _ = winapi::um::handleapi::CloseHandle(self.raw.as_ptr());
+            let _ = winapi::um::handleapi::CloseHandle(self.raw);
         }
     }
 }
