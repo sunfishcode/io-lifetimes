@@ -162,6 +162,11 @@ pub struct OwnedSocket {
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OptionFileHandle {
+    // TODO: There is reason to guess that functions like `CreateFile`
+    // never return NULL, even on success, however I haven't yet found
+    // official documentation mentioning this. If it turns out that NULL
+    // can be a valid value, we'll need to redesign how
+    // `Option<OwnedHandle>` works.
     raw: NonNull<c_void>,
 }
 
