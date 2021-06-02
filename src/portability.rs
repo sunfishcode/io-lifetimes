@@ -98,6 +98,18 @@ pub(crate) type RawSocketlike = RawSocket;
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsFilelike: AsFd {
     /// Borrows the reference.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{AsFilelike, BorrowedFilelike};
+    ///
+    /// let mut f = File::open("foo.txt")?;
+    /// let borrowed_filelike: BorrowedFilelike<'_> = f.as_filelike();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -133,6 +145,18 @@ impl<T: AsFd> AsFilelike for T {
 #[cfg(windows)]
 pub trait AsFilelike: AsHandle {
     /// Borrows the reference.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{AsFilelike, BorrowedFilelike};
+    ///
+    /// let mut f = File::open("foo.txt")?;
+    /// let borrowed_filelike: BorrowedFilelike<'_> = f.as_filelike();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -240,6 +264,18 @@ impl<T: AsSocket> AsSocketlike for T {
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait IntoFilelike: IntoFd {
     /// Consumes this object, returning the underlying filelike object.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{IntoFilelike, OwnedFilelike};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_filelike: OwnedFilelike = f.into_filelike();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn into_filelike(self) -> OwnedFilelike;
 }
 
@@ -297,6 +333,18 @@ impl<T: IntoFd> IntoSocketlike for T {
 #[cfg(windows)]
 pub trait IntoSocketlike: IntoSocket {
     /// Consumes this object, returning the underlying socketlike object.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{IntoFilelike, OwnedFilelike};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_filelike: OwnedFilelike = f.into_filelike();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn into_socketlike(self) -> OwnedSocketlike;
 }
 
@@ -317,10 +365,35 @@ impl<T: IntoSocket> IntoSocketlike for T {
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait FromFilelike: FromFd {
     /// Constructs a new instance of `Self` from the given filelike object.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromFilelike, IntoFilelike, OwnedFilelike};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_filelike: OwnedFilelike = f.into_filelike();
+    /// let f = File::from_filelike(owned_filelike);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn from_filelike(owned: OwnedFilelike) -> Self;
 
     /// Constructs a new instance of `Self` from the given filelike object
     /// converted from `into_owned`.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromFilelike, IntoFilelike};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let f = File::from_into_filelike(f);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn from_into_filelike<Owned: IntoFilelike>(owned: Owned) -> Self;
 }
 
@@ -346,10 +419,35 @@ impl<T: FromFd> FromFilelike for T {
 #[cfg(windows)]
 pub trait FromFilelike: FromHandle {
     /// Constructs a new instance of `Self` from the given filelike object.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromFilelike, IntoFilelike, OwnedFilelike};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_filelike: OwnedFilelike = f.into_filelike();
+    /// let f = File::from_filelike(owned_filelike);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn from_filelike(owned: OwnedFilelike) -> Self;
 
     /// Constructs a new instance of `Self` from the given filelike object
     /// converted from `into_owned`.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromFilelike, IntoFilelike};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let f = File::from_into_filelike(f);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn from_into_filelike<Owned: IntoFilelike>(owned: Owned) -> Self;
 }
 

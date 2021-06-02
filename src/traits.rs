@@ -155,10 +155,35 @@ pub trait FromFd {
 #[cfg(windows)]
 pub trait FromHandle {
     /// Constructs a new instance of `Self` from the given handle.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromHandle, IntoHandle, OwnedHandle};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_handle: OwnedHandle = f.into_handle();
+    /// let f = File::from_handle(owned_handle);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn from_handle(owned: OwnedHandle) -> Self;
 
     /// Constructs a new instance of `Self` from the given handle converted
     /// from `into_owned`.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{FromHandle, IntoHandle};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let f = File::from_into_handle(f);
+    /// # Ok::<(), io::Error>(())
+    /// ```
     #[inline]
     fn from_into_handle<Owned: IntoHandle>(into_owned: Owned) -> Self
     where
