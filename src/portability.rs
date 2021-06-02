@@ -97,7 +97,7 @@ pub(crate) type RawSocketlike = RawSocket;
 /// providing typed views.
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsFilelike: AsFd {
-    /// Extracts the reference.
+    /// Borrows the reference.
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -132,7 +132,7 @@ impl<T: AsFd> AsFilelike for T {
 /// providing typed views.
 #[cfg(windows)]
 pub trait AsFilelike: AsHandle {
-    /// Extracts the reference.
+    /// Borrows the reference.
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -168,7 +168,7 @@ impl<T: AsHandle> AsFilelike for T {
 /// function providing typed views.
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsSocketlike: AsFd {
-    /// Extracts the reference.
+    /// Borrows the reference.
     fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -204,7 +204,7 @@ impl<T: AsFd> AsSocketlike for T {
 /// function providing typed views.
 #[cfg(windows)]
 pub trait AsSocketlike: AsSocket {
-    /// Extracts the reference.
+    /// Borrows the reference.
     fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`

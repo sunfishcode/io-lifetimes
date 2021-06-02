@@ -18,7 +18,7 @@ use std::os::windows::io::{
 /// `AsSocket` set of traits.
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsFd {
-    /// Extracts the file descriptor.
+    /// Borrows the file descriptor.
     ///
     /// # Example
     ///
@@ -37,14 +37,26 @@ pub trait AsFd {
 /// A trait to borrow the handle from an underlying object.
 #[cfg(windows)]
 pub trait AsHandle {
-    /// Extracts the handle.
+    /// Borrows the handle.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{AsHandle, BorrowedHandle};
+    ///
+    /// let mut f = File::open("foo.txt")?;
+    /// let borrowed_handle: BorrowedHandle<'_> = f.as_handle();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn as_handle(&self) -> BorrowedHandle<'_>;
 }
 
 /// A trait to borrow the socket from an underlying object.
 #[cfg(windows)]
 pub trait AsSocket {
-    /// Extracts the socket.
+    /// Borrows the socket.
     fn as_socket(&self) -> BorrowedSocket<'_>;
 }
 
@@ -73,6 +85,18 @@ pub trait IntoFd {
 #[cfg(windows)]
 pub trait IntoHandle {
     /// Consumes this object, returning the underlying handle.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// # use std::io;
+    /// use io_experiment::{IntoHandle, OwnedHandle};
+    ///
+    /// let f = File::open("foo.txt")?;
+    /// let owned_handle: OwnedHandle = f.into_handle();
+    /// # Ok::<(), io::Error>(())
+    /// ```
     fn into_handle(self) -> OwnedHandle;
 }
 
