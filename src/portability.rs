@@ -4,6 +4,7 @@
 //!
 //! TODO: Should this layer be folded into types.rs/traits.rs?
 
+use crate::views::{FilelikeView, SocketlikeView};
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
@@ -11,7 +12,6 @@ use crate::{
     AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, FromHandle, FromSocket, IntoHandle,
     IntoSocket, OwnedHandle, OwnedSocket,
 };
-use crate::{FilelikeView, SocketlikeView};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 #[cfg(target_os = "wasi")]

@@ -1,4 +1,9 @@
 //! Typed views using temporary objects.
+//!
+//! This module defines the return types for [`AsFilelike::as_filelike_view`]
+//! and [`AsSocketlike::as_socketlike_view`].
+//!
+//! [`AsSocketlike::as_socketlike_view`]: crate::AsSocketlike::as_socketlike_view
 
 use crate::portability::{AsRawFilelike, FromRawFilelike};
 #[cfg(windows)]
@@ -13,7 +18,7 @@ use std::mem::ManuallyDrop;
 use std::ops::{Deref, DerefMut};
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
-/// `&mut Target`.
+/// `&mut Target`. These are returned by [`AsFilelike::as_filelike_view`].
 pub struct FilelikeView<'owned, Target: FromFilelike> {
     /// The value to dereference to. It's wrapped in `ManuallyDrop` because
     /// this is a non-owning view over the underlying resource.
@@ -24,12 +29,14 @@ pub struct FilelikeView<'owned, Target: FromFilelike> {
 }
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
-/// `&mut Target`.
+/// `&mut Target`. These are returned by [`AsSocketlike::as_socketlike_view`].
+///
+/// [`AsSocketlike::as_socketlike_view`]: crate::AsSocketlike::as_socketlike_view
 #[cfg(any(unix, target_os = "wasi"))]
 pub type SocketlikeView<'owned, Target> = FilelikeView<'owned, Target>;
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
-/// `&mut Target`.
+/// `&mut Target`. These are returned by [`AsSocketlike::as_socketlike_view`].
 #[cfg(windows)]
 pub struct SocketlikeView<'owned, Target: FromSocketlike> {
     /// The value to dereference to. It's wrapped in `ManuallyDrop` because
