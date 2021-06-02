@@ -52,8 +52,8 @@ impl<Target: FromFilelike> FilelikeView<'_, Target> {
     #[inline]
     pub(crate) fn new<T: AsFilelike>(filelike: &T) -> Self {
         // Safety: The returned `FilelikeView` is scoped to the lifetime of
-        // `self`, which we've borrowed immutably here, so the raw filelike will
-        // remain valid.
+        // `self`, which we've borrowed immutably here, so the raw filelike
+        // object will remain valid.
         let owned =
             unsafe { OwnedFilelike::from_raw_filelike(filelike.as_filelike().as_raw_filelike()) };
         Self {
@@ -69,8 +69,8 @@ impl<Target: FromSocketlike> SocketlikeView<'_, Target> {
     #[inline]
     pub(crate) fn new<T: AsSocketlike>(socketlike: &T) -> Self {
         // Safety: The returned `SocketlikeView` is scoped to the lifetime of
-        // `self`, which we've borrowed immutably here, so the raw socketlike will
-        // remain valid.
+        // `self`, which we've borrowed immutably here, so the raw socketlike
+        // object will remain valid.
         let owned = unsafe {
             OwnedSocketlike::from_raw_socketlike(socketlike.as_socketlike().as_raw_socketlike())
         };

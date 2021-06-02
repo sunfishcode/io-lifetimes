@@ -22,28 +22,28 @@ use std::os::windows::io::{
     RawHandle, RawSocket,
 };
 
-/// A borrowed filelike reference.
+/// A reference to a filelike object.
 ///
 /// This is a portability abstraction over Unix-like [`BorrowedFd`] and
 /// Windows' `BorrowedHandle`.
 #[cfg(any(unix, target_os = "wasi"))]
 pub type BorrowedFilelike<'owned> = BorrowedFd<'owned>;
 
-/// A borrowed filelike reference.
+/// A reference to a filelike object.
 ///
 /// This is a portability abstraction over Unix-like `BorrowedFd` and
 /// Windows' [`BorrowedHandle`].
 #[cfg(windows)]
 pub type BorrowedFilelike<'owned> = BorrowedHandle<'owned>;
 
-/// A borrowed socketlike reference.
+/// A reference to a socketlike object.
 ///
 /// This is a portability abstraction over Unix-like [`BorrowedFd`] and
 /// Windows' `BorrowedSocket`.
 #[cfg(any(unix, target_os = "wasi"))]
 pub type BorrowedSocketlike<'owned> = BorrowedFd<'owned>;
 
-/// A borrowed socketlike reference.
+/// A reference to a socketlike object.
 ///
 /// This is a portability abstraction over Unix-like `BorrowedFd` and
 /// Windows' [`BorrowedSocket`].
@@ -90,14 +90,14 @@ pub(crate) type RawSocketlike = RawFd;
 #[cfg(windows)]
 pub(crate) type RawSocketlike = RawSocket;
 
-/// A portable trait to borrow a filelike reference from an underlying object.
+/// A portable trait to borrow a reference from an underlying filelike object.
 ///
 /// This is a portability abstraction over Unix-like [`AsFd`] and Windows'
 /// `AsHandle`. It also provides the `as_filelike_view` convenience function
 /// providing typed views.
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsFilelike: AsFd {
-    /// Extracts the filelike reference.
+    /// Extracts the reference.
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -125,14 +125,14 @@ impl<T: AsFd> AsFilelike for T {
     }
 }
 
-/// A portable trait to borrow a filelike reference from an underlying object.
+/// A portable trait to borrow a reference from an underlying filelike object.
 ///
 /// This is a portability abstraction over Unix-like `AsFd` and Windows'
 /// [`AsHandle`]. It also provides the `as_filelike_view` convenience function
 /// providing typed views.
 #[cfg(windows)]
 pub trait AsFilelike: AsHandle {
-    /// Extracts the filelike reference.
+    /// Extracts the reference.
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -160,7 +160,7 @@ impl<T: AsHandle> AsFilelike for T {
     }
 }
 
-/// A portable trait to borrow a socketlike reference from an underlying
+/// A portable trait to borrow a reference from an underlying socketlike
 /// object.
 ///
 /// This is a portability abstraction over Unix-like [`AsFd`] and Windows'
@@ -168,7 +168,7 @@ impl<T: AsHandle> AsFilelike for T {
 /// function providing typed views.
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsSocketlike: AsFd {
-    /// Extracts the socketlike reference.
+    /// Extracts the reference.
     fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
@@ -196,7 +196,7 @@ impl<T: AsFd> AsSocketlike for T {
     }
 }
 
-/// A portable trait to borrow a socketlike reference from an underlying
+/// A portable trait to borrow a reference from an underlying socketlike
 /// object.
 ///
 /// This is a portability abstraction over Unix-like `AsFd` and Windows'
@@ -204,7 +204,7 @@ impl<T: AsFd> AsSocketlike for T {
 /// function providing typed views.
 #[cfg(windows)]
 pub trait AsSocketlike: AsSocket {
-    /// Extracts the socketlike reference.
+    /// Extracts the reference.
     fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
