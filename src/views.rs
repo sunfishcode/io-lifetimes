@@ -65,7 +65,8 @@ impl<Target: FromFilelike> FilelikeView<'_, Target> {
 
 #[cfg(windows)]
 impl<Target: FromSocketlike> SocketlikeView<'_, Target> {
-    /// Construct a temporary `Target` and wrap it in a `SocketlikeView` object.
+    /// Construct a temporary `Target` and wrap it in a `SocketlikeView`
+    /// object.
     #[inline]
     pub(crate) fn new<T: AsSocketlike>(socketlike: &T) -> Self {
         // Safety: The returned `SocketlikeView` is scoped to the lifetime of

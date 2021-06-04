@@ -21,8 +21,8 @@
 //!    `RawFd` values that users ought to be able to trust, but aren't unsafe,
 //!    so it's possible to fail to uphold this trust in purely safe Rust.
 //!
-//!  - It enables a number of safe and portable convenience features, such
-//!    as [safe typed views] and [from+into conversions].
+//!  - It enables a number of safe and portable convenience features, such as
+//!    [safe typed views] and [from+into conversions].
 //!
 //! [safe typed views]: AsFilelike::as_filelike_view
 //! [from+into conversions]: FromFilelike::from_into_filelike

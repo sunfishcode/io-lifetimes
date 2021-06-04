@@ -11,6 +11,7 @@ impl Tester {
         let _ = filelike.as_filelike_view::<std::fs::File>();
         let _ = dbg!(filelike);
     }
+
     fn use_socket<Socketlike: io_experiment::AsSocketlike>(socketlike: Socketlike) {
         let socketlike = socketlike.as_socketlike();
         let _ = socketlike.as_socketlike_view::<std::net::TcpStream>();
@@ -23,6 +24,7 @@ impl Tester {
         let _ = dbg!(&filelike);
         let _ = std::fs::File::from_filelike(filelike);
     }
+
     fn from_socket<Socketlike: io_experiment::IntoSocketlike>(socketlike: Socketlike) {
         let socketlike = socketlike.into_socketlike();
         let _ = socketlike.as_socketlike_view::<std::net::TcpStream>();
@@ -33,6 +35,7 @@ impl Tester {
     fn from_into_file<Filelike: io_experiment::IntoFilelike>(filelike: Filelike) {
         let _ = std::fs::File::from_into_filelike(filelike);
     }
+
     fn from_into_socket<Socketlike: io_experiment::IntoSocketlike>(socketlike: Socketlike) {
         let _ = std::net::TcpStream::from_into_socketlike(socketlike);
     }
