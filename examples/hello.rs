@@ -1,3 +1,5 @@
+#![cfg_attr(not(rustc_attrs), allow(unused_imports))]
+
 use io_experiment::example_ffi::*;
 use std::fs::File;
 use std::io::{self, Write};
@@ -12,7 +14,7 @@ use std::{convert::TryInto, ptr::null_mut};
 
 /// A simple testcase that prints a few messages to the console, demonstrating
 /// the io-experiment API.
-#[cfg(unix)]
+#[cfg(all(rustc_attrs, unix))]
 fn main() -> io::Result<()> {
     let fd = unsafe {
         // Open a file, which returns an `Option<OwnedFd>`, which we can
@@ -126,4 +128,9 @@ fn main() -> io::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(not(any(windows, rustc_attrs)))]
+fn main() {
+    println!("On Unix, this example requires Rust nightly (for `rustc_attrs`).");
 }

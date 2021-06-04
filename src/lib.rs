@@ -28,7 +28,7 @@
 //! [from+into conversions]: FromFilelike::from_into_filelike
 
 #![deny(missing_docs)]
-#![feature(rustc_attrs)]
+#![cfg_attr(rustc_attrs, feature(rustc_attrs))]
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
 mod portability;

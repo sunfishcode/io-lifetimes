@@ -1,3 +1,4 @@
+#![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
 use std::mem::size_of;
@@ -14,7 +15,7 @@ use std::os::wasi::io::RawFd;
 #[cfg(windows)]
 use std::os::windows::io::{RawHandle, RawSocket};
 
-#[cfg(any(unix, target_os = "wasi"))]
+#[cfg(all(rustc_attrs, any(unix, target_os = "wasi")))]
 #[test]
 fn test_niche_optimizations() {
     assert_eq!(size_of::<Option<OwnedFd>>(), size_of::<RawFd>());
@@ -23,12 +24,17 @@ fn test_niche_optimizations() {
 
 #[cfg(windows)]
 #[test]
-fn test_niche_optimizations() {
+fn test_niche_optimizations_handle() {
     assert_eq!(size_of::<Option<OwnedHandle>>(), size_of::<RawHandle>());
     assert_eq!(
         size_of::<Option<BorrowedHandle<'static>>>(),
         size_of::<RawHandle>(),
     );
+}
+
+#[cfg(all(rustc_attrs, windows))]
+#[test]
+fn test_niche_optimizations_socket() {
     assert_eq!(size_of::<Option<OwnedSocket>>(), size_of::<RawSocket>());
     assert_eq!(
         size_of::<Option<BorrowedSocket<'static>>>(),

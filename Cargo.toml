@@ -10,6 +10,9 @@ edition = "2018"
 repository = "https://github.com/sunfishcode/io-experiment"
 exclude = ["/.github"]
 
+[build-dependencies]
+rustc_version = "0.3.0"
+
 [dependencies]
 
 [target.'cfg(not(windows))'.dependencies]

@@ -1,7 +1,7 @@
 This is an experiment, associated with [RFC 3128].
 
-It requires nightly Rust, so that it can use `rustc_attrs` outside of `std`
-for now.
+Some features require nightly Rust, as they depend on `rustc_attrs` to
+perform niche optimizations needed for FFI use cases.
 
 For a quick taste, check out the code examples:
 
@@ -53,7 +53,7 @@ Full API documentation:
 
 Here's the fun part. `BorrowedFd` and `OwnedFd` are `repr(transparent)` and
 hold `RawFd` values, and `Option<BorrowedFd>` and `Option<OwnedFd>` are
-FFI-safe, so they can all be used in FFI [directly]:
+FFI-safe (on nightly Rust), so they can all be used in FFI [directly]:
 
 [directly]: https://github.com/sunfishcode/io-experiment/blob/main/src/example_ffi.rs
 

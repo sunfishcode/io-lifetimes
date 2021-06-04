@@ -30,11 +30,11 @@ use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
 #[cfg(any(unix, target_os = "wasi"))]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
-#[rustc_layout_scalar_valid_range_start(0)]
+#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
 // 32-bit c_int. Below is -2, in two's complement, but that only works out
 // because c_int is 32 bits.
-#[rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)]
+#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE))]
 pub struct BorrowedFd<'owned> {
     raw: RawFd,
     _phantom: PhantomData<&'owned OwnedFd>,
@@ -73,14 +73,14 @@ pub struct BorrowedHandle<'owned> {
 #[cfg(windows)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
-#[rustc_layout_scalar_valid_range_start(0)]
+#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // This is -2, in two's complement. -1 is `INVALID_SOCKET`.
 #[cfg_attr(
-    target_pointer_width = "32",
+    all(rustc_attrs, target_pointer_width = "32"),
     rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)
 )]
 #[cfg_attr(
-    target_pointer_width = "64",
+    all(rustc_attrs, target_pointer_width = "64"),
     rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FF_FF_FF_FF_FE)
 )]
 pub struct BorrowedSocket<'owned> {
@@ -98,11 +98,11 @@ pub struct BorrowedSocket<'owned> {
 /// has the value `-1`.
 #[cfg(any(unix, target_os = "wasi"))]
 #[repr(transparent)]
-#[rustc_layout_scalar_valid_range_start(0)]
+#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
 // 32-bit c_int. Below is -2, in two's complement, but that only works out
 // because c_int is 32 bits.
-#[rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)]
+#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE))]
 pub struct OwnedFd {
     raw: RawFd,
 }
@@ -137,14 +137,14 @@ pub struct OwnedHandle {
 /// [`INVALID_SOCKET`].
 #[cfg(windows)]
 #[repr(transparent)]
-#[rustc_layout_scalar_valid_range_start(0)]
+#[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // This is -2, in two's complement. -1 is `INVALID_SOCKET`.
 #[cfg_attr(
-    target_pointer_width = "32",
+    all(rustc_attrs, target_pointer_width = "32"),
     rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)
 )]
 #[cfg_attr(
-    target_pointer_width = "64",
+    all(rustc_attrs, target_pointer_width = "64"),
     rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FF_FF_FF_FF_FE)
 )]
 pub struct OwnedSocket {

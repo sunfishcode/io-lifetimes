@@ -1,3 +1,5 @@
+#![cfg_attr(not(rustc_attrs), allow(unused_imports))]
+
 #[cfg(any(unix, windows))]
 use io_experiment::example_ffi::*;
 #[cfg(windows)]
@@ -10,7 +12,7 @@ use winapi::{
     um::winnt::{FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ},
 };
 
-#[cfg(unix)]
+#[cfg(all(rustc_attrs, unix))]
 #[test]
 fn test_file_not_found() {
     assert!(unsafe {
@@ -44,7 +46,7 @@ fn test_file_not_found() {
     assert!(handle.is_err());
 }
 
-#[cfg(unix)]
+#[cfg(all(rustc_attrs, unix))]
 #[test]
 fn test_file_found() {
     assert!(unsafe { open("Cargo.toml\0".as_ptr() as *const _, O_RDONLY | O_CLOEXEC) }.is_some());

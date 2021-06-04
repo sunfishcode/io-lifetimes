@@ -3,7 +3,8 @@
 // Disable `improper_ctypes` warnings so that we don't lint about
 // `Option<OwnedFd>` appearing in an FFI signature. In the future rustc
 // would be modified to recognize this case.
-#![allow(improper_ctypes)]
+#![cfg_attr(rustc_attrs, allow(improper_ctypes))]
+#![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 #![allow(missing_docs)]
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -21,9 +22,12 @@ use winapi::{
 };
 
 /// Declare a few FFI functions ourselves, to show off the FFI ergonomics.
-#[cfg(any(unix, target_os = "wasi"))]
+#[cfg(all(rustc_attrs, any(unix, target_os = "wasi")))]
 extern "C" {
     pub fn open(pathname: *const c_char, flags: c_int, ...) -> Option<OwnedFd>;
+}
+#[cfg(any(unix, target_os = "wasi"))]
+extern "C" {
     pub fn read(fd: BorrowedFd<'_>, ptr: *mut c_void, size: size_t) -> ssize_t;
     pub fn write(fd: BorrowedFd<'_>, ptr: *const c_void, size: size_t) -> ssize_t;
     pub fn close(fd: OwnedFd) -> c_int;
