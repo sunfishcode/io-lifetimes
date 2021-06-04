@@ -75,6 +75,6 @@ extern "C" {
 #[cfg(windows)]
 pub use winapi::{
     shared::minwindef::{FALSE, TRUE},
-    um::fileapi::{CREATE_NEW, OPEN_EXISTING},
+    um::fileapi::{CREATE_ALWAYS, CREATE_NEW, OPEN_EXISTING},
     um::winnt::{FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ, FILE_GENERIC_WRITE},
 };
