@@ -136,4 +136,6 @@ they're simpler and safer to use. io-experiment doesn't include unsafe-io's
 `*ReadWrite*` or `*HandleOrSocket*` abstractions, and leaves these as features
 to be provided by separate layers on top.
 
+[`OwnedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_experiment/struct.OwnedFd.html
+[`BorrowedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_experiment/struct.BorrowedFd.html
 [RFC 3128]: https://github.com/rust-lang/rfcs/pull/3128
