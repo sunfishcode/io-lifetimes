@@ -32,15 +32,8 @@ extern "C" {
     pub fn write(fd: BorrowedFd<'_>, ptr: *const c_void, size: size_t) -> ssize_t;
     pub fn close(fd: OwnedFd) -> c_int;
 }
-#[cfg(unix)]
-pub use libc::O_CLOEXEC;
 #[cfg(any(unix, target_os = "wasi"))]
-pub use libc::{O_CREAT, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
-
-// Define `O_CLOEXEC` for WASI manually; upstream fix submitted here:
-// https://github.com/rust-lang/libc/pull/2210
-#[cfg(target_os = "wasi")]
-pub const O_CLOEXEC: c_int = 0;
+pub use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
 
 /// The Windows analogs of the above. Note the use of [`OptionFileHandle`] as
 /// the return type for `CreateFileW`, since that function is defined to return
