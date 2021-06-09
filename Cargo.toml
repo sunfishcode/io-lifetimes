@@ -11,7 +11,7 @@ repository = "https://github.com/sunfishcode/io-experiment"
 exclude = ["/.github"]
 
 [build-dependencies]
-rustc_version = "0.3.0"
+rustc_version = "0.4.0"
 
 [dependencies]
 
