@@ -1,18 +1,19 @@
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
 use io_lifetimes::{
-    AsFilelike, AsSocketlike, FromFilelike, FromSocketlike, IntoFilelike, IntoSocketlike,
+    AsFilelike, AsSocketlike, BorrowedFilelike, FromFilelike, FromSocketlike, IntoFilelike,
+    IntoSocketlike,
 };
 
 struct Tester {}
 impl Tester {
-    fn use_file<Filelike: AsFilelike>(filelike: &Filelike) {
+    fn use_file<'f, Filelike: AsFilelike<'f>>(filelike: Filelike) {
         let filelike = filelike.as_filelike();
         let _ = filelike.as_filelike_view::<std::fs::File>();
         let _ = dbg!(filelike);
     }
 
-    fn use_socket<Socketlike: AsSocketlike>(socketlike: &Socketlike) {
+    fn use_socket<'s, Socketlike: AsSocketlike<'s>>(socketlike: Socketlike) {
         let socketlike = socketlike.as_socketlike();
         let _ = socketlike.as_socketlike_view::<std::net::TcpStream>();
         let _ = dbg!(socketlike);
@@ -45,11 +46,11 @@ impl Tester {
 fn test_api() {
     let file = std::fs::File::open("Cargo.toml").unwrap();
     Tester::use_file(&file);
-    Tester::use_file(&file.as_filelike());
+    Tester::use_file(file.as_filelike());
 
     let socket = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
     Tester::use_socket(&socket);
-    Tester::use_socket(&socket.as_socketlike());
+    Tester::use_socket(socket.as_socketlike());
 
     Tester::from_file(std::fs::File::open("Cargo.toml").unwrap().into_filelike());
     Tester::from_socket(
@@ -64,4 +65,14 @@ fn test_api() {
             .unwrap()
             .into_socketlike(),
     );
+}
+
+#[test]
+fn test_as() {
+    let file = std::fs::File::open("Cargo.toml").unwrap();
+    let borrow: BorrowedFilelike = file.as_filelike();
+    let reborrow: BorrowedFilelike = borrow.as_filelike();
+    let ref_reborrow: &BorrowedFilelike = &reborrow;
+    let borrow_ref_reborrow: BorrowedFilelike = ref_reborrow.as_filelike();
+    let _ref_borrow_ref_reborrow: &BorrowedFilelike = &borrow_ref_reborrow;
 }
