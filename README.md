@@ -27,21 +27,21 @@ The core of the API is very simple, and consists of two main types and three
 main traits:
 
 ```rust
-pub struct BorrowedFd<'owned> { ... }
+pub struct BorrowedFd<'fd> { ... }
 pub struct OwnedFd { ... }
 
 pub trait AsFd { ... }
 pub trait IntoFd { ... }
 pub trait FromFd { ... }
 
-impl<'owned> AsRawFd for BorrowedFd<'owned> { ... }
+impl<'fd> AsRawFd for BorrowedFd<'fd> { ... }
 impl AsRawFd for OwnedFd { ... }
 impl IntoRawFd for OwnedFd { ... }
 impl FromRawFd for OwnedFd { ... }
 
 impl Drop for OwnedFd { ... }
 
-impl<'owned> AsFd for BorrowedFd<'owned> { ... }
+impl<'fd> AsFd for BorrowedFd<'fd> { ... }
 impl AsFd for OwnedFd { ... }
 impl IntoFd for OwnedFd { ... }
 impl FromFd for OwnedFd { ... }

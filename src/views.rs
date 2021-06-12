@@ -18,13 +18,14 @@ use std::ops::{Deref, DerefMut};
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
 /// `&mut Target`. These are returned by [`AsFilelike::as_filelike_view`].
-pub struct FilelikeView<'owned, Target: FromFilelike + IntoFilelike> {
+pub struct FilelikeView<'filelike, Target: FromFilelike + IntoFilelike> {
     /// The value to dereference to. This is an `Option` so that we can consume
     /// it in our `Drop` impl.
     target: Option<Target>,
 
-    /// This field exists because we don't otherwise explicitly use `'owned`.
-    _phantom: PhantomData<&'owned OwnedFilelike>,
+    /// This field exists because we don't otherwise explicitly use
+    /// `'filelike`.
+    _phantom: PhantomData<&'filelike OwnedFilelike>,
 }
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
@@ -32,18 +33,19 @@ pub struct FilelikeView<'owned, Target: FromFilelike + IntoFilelike> {
 ///
 /// [`AsSocketlike::as_socketlike_view`]: crate::AsSocketlike::as_socketlike_view
 #[cfg(any(unix, target_os = "wasi"))]
-pub type SocketlikeView<'owned, Target> = FilelikeView<'owned, Target>;
+pub type SocketlikeView<'socketlike, Target> = FilelikeView<'socketlike, Target>;
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
 /// `&mut Target`. These are returned by [`AsSocketlike::as_socketlike_view`].
 #[cfg(windows)]
-pub struct SocketlikeView<'owned, Target: FromSocketlike + IntoSocketlike> {
+pub struct SocketlikeView<'socketlike, Target: FromSocketlike + IntoSocketlike> {
     /// The value to dereference to. This is an `Option` so that we can consume
     /// it in our `Drop` impl.
     target: Option<Target>,
 
-    /// This field exists because we don't otherwise explicitly use `'owned`.
-    _phantom: PhantomData<&'owned OwnedSocketlike>,
+    /// This field exists because we don't otherwise explicitly use
+    /// `'socketlike`.
+    _phantom: PhantomData<&'socketlike OwnedSocketlike>,
 }
 
 impl<Target: FromFilelike + IntoFilelike> FilelikeView<'_, Target> {

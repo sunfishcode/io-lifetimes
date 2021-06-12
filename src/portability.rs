@@ -27,28 +27,28 @@ use std::os::windows::io::{
 /// This is a portability abstraction over Unix-like [`BorrowedFd`] and
 /// Windows' `BorrowedHandle`.
 #[cfg(any(unix, target_os = "wasi"))]
-pub type BorrowedFilelike<'owned> = BorrowedFd<'owned>;
+pub type BorrowedFilelike<'filelike> = BorrowedFd<'filelike>;
 
 /// A reference to a filelike object.
 ///
 /// This is a portability abstraction over Unix-like `BorrowedFd` and
 /// Windows' [`BorrowedHandle`].
 #[cfg(windows)]
-pub type BorrowedFilelike<'owned> = BorrowedHandle<'owned>;
+pub type BorrowedFilelike<'filelike> = BorrowedHandle<'filelike>;
 
 /// A reference to a socketlike object.
 ///
 /// This is a portability abstraction over Unix-like [`BorrowedFd`] and
 /// Windows' `BorrowedSocket`.
 #[cfg(any(unix, target_os = "wasi"))]
-pub type BorrowedSocketlike<'owned> = BorrowedFd<'owned>;
+pub type BorrowedSocketlike<'socketlike> = BorrowedFd<'socketlike>;
 
 /// A reference to a socketlike object.
 ///
 /// This is a portability abstraction over Unix-like `BorrowedFd` and
 /// Windows' [`BorrowedSocket`].
 #[cfg(windows)]
-pub type BorrowedSocketlike<'owned> = BorrowedSocket<'owned>;
+pub type BorrowedSocketlike<'socketlike> = BorrowedSocket<'socketlike>;
 
 /// An owned filelike object.
 ///

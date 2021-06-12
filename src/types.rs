@@ -35,9 +35,9 @@ use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
 // 32-bit c_int. Below is -2, in two's complement, but that only works out
 // because c_int is 32 bits.
 #[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE))]
-pub struct BorrowedFd<'owned> {
+pub struct BorrowedFd<'fd> {
     raw: RawFd,
-    _phantom: PhantomData<&'owned OwnedFd>,
+    _phantom: PhantomData<&'fd OwnedFd>,
 }
 
 /// A borrowed handle.
@@ -56,9 +56,9 @@ pub struct BorrowedFd<'owned> {
 #[cfg(windows)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
-pub struct BorrowedHandle<'owned> {
+pub struct BorrowedHandle<'handle> {
     raw: NonNull<c_void>,
-    _phantom: PhantomData<&'owned OwnedHandle>,
+    _phantom: PhantomData<&'handle OwnedHandle>,
 }
 
 /// A borrowed socket.
@@ -83,9 +83,9 @@ pub struct BorrowedHandle<'owned> {
     all(rustc_attrs, target_pointer_width = "64"),
     rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FF_FF_FF_FF_FE)
 )]
-pub struct BorrowedSocket<'owned> {
+pub struct BorrowedSocket<'socket> {
     raw: RawSocket,
-    _phantom: PhantomData<&'owned OwnedSocket>,
+    _phantom: PhantomData<&'socket OwnedSocket>,
 }
 
 /// An owned file descriptor.
