@@ -1,9 +1,9 @@
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 
 #[cfg(any(unix, windows))]
-use io_experiment::example_ffi::*;
+use io_lifetimes::example_ffi::*;
 #[cfg(windows)]
-use io_experiment::OwnedHandle;
+use io_lifetimes::OwnedHandle;
 #[cfg(windows)]
 use std::{convert::TryInto, ptr::null_mut};
 #[cfg(windows)]

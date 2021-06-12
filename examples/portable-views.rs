@@ -1,4 +1,4 @@
-use io_experiment::AsFilelike;
+use io_lifetimes::AsFilelike;
 use std::fs::File;
 use std::io::{self, stdout};
 

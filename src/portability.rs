@@ -104,7 +104,7 @@ pub trait AsFilelike: AsFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{AsFilelike, BorrowedFilelike};
+    /// use io_lifetimes::{AsFilelike, BorrowedFilelike};
     ///
     /// let mut f = File::open("foo.txt")?;
     /// let borrowed_filelike: BorrowedFilelike<'_> = f.as_filelike();
@@ -146,7 +146,7 @@ pub trait AsFilelike: AsHandle {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{AsFilelike, BorrowedFilelike};
+    /// use io_lifetimes::{AsFilelike, BorrowedFilelike};
     ///
     /// let mut f = File::open("foo.txt")?;
     /// let borrowed_filelike: BorrowedFilelike<'_> = f.as_filelike();
@@ -258,7 +258,7 @@ pub trait IntoFilelike: IntoFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{IntoFilelike, OwnedFilelike};
+    /// use io_lifetimes::{IntoFilelike, OwnedFilelike};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_filelike: OwnedFilelike = f.into_filelike();
@@ -327,7 +327,7 @@ pub trait IntoSocketlike: IntoSocket {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{IntoFilelike, OwnedFilelike};
+    /// use io_lifetimes::{IntoFilelike, OwnedFilelike};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_filelike: OwnedFilelike = f.into_filelike();
@@ -359,7 +359,7 @@ pub trait FromFilelike: FromFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromFilelike, IntoFilelike, OwnedFilelike};
+    /// use io_lifetimes::{FromFilelike, IntoFilelike, OwnedFilelike};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_filelike: OwnedFilelike = f.into_filelike();
@@ -376,7 +376,7 @@ pub trait FromFilelike: FromFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromFilelike, IntoFilelike};
+    /// use io_lifetimes::{FromFilelike, IntoFilelike};
     ///
     /// let f = File::open("foo.txt")?;
     /// let f = File::from_into_filelike(f);
@@ -413,7 +413,7 @@ pub trait FromFilelike: FromHandle {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromFilelike, IntoFilelike, OwnedFilelike};
+    /// use io_lifetimes::{FromFilelike, IntoFilelike, OwnedFilelike};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_filelike: OwnedFilelike = f.into_filelike();
@@ -430,7 +430,7 @@ pub trait FromFilelike: FromHandle {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromFilelike, IntoFilelike};
+    /// use io_lifetimes::{FromFilelike, IntoFilelike};
     ///
     /// let f = File::open("foo.txt")?;
     /// let f = File::from_into_filelike(f);

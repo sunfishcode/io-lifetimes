@@ -1,13 +1,13 @@
 [package]
-name = "io-experiment"
+name = "io-lifetimes"
 version = "0.0.0"
-description = "An experimental low-level I/O library"
+description = "A low-level I/O ownership and borrowing library"
 authors = ["Dan Gohman <dev@sunfishcode.online>"]
 license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
 keywords = ["api", "io"]
 categories = ["os", "rust-patterns"]
 edition = "2018"
-repository = "https://github.com/sunfishcode/io-experiment"
+repository = "https://github.com/sunfishcode/io-lifetimes"
 exclude = ["/.github"]
 
 [build-dependencies]

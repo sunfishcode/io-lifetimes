@@ -4,9 +4,9 @@
 use std::mem::size_of;
 
 #[cfg(any(unix, target_os = "wasi"))]
-use io_experiment::{BorrowedFd, OwnedFd};
+use io_lifetimes::{BorrowedFd, OwnedFd};
 #[cfg(windows)]
-use io_experiment::{BorrowedHandle, BorrowedSocket, OwnedHandle, OwnedSocket};
+use io_lifetimes::{BorrowedHandle, BorrowedSocket, OwnedHandle, OwnedSocket};
 
 #[cfg(unix)]
 use std::os::unix::io::RawFd;

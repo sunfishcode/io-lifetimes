@@ -25,7 +25,7 @@ pub trait AsFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{AsFd, BorrowedFd};
+    /// use io_lifetimes::{AsFd, BorrowedFd};
     ///
     /// let mut f = File::open("foo.txt")?;
     /// let borrowed_fd: BorrowedFd<'_> = f.as_fd();
@@ -44,7 +44,7 @@ pub trait AsHandle {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{AsHandle, BorrowedHandle};
+    /// use io_lifetimes::{AsHandle, BorrowedHandle};
     ///
     /// let mut f = File::open("foo.txt")?;
     /// let borrowed_handle: BorrowedHandle<'_> = f.as_handle();
@@ -71,7 +71,7 @@ pub trait IntoFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{IntoFd, OwnedFd};
+    /// use io_lifetimes::{IntoFd, OwnedFd};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_fd: OwnedFd = f.into_fd();
@@ -91,7 +91,7 @@ pub trait IntoHandle {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{IntoHandle, OwnedHandle};
+    /// use io_lifetimes::{IntoHandle, OwnedHandle};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_handle: OwnedHandle = f.into_handle();
@@ -119,7 +119,7 @@ pub trait FromFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromFd, IntoFd, OwnedFd};
+    /// use io_lifetimes::{FromFd, IntoFd, OwnedFd};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_fd: OwnedFd = f.into_fd();
@@ -136,7 +136,7 @@ pub trait FromFd {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromFd, IntoFd};
+    /// use io_lifetimes::{FromFd, IntoFd};
     ///
     /// let f = File::open("foo.txt")?;
     /// let f = File::from_into_fd(f);
@@ -161,7 +161,7 @@ pub trait FromHandle {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromHandle, IntoHandle, OwnedHandle};
+    /// use io_lifetimes::{FromHandle, IntoHandle, OwnedHandle};
     ///
     /// let f = File::open("foo.txt")?;
     /// let owned_handle: OwnedHandle = f.into_handle();
@@ -178,7 +178,7 @@ pub trait FromHandle {
     /// ```rust,no_run
     /// use std::fs::File;
     /// # use std::io;
-    /// use io_experiment::{FromHandle, IntoHandle};
+    /// use io_lifetimes::{FromHandle, IntoHandle};
     ///
     /// let f = File::open("foo.txt")?;
     /// let f = File::from_into_handle(f);

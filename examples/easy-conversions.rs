@@ -1,4 +1,4 @@
-use io_experiment::FromFilelike;
+use io_lifetimes::FromFilelike;
 use std::fs::File;
 use std::io::{self, Read};
 use std::process::{Command, Stdio};

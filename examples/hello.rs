@@ -1,19 +1,19 @@
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 
-use io_experiment::example_ffi::*;
+use io_lifetimes::example_ffi::*;
 use std::fs::File;
 use std::io::{self, Write};
 
 #[cfg(unix)]
-use io_experiment::{AsFd, FromFd, IntoFd, OwnedFd};
+use io_lifetimes::{AsFd, FromFd, IntoFd, OwnedFd};
 
 #[cfg(windows)]
-use io_experiment::{AsHandle, FromHandle, IntoHandle, OwnedHandle};
+use io_lifetimes::{AsHandle, FromHandle, IntoHandle, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, ptr::null_mut};
 
 /// A simple testcase that prints a few messages to the console, demonstrating
-/// the io-experiment API.
+/// the io-lifetimes API.
 #[cfg(all(rustc_attrs, unix))]
 fn main() -> io::Result<()> {
     let fd = unsafe {

@@ -1,7 +1,13 @@
-This is an experiment, associated with [RFC 3128].
+This library introduces `OwnedFd`, `BorrowedFd`, and supporting types and
+traits, and corresponding features for Windows, which implement safe owning
+and borrowing I/O lifetime patterns.
 
-Some features require nightly Rust, as they depend on `rustc_attrs` to
-perform niche optimizations needed for FFI use cases.
+This is associated with [RFC 3128], the I/O Safety RFC, which proposes that
+this API be added to `std`, with the goal being to eventually replace `RawFd`
+etc. for most use cases.
+
+Some features currently require nightly Rust, as they depend on `rustc_attrs`
+to perform niche optimizations needed for FFI use cases.
 
 For a quick taste, check out the code examples:
 
@@ -12,10 +18,10 @@ For a quick taste, check out the code examples:
  - [portable-views], demonstrating the convenience feature which allows one
    to temporarily "view" a file descriptor as any owning type such as `File`
 
-[hello]: https://github.com/sunfishcode/io-experiment/blob/main/examples/hello.rs
-[easy-conversions]: https://github.com/sunfishcode/io-experiment/blob/main/examples/easy-conversions.rs
-[portable-views]: https://github.com/sunfishcode/io-experiment/blob/main/examples/portable-views.rs
-[provided example FFI bindings]: https://github.com/sunfishcode/io-experiment/blob/main/src/example_ffi.rs
+[hello]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/hello.rs
+[easy-conversions]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/easy-conversions.rs
+[portable-views]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/portable-views.rs
+[provided example FFI bindings]: https://github.com/sunfishcode/io-lifetimes/blob/main/src/example_ffi.rs
 
 The core of the API is very simple, and consists of two main types and three
 main traits:
@@ -55,7 +61,7 @@ Here's the fun part. `BorrowedFd` and `OwnedFd` are `repr(transparent)` and
 hold `RawFd` values, and `Option<BorrowedFd>` and `Option<OwnedFd>` are
 FFI-safe (on nightly Rust), so they can all be used in FFI [directly]:
 
-[directly]: https://github.com/sunfishcode/io-experiment/blob/main/src/example_ffi.rs
+[directly]: https://github.com/sunfishcode/io-lifetimes/blob/main/src/example_ffi.rs
 
 ```rust
 extern "C" {
@@ -83,56 +89,56 @@ There are several similar crates: [fd](https://crates.io/crates/fd),
 
 Some of these provide additional features such as the ability to create pipes
 or sockets, to get and set flags, and to do read and write operations.
-io-experiment omits these features, leaving them to to be provided as separate
+io-lifetimes omits these features, leaving them to to be provided as separate
 layers on top.
 
-Most of these crates provide ways to duplicate a file descriptor. io-experiment
+Most of these crates provide ways to duplicate a file descriptor. io-lifetimes
 currently treats this as another feature than can be provided by a layer on
 top, though if there are use cases where this is a common operation, it could
 be added.
 
-io-experiment's distinguishing features are its use of `repr(transparent)`
+io-lifetimes's distinguishing features are its use of `repr(transparent)`
 to support direct FFI usage, niche optimizations so `Option` can support direct
 FFI usafe as well (on nightly Rust), lifetime-aware `As*`/`Into*`/`From*`
 traits which leverage Rust's lifetime system and allow safe and checked
 `from_*` and `as_*`/`into_*` functions, and powerful convenience features
 enabled by its underlying safety.
 
-io-experiment also has full Windows support, as well as Unix/Windows
+io-lifetimes also has full Windows support, as well as Unix/Windows
 portability abstractions, covering both file-like and socket-like types.
 
-io-experiment's [`OwnedFd`] type is similar to
+io-lifetimes's [`OwnedFd`] type is similar to
 [fd](https://crates.io/crates/fd)'s
-[`FileDesc`](https://docs.rs/fd/0.2.3/fd/struct.FileDesc.html). io-experiment
+[`FileDesc`](https://docs.rs/fd/0.2.3/fd/struct.FileDesc.html). io-lifetimes
 doesn't have a `close_on_drop` parameter, and instead uses [`OwnedFd`] and
 [`BorrowedFd`] to represent dropping and non-dropping handles, respectively, in
 a way that is checked at compile time rather than runtime.
 
-io-experiment's [`OwnedFd`] type is also similar to
+io-lifetimes's [`OwnedFd`] type is also similar to
 [filedesc](https://crates.io/crates/filedesc)'s
 [`FileDesc`](https://docs.rs/filedesc/0.3.0/filedesc/struct.FileDesc.html)
-io-experiment's `OwnedFd` reserves the value -1, so it doesn't need to test for
+io-lifetimes's `OwnedFd` reserves the value -1, so it doesn't need to test for
 `-1` in its `Drop`, and `Option<OwnedFd>` is the same size as `OwnedFd` (on
 nightly Rust).
 
-io-experiment's [`OwnedFd`] type is also similar to
+io-lifetimes's [`OwnedFd`] type is also similar to
 [owned-fd](https://crates.io/crates/owned-fd)'s
 [`OwnedFd`](https://docs.rs/owned-fd/0.1.0/owned_fd/struct.OwnedFd.html).
-io-experiment doesn't implement `Clone`, because duplicating a file descriptor
+io-lifetimes doesn't implement `Clone`, because duplicating a file descriptor
 can fail due to OS process limits, while `Clone` is an infallible interface.
 
-io-experiment's [`BorrowedFd`] is similar to
+io-lifetimes's [`BorrowedFd`] is similar to
 [owned-fd](https://crates.io/crates/owned-fd)'s
 [`FdRef`](https://docs.rs/owned-fd/0.1.0/owned_fd/struct.FdRef.html), except it
 uses a lifetime parameter and `PhantomData` rather than transmuting a raw file
 descriptor value into a reference value.
 
-io-experiment's convenience features are similar to those of
-[unsafe-io](https://crates.io/crates/unsafe-io), but io-experiment is built on
+io-lifetimes's convenience features are similar to those of
+[unsafe-io](https://crates.io/crates/unsafe-io), but io-lifetimes is built on
 its own `As*`/`Into*`/`From*` traits, rather than extending
 `AsRaw*`/`IntoRaw*`/`FromRaw*` with
 [`OwnsRaw`](https://docs.rs/unsafe-io/0.6.9/unsafe_io/trait.OwnsRaw.html), so
-they're simpler and safer to use. io-experiment doesn't include unsafe-io's
+they're simpler and safer to use. io-lifetimes doesn't include unsafe-io's
 `*ReadWrite*` or `*HandleOrSocket*` abstractions, and leaves these as features
 to be provided by separate layers on top.
 
