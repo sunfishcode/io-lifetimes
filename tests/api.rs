@@ -6,13 +6,13 @@ use io_lifetimes::{
 
 struct Tester {}
 impl Tester {
-    fn use_file<Filelike: AsFilelike>(filelike: Filelike) {
+    fn use_file<Filelike: AsFilelike>(filelike: &Filelike) {
         let filelike = filelike.as_filelike();
         let _ = filelike.as_filelike_view::<std::fs::File>();
         let _ = dbg!(filelike);
     }
 
-    fn use_socket<Socketlike: AsSocketlike>(socketlike: Socketlike) {
+    fn use_socket<Socketlike: AsSocketlike>(socketlike: &Socketlike) {
         let socketlike = socketlike.as_socketlike();
         let _ = socketlike.as_socketlike_view::<std::net::TcpStream>();
         let _ = dbg!(socketlike);
@@ -43,12 +43,13 @@ impl Tester {
 
 #[test]
 fn test_api() {
-    Tester::use_file(std::fs::File::open("Cargo.toml").unwrap().as_filelike());
-    Tester::use_socket(
-        std::net::TcpListener::bind("127.0.0.1:0")
-            .unwrap()
-            .as_socketlike(),
-    );
+    let file = std::fs::File::open("Cargo.toml").unwrap();
+    Tester::use_file(&file);
+    Tester::use_file(&file.as_filelike());
+
+    let socket = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    Tester::use_socket(&socket);
+    Tester::use_socket(&socket.as_socketlike());
 
     Tester::from_file(std::fs::File::open("Cargo.toml").unwrap().into_filelike());
     Tester::from_socket(
