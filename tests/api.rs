@@ -47,15 +47,35 @@ fn test_api() {
     let file = std::fs::File::open("Cargo.toml").unwrap();
     Tester::use_file(&file);
     Tester::use_file(file.as_filelike());
+    Tester::use_file(&*file.as_filelike_view::<std::fs::File>());
+    Tester::use_file(file.as_filelike_view::<std::fs::File>().as_filelike());
 
     let socket = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
     Tester::use_socket(&socket);
     Tester::use_socket(socket.as_socketlike());
+    Tester::use_socket(&*socket.as_socketlike_view::<std::net::TcpListener>());
+    Tester::use_socket(
+        socket
+            .as_socketlike_view::<std::net::TcpListener>()
+            .as_socketlike(),
+    );
 
     Tester::from_file(std::fs::File::open("Cargo.toml").unwrap().into_filelike());
+    Tester::from_file(
+        std::fs::File::open("Cargo.toml")
+            .unwrap()
+            .into_filelike()
+            .into_filelike(),
+    );
     Tester::from_socket(
         std::net::TcpListener::bind("127.0.0.1:0")
             .unwrap()
+            .into_socketlike(),
+    );
+    Tester::from_socket(
+        std::net::TcpListener::bind("127.0.0.1:0")
+            .unwrap()
+            .into_socketlike()
             .into_socketlike(),
     );
 
