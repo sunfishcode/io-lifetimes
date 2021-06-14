@@ -52,3 +52,8 @@ pub use portability::{
 
 pub mod example_ffi;
 pub mod views;
+
+// Ideally, we'd want crates to implement our traits themselves. But for now,
+// while we're prototyping, we provide a few impls on foreign types.
+#[cfg(feature = "async-std")]
+mod impls_async_std;
