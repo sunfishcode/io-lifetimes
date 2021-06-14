@@ -1,25 +1,20 @@
-//! Implementations of io-lifetimes' traits for async-std's types. In the
+//! Implementations of io-lifetimes' traits for mio's types. In the
 //! future, we'll prefer to have crates provide their own impls; this is
 //! just a temporary measure.
 
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
-use crate::{
-    AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, FromHandle, FromSocket, IntoHandle,
-    IntoSocket, OwnedHandle, OwnedSocket,
-};
+use crate::{AsSocket, BorrowedSocket, FromSocket, IntoSocket, OwnedSocket};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(target_os = "wasi")]
 use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(windows)]
-use std::os::windows::io::{
-    AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
-};
+use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket};
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'fd> AsFd<'fd> for &'fd async_std::fs::File {
+impl<'fd> AsFd<'fd> for &'fd mio::net::TcpStream {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'fd> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -27,55 +22,7 @@ impl<'fd> AsFd<'fd> for &'fd async_std::fs::File {
 }
 
 #[cfg(windows)]
-impl<'handle> AsHandle<'handle> for &'handle async_std::fs::File {
-    #[inline]
-    fn as_handle(self) -> BorrowedHandle<'handle> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl IntoFd for async_std::fs::File {
-    #[inline]
-    fn into_fd(self) -> OwnedFd {
-        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
-    }
-}
-
-#[cfg(windows)]
-impl IntoHandle for async_std::fs::File {
-    #[inline]
-    fn into_handle(self) -> OwnedHandle {
-        unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl FromFd for async_std::fs::File {
-    #[inline]
-    fn from_fd(owned: OwnedFd) -> Self {
-        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
-    }
-}
-
-#[cfg(windows)]
-impl FromHandle for async_std::fs::File {
-    #[inline]
-    fn from_handle(owned: OwnedHandle) -> Self {
-        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl<'fd> AsFd<'fd> for &'fd async_std::net::TcpStream {
-    #[inline]
-    fn as_fd(self) -> BorrowedFd<'fd> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
-    }
-}
-
-#[cfg(windows)]
-impl<'socket> AsSocket<'socket> for &'socket async_std::net::TcpStream {
+impl<'socket> AsSocket<'socket> for &'socket mio::net::TcpStream {
     #[inline]
     fn as_socket(self) -> BorrowedSocket<'socket> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
@@ -83,7 +30,7 @@ impl<'socket> AsSocket<'socket> for &'socket async_std::net::TcpStream {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl IntoFd for async_std::net::TcpStream {
+impl IntoFd for mio::net::TcpStream {
     #[inline]
     fn into_fd(self) -> OwnedFd {
         unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
@@ -91,7 +38,7 @@ impl IntoFd for async_std::net::TcpStream {
 }
 
 #[cfg(windows)]
-impl IntoSocket for async_std::net::TcpStream {
+impl IntoSocket for mio::net::TcpStream {
     #[inline]
     fn into_socket(self) -> OwnedSocket {
         unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
@@ -99,7 +46,7 @@ impl IntoSocket for async_std::net::TcpStream {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl FromFd for async_std::net::TcpStream {
+impl FromFd for mio::net::TcpStream {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
@@ -107,7 +54,7 @@ impl FromFd for async_std::net::TcpStream {
 }
 
 #[cfg(windows)]
-impl FromSocket for async_std::net::TcpStream {
+impl FromSocket for mio::net::TcpStream {
     #[inline]
     fn from_socket(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
@@ -115,7 +62,7 @@ impl FromSocket for async_std::net::TcpStream {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'fd> AsFd<'fd> for &'fd async_std::net::TcpListener {
+impl<'fd> AsFd<'fd> for &'fd mio::net::TcpListener {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'fd> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -123,7 +70,7 @@ impl<'fd> AsFd<'fd> for &'fd async_std::net::TcpListener {
 }
 
 #[cfg(windows)]
-impl<'socket> AsSocket<'socket> for &'socket async_std::net::TcpListener {
+impl<'socket> AsSocket<'socket> for &'socket mio::net::TcpListener {
     #[inline]
     fn as_socket(self) -> BorrowedSocket<'socket> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
@@ -131,7 +78,7 @@ impl<'socket> AsSocket<'socket> for &'socket async_std::net::TcpListener {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl IntoFd for async_std::net::TcpListener {
+impl IntoFd for mio::net::TcpListener {
     #[inline]
     fn into_fd(self) -> OwnedFd {
         unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
@@ -139,7 +86,7 @@ impl IntoFd for async_std::net::TcpListener {
 }
 
 #[cfg(windows)]
-impl IntoSocket for async_std::net::TcpListener {
+impl IntoSocket for mio::net::TcpListener {
     #[inline]
     fn into_socket(self) -> OwnedSocket {
         unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
@@ -147,7 +94,7 @@ impl IntoSocket for async_std::net::TcpListener {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl FromFd for async_std::net::TcpListener {
+impl FromFd for mio::net::TcpListener {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
@@ -155,7 +102,7 @@ impl FromFd for async_std::net::TcpListener {
 }
 
 #[cfg(windows)]
-impl FromSocket for async_std::net::TcpListener {
+impl FromSocket for mio::net::TcpListener {
     #[inline]
     fn from_socket(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
@@ -163,7 +110,7 @@ impl FromSocket for async_std::net::TcpListener {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'fd> AsFd<'fd> for &'fd async_std::net::UdpSocket {
+impl<'fd> AsFd<'fd> for &'fd mio::net::TcpSocket {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'fd> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -171,7 +118,7 @@ impl<'fd> AsFd<'fd> for &'fd async_std::net::UdpSocket {
 }
 
 #[cfg(windows)]
-impl<'socket> AsSocket<'socket> for &'socket async_std::net::UdpSocket {
+impl<'socket> AsSocket<'socket> for &'socket mio::net::TcpSocket {
     #[inline]
     fn as_socket(self) -> BorrowedSocket<'socket> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
@@ -179,7 +126,7 @@ impl<'socket> AsSocket<'socket> for &'socket async_std::net::UdpSocket {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl IntoFd for async_std::net::UdpSocket {
+impl IntoFd for mio::net::TcpSocket {
     #[inline]
     fn into_fd(self) -> OwnedFd {
         unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
@@ -187,7 +134,7 @@ impl IntoFd for async_std::net::UdpSocket {
 }
 
 #[cfg(windows)]
-impl IntoSocket for async_std::net::UdpSocket {
+impl IntoSocket for mio::net::TcpSocket {
     #[inline]
     fn into_socket(self) -> OwnedSocket {
         unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
@@ -195,7 +142,7 @@ impl IntoSocket for async_std::net::UdpSocket {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl FromFd for async_std::net::UdpSocket {
+impl FromFd for mio::net::TcpSocket {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
@@ -203,7 +150,7 @@ impl FromFd for async_std::net::UdpSocket {
 }
 
 #[cfg(windows)]
-impl FromSocket for async_std::net::UdpSocket {
+impl FromSocket for mio::net::TcpSocket {
     #[inline]
     fn from_socket(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
@@ -211,7 +158,7 @@ impl FromSocket for async_std::net::UdpSocket {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'fd> AsFd<'fd> for &'fd async_std::io::Stdin {
+impl<'fd> AsFd<'fd> for &'fd mio::net::UdpSocket {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'fd> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -219,47 +166,47 @@ impl<'fd> AsFd<'fd> for &'fd async_std::io::Stdin {
 }
 
 #[cfg(windows)]
-impl<'handle> AsHandle<'handle> for &'handle async_std::io::Stdin {
+impl<'socket> AsSocket<'socket> for &'socket mio::net::UdpSocket {
     #[inline]
-    fn as_handle(self) -> BorrowedHandle<'handle> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    fn as_socket(self) -> BorrowedSocket<'socket> {
+        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'fd> AsFd<'fd> for &'fd async_std::io::Stdout {
+impl IntoFd for mio::net::UdpSocket {
     #[inline]
-    fn as_fd(self) -> BorrowedFd<'fd> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    fn into_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl<'handle> AsHandle<'handle> for &'handle async_std::io::Stdout {
+impl IntoSocket for mio::net::UdpSocket {
     #[inline]
-    fn as_handle(self) -> BorrowedHandle<'handle> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    fn into_socket(self) -> OwnedSocket {
+        unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'fd> AsFd<'fd> for &'fd async_std::io::Stderr {
+impl FromFd for mio::net::UdpSocket {
     #[inline]
-    fn as_fd(self) -> BorrowedFd<'fd> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl<'handle> AsHandle<'handle> for &'handle async_std::io::Stderr {
+impl FromSocket for mio::net::UdpSocket {
     #[inline]
-    fn as_handle(self) -> BorrowedHandle<'handle> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    fn from_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
 
 #[cfg(unix)]
-impl<'fd> AsFd<'fd> for &'fd async_std::os::unix::net::UnixStream {
+impl<'fd> AsFd<'fd> for &'fd mio::net::UnixDatagram {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'fd> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -267,7 +214,7 @@ impl<'fd> AsFd<'fd> for &'fd async_std::os::unix::net::UnixStream {
 }
 
 #[cfg(unix)]
-impl IntoFd for async_std::os::unix::net::UnixStream {
+impl IntoFd for mio::net::UnixDatagram {
     #[inline]
     fn into_fd(self) -> OwnedFd {
         unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
@@ -275,7 +222,7 @@ impl IntoFd for async_std::os::unix::net::UnixStream {
 }
 
 #[cfg(unix)]
-impl FromFd for async_std::os::unix::net::UnixStream {
+impl FromFd for mio::net::UnixDatagram {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
@@ -283,7 +230,7 @@ impl FromFd for async_std::os::unix::net::UnixStream {
 }
 
 #[cfg(unix)]
-impl<'fd> AsFd<'fd> for &'fd async_std::os::unix::net::UnixListener {
+impl<'fd> AsFd<'fd> for &'fd mio::net::UnixListener {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'fd> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -291,7 +238,7 @@ impl<'fd> AsFd<'fd> for &'fd async_std::os::unix::net::UnixListener {
 }
 
 #[cfg(unix)]
-impl IntoFd for async_std::os::unix::net::UnixListener {
+impl IntoFd for mio::net::UnixListener {
     #[inline]
     fn into_fd(self) -> OwnedFd {
         unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
@@ -299,7 +246,7 @@ impl IntoFd for async_std::os::unix::net::UnixListener {
 }
 
 #[cfg(unix)]
-impl FromFd for async_std::os::unix::net::UnixListener {
+impl FromFd for mio::net::UnixListener {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
@@ -307,7 +254,7 @@ impl FromFd for async_std::os::unix::net::UnixListener {
 }
 
 #[cfg(unix)]
-impl<'fd> AsFd<'fd> for &'fd async_std::os::unix::net::UnixDatagram {
+impl<'fd> AsFd<'fd> for &'fd mio::net::UnixStream {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'fd> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -315,7 +262,7 @@ impl<'fd> AsFd<'fd> for &'fd async_std::os::unix::net::UnixDatagram {
 }
 
 #[cfg(unix)]
-impl IntoFd for async_std::os::unix::net::UnixDatagram {
+impl IntoFd for mio::net::UnixStream {
     #[inline]
     fn into_fd(self) -> OwnedFd {
         unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
@@ -323,7 +270,55 @@ impl IntoFd for async_std::os::unix::net::UnixDatagram {
 }
 
 #[cfg(unix)]
-impl FromFd for async_std::os::unix::net::UnixDatagram {
+impl FromFd for mio::net::UnixStream {
+    #[inline]
+    fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl<'fd> AsFd<'fd> for &'fd mio::unix::pipe::Receiver {
+    #[inline]
+    fn as_fd(self) -> BorrowedFd<'fd> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoFd for mio::unix::pipe::Receiver {
+    #[inline]
+    fn into_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl FromFd for mio::unix::pipe::Receiver {
+    #[inline]
+    fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl<'fd> AsFd<'fd> for &'fd mio::unix::pipe::Sender {
+    #[inline]
+    fn as_fd(self) -> BorrowedFd<'fd> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl IntoFd for mio::unix::pipe::Sender {
+    #[inline]
+    fn into_fd(self) -> OwnedFd {
+        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl FromFd for mio::unix::pipe::Sender {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }

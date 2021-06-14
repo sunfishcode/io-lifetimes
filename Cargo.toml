@@ -14,8 +14,24 @@ exclude = ["/.github"]
 rustc_version = "0.4.0"
 
 [dependencies]
+# io-lifetimes only depends on libc/winapi for the ability to close
+# fds/handles/sockets. The following are just optional dependencies to add
+# foreign-type impls for the traits. In the future, we'll prefer to have
+# crates provide their own impls; this is just a temporary measure.
+
 # Optionally depend on async-std just to provide impls for its types for now.
+#
+# Enable the "unstable" feature so that we can implement traits for
+# `process::ChildStdin` etc.
 async-std = { version = "1.9.0", features = ["unstable"], optional = true }
+# Optionally depend on tokio to implement traits for its types for now.
+tokio = { version = "1.6.0", features = ["io-std", "fs", "net", "process"], optional = true }
+# Optionally depend on os_pipe to implement traits for its types for now.
+os_pipe = { version = "0.9.2", optional = true }
+# Optionally depend on socket2 to implement traits for its types for now.
+socket2 = { version = "0.4.0", optional = true }
+# Optionally depend on mio to implement traits for its types for now.
+mio = { version = "0.7.11", features = ["net", "os-ext"], optional = true }
 
 [target.'cfg(not(windows))'.dependencies]
 libc = "0.2.96"
