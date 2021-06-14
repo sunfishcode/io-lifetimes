@@ -8,7 +8,7 @@ fn test_assumptions() {
     assert_eq!(size_of::<std::os::unix::io::RawFd>(), size_of::<i32>());
     assert_eq!(
         size_of::<std::os::unix::io::RawFd>(),
-        size_of::<libc::c_int>()
+        size_of::<std::os::raw::c_int>()
     );
 }
 
@@ -18,7 +18,7 @@ fn test_assumptions() {
     assert_eq!(size_of::<std::os::wasi::io::RawFd>(), size_of::<i32>());
     assert_eq!(
         size_of::<std::os::wasi::io::RawFd>(),
-        size_of::<libc::c_int>()
+        size_of::<std::os::raw::c_int>()
     );
 }
 

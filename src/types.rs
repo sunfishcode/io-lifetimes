@@ -441,7 +441,7 @@ impl Drop for OwnedFd {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            let _ = libc::close(self.raw as libc::c_int);
+            let _ = libc::close(self.raw as std::os::raw::c_int);
         }
     }
 }
