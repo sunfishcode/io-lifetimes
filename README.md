@@ -17,6 +17,8 @@ For a quick taste, check out the code examples:
    converting from an `impl Into*` into an `impl From*`.
  - [portable-views], demonstrating the convenience feature which allows one
    to temporarily "view" a file descriptor as any owning type such as `File`
+ - [flexible-apis], demonstrating how to write library APIs that accept
+   untyped I/O resources.
 
 [hello]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/hello.rs
 [easy-conversions]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/easy-conversions.rs

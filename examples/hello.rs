@@ -1,3 +1,6 @@
+//! A simple testcase that prints a few messages to the console, demonstrating
+//! the io-lifetimes API.
+
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 
 use io_lifetimes::example_ffi::*;
@@ -12,8 +15,6 @@ use io_lifetimes::{AsHandle, FromHandle, IntoHandle, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, ptr::null_mut};
 
-/// A simple testcase that prints a few messages to the console, demonstrating
-/// the io-lifetimes API.
 #[cfg(all(rustc_attrs, unix))]
 fn main() -> io::Result<()> {
     let fd = unsafe {

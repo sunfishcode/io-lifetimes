@@ -1,3 +1,6 @@
+//! io-lifetimes provides safe, convenient, and portable ways to temporarily
+//! view an I/O resource as a `File`, `Socket`, or other types.
+
 use io_lifetimes::AsFilelike;
 use std::fs::File;
 use std::io::{self, stdout};

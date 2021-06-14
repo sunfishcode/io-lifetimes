@@ -1,3 +1,7 @@
+//! io-lifetimes provides safe, portable, and convenient conversions from types
+//! implementing `IntoFilelike` and `FromSocketlike` to types implementing
+//! `FromFilelike` and `IntoSocketlike`, respectively.
+
 use io_lifetimes::FromFilelike;
 use std::fs::File;
 use std::io::{self, Read};
