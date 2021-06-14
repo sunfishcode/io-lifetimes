@@ -25,6 +25,7 @@ For a quick taste, check out the code examples:
 [hello]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/hello.rs
 [easy-conversions]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/easy-conversions.rs
 [portable-views]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/portable-views.rs
+[flexible-apis]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/flexible-apis.rs
 [owning-wrapper]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/owning-wrapper.rs
 [provided example FFI bindings]: https://github.com/sunfishcode/io-lifetimes/blob/main/src/example_ffi.rs
 
