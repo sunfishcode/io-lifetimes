@@ -19,10 +19,13 @@ For a quick taste, check out the code examples:
    to temporarily "view" a file descriptor as any owning type such as `File`
  - [flexible-apis], demonstrating how to write library APIs that accept
    untyped I/O resources.
+ - [owning-wrapper], demonstrating how to implement a type which wraps an
+   `Owned*` type.
 
 [hello]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/hello.rs
 [easy-conversions]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/easy-conversions.rs
 [portable-views]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/portable-views.rs
+[owning-wrapper]: https://github.com/sunfishcode/io-lifetimes/blob/main/examples/owning-wrapper.rs
 [provided example FFI bindings]: https://github.com/sunfishcode/io-lifetimes/blob/main/src/example_ffi.rs
 
 The core of the API is very simple, and consists of two main types and three
