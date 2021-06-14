@@ -57,8 +57,8 @@ a special `OptionFileHandle` type to cope with inconsistent error reporting
 in the Windows API.
 
 Full API documentation:
- - [for `x86_64-unknown-linux-gnu`](https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_experiment/index.html)
- - [for `x86_64-pc-windows-msvc`](https://io-experiment.sunfishcode.online/x86_64-pc-windows-msvc/io_experiment/index.html)
+ - [for `x86_64-unknown-linux-gnu`](https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/index.html)
+ - [for `x86_64-pc-windows-msvc`](https://io-experiment.sunfishcode.online/x86_64-pc-windows-msvc/io_lifetimes/index.html)
 
 ## The magic of transparency
 
@@ -147,6 +147,6 @@ they're simpler and safer to use. io-lifetimes doesn't include unsafe-io's
 `*ReadWrite*` or `*HandleOrSocket*` abstractions, and leaves these as features
 to be provided by separate layers on top.
 
-[`OwnedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_experiment/struct.OwnedFd.html
-[`BorrowedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_experiment/struct.BorrowedFd.html
+[`OwnedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/struct.OwnedFd.html
+[`BorrowedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/struct.BorrowedFd.html
 [RFC 3128]: https://github.com/rust-lang/rfcs/pull/3128
