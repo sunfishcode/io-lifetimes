@@ -1,5 +1,5 @@
 fn main() {
-    // Niche optimizations for `RawFd` and `RawSocket` depend on `rustc_attrs`
+    // Niche optimizations for `Borrowed*` and `Owned*` depend on `rustc_attrs`
     // which, outside of `std`, are only available on nightly.
     if let rustc_version::Channel::Nightly = rustc_version::version_meta()
         .expect("query rustc release channel")
