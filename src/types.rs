@@ -210,7 +210,7 @@ impl BorrowedHandle<'_> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
-    /// the returned `BorrowedFd`, and it must not be null.
+    /// the returned `BorrowedHandle`, and it must not be null.
     #[inline]
     pub unsafe fn borrow_raw_handle(raw: RawHandle) -> Self {
         debug_assert!(!raw.is_null());
@@ -228,7 +228,7 @@ impl BorrowedSocket<'_> {
     /// # Safety
     ///
     /// The resource pointed to by `raw` must remain open for the duration of
-    /// the returned `BorrowedFd`, and it must not have the value
+    /// the returned `BorrowedSocket`, and it must not have the value
     /// [`INVALID_SOCKET`].
     #[inline]
     pub unsafe fn borrow_raw_socket(raw: RawSocket) -> Self {
