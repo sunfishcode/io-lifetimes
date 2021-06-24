@@ -24,9 +24,9 @@ struct Thing {
 }
 
 #[cfg(not(windows))]
-impl<'f> AsFd<'f> for &'f Thing {
+impl AsFd for Thing {
     #[inline]
-    fn as_fd(self) -> BorrowedFd<'f> {
+    fn as_fd(&self) -> BorrowedFd<'_> {
         self.filelike.as_fd()
     }
 }
@@ -48,9 +48,9 @@ impl FromFd for Thing {
 }
 
 #[cfg(windows)]
-impl<'f> AsHandle<'f> for &'f Thing {
+impl AsHandle for Thing {
     #[inline]
-    fn as_handle(self) -> BorrowedHandle<'f> {
+    fn as_handle(&self) -> BorrowedHandle<'_> {
         self.filelike.as_handle()
     }
 }

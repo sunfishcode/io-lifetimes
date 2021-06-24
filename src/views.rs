@@ -51,7 +51,7 @@ pub struct SocketlikeView<'socketlike, Target: FromSocketlike + IntoSocketlike> 
 impl<Target: FromFilelike + IntoFilelike> FilelikeView<'_, Target> {
     /// Construct a temporary `Target` and wrap it in a `FilelikeView` object.
     #[inline]
-    pub(crate) fn new<'filelike, T: AsFilelike<'filelike>>(filelike: T) -> Self {
+    pub(crate) fn new<T: AsFilelike>(filelike: &T) -> Self {
         // Safety: The returned `FilelikeView` is scoped to the lifetime of
         // `filelike`, which we've borrowed here, so the view won't outlive
         // the object it's borrowed from.
@@ -69,7 +69,7 @@ impl<Target: FromSocketlike + IntoSocketlike> SocketlikeView<'_, Target> {
     /// Construct a temporary `Target` and wrap it in a `SocketlikeView`
     /// object.
     #[inline]
-    pub(crate) fn new<'socketlike, T: AsSocketlike<'socketlike>>(socketlike: T) -> Self {
+    pub(crate) fn new<T: AsSocketlike>(socketlike: &T) -> Self {
         // Safety: The returned `SocketlikeView` is scoped to the lifetime of
         // `socketlike`, which we've borrowed here, so the view won't outlive
         // the object it's borrowed from.

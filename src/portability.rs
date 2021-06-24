@@ -96,7 +96,7 @@ pub(crate) type RawSocketlike = RawSocket;
 /// `AsHandle`. It also provides the `as_filelike_view` convenience function
 /// providing typed views.
 #[cfg(any(unix, target_os = "wasi"))]
-pub trait AsFilelike<'filelike>: AsFd<'filelike> {
+pub trait AsFilelike: AsFd {
     /// Borrows the reference.
     ///
     /// # Example
@@ -110,28 +110,24 @@ pub trait AsFilelike<'filelike>: AsFd<'filelike> {
     /// let borrowed_filelike: BorrowedFilelike<'_> = f.as_filelike();
     /// # Ok::<(), io::Error>(())
     /// ```
-    fn as_filelike(self) -> BorrowedFilelike<'filelike>;
+    fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
     /// or `&mut Target`.
     ///
     /// [`File`]: std::fs::File
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(
-        self,
-    ) -> FilelikeView<'filelike, Target>;
+    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target>;
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'filelike, T: AsFd<'filelike>> AsFilelike<'filelike> for T {
+impl<T: AsFd> AsFilelike for T {
     #[inline]
-    fn as_filelike(self) -> BorrowedFilelike<'filelike> {
+    fn as_filelike(&self) -> BorrowedFilelike<'_> {
         self.as_fd()
     }
 
     #[inline]
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(
-        self,
-    ) -> FilelikeView<'filelike, Target> {
+    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target> {
         FilelikeView::new(self)
     }
 }
@@ -142,7 +138,7 @@ impl<'filelike, T: AsFd<'filelike>> AsFilelike<'filelike> for T {
 /// [`AsHandle`]. It also provides the `as_filelike_view` convenience function
 /// providing typed views.
 #[cfg(windows)]
-pub trait AsFilelike<'filelike>: AsHandle<'filelike> {
+pub trait AsFilelike: AsHandle {
     /// Borrows the reference.
     ///
     /// # Example
@@ -156,28 +152,24 @@ pub trait AsFilelike<'filelike>: AsHandle<'filelike> {
     /// let borrowed_filelike: BorrowedFilelike<'_> = f.as_filelike();
     /// # Ok::<(), io::Error>(())
     /// ```
-    fn as_filelike(self) -> BorrowedFilelike<'filelike>;
+    fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
     /// or `&mut Target`.
     ///
     /// [`File`]: std::fs::File
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(
-        self,
-    ) -> FilelikeView<'filelike, Target>;
+    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target>;
 }
 
 #[cfg(windows)]
-impl<'filelike, T: AsHandle<'filelike>> AsFilelike<'filelike> for T {
+impl<T: AsHandle> AsFilelike for T {
     #[inline]
-    fn as_filelike(self) -> BorrowedFilelike<'filelike> {
+    fn as_filelike(&self) -> BorrowedFilelike<'_> {
         self.as_handle()
     }
 
     #[inline]
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(
-        self,
-    ) -> FilelikeView<'filelike, Target> {
+    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target> {
         FilelikeView::new(self)
     }
 }
@@ -189,30 +181,30 @@ impl<'filelike, T: AsHandle<'filelike>> AsFilelike<'filelike> for T {
 /// `AsSocket`. It also provides the `as_socketlike_view` convenience
 /// function providing typed views.
 #[cfg(any(unix, target_os = "wasi"))]
-pub trait AsSocketlike<'socketlike>: AsFd<'socketlike> {
+pub trait AsSocketlike: AsFd {
     /// Borrows the reference.
-    fn as_socketlike(self) -> BorrowedSocketlike<'socketlike>;
+    fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
     /// or `&mut Target`.
     ///
     /// [`TcpStream`]: std::net::TcpStream
     fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        self,
-    ) -> SocketlikeView<'socketlike, Target>;
+        &self,
+    ) -> SocketlikeView<'_, Target>;
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'socketlike, T: AsFd<'socketlike>> AsSocketlike<'socketlike> for T {
+impl<T: AsFd> AsSocketlike for T {
     #[inline]
-    fn as_socketlike(self) -> BorrowedSocketlike<'socketlike> {
+    fn as_socketlike(&self) -> BorrowedSocketlike<'_> {
         self.as_fd()
     }
 
     #[inline]
     fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        self,
-    ) -> SocketlikeView<'socketlike, Target> {
+        &self,
+    ) -> SocketlikeView<'_, Target> {
         SocketlikeView::new(self)
     }
 }
@@ -224,30 +216,30 @@ impl<'socketlike, T: AsFd<'socketlike>> AsSocketlike<'socketlike> for T {
 /// [`AsSocket`]. It also provides the `as_socketlike_view` convenience
 /// function providing typed views.
 #[cfg(windows)]
-pub trait AsSocketlike<'socketlike>: AsSocket<'socketlike> {
+pub trait AsSocketlike: AsSocket {
     /// Borrows the reference.
-    fn as_socketlike(self) -> BorrowedSocketlike<'socketlike>;
+    fn as_socketlike(&self) -> BorrowedSocketlike;
 
     /// Return a borrowing view of a resource which dereferences to a `&Target`
     /// or `&mut Target`.
     ///
     /// [`TcpStream`]: std::net::TcpStream
     fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        self,
-    ) -> SocketlikeView<'socketlike, Target>;
+        &self,
+    ) -> SocketlikeView<'_, Target>;
 }
 
 #[cfg(windows)]
-impl<'socketlike, T: AsSocket<'socketlike>> AsSocketlike<'socketlike> for T {
+impl<T: AsSocket> AsSocketlike for T {
     #[inline]
-    fn as_socketlike(self) -> BorrowedSocketlike<'socketlike> {
+    fn as_socketlike(&self) -> BorrowedSocketlike<'_> {
         self.as_socket()
     }
 
     #[inline]
     fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        self,
-    ) -> SocketlikeView<'socketlike, Target> {
+        &self,
+    ) -> SocketlikeView<'_, Target> {
         SocketlikeView::new(self)
     }
 }

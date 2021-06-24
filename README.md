@@ -36,19 +36,19 @@ main traits:
 pub struct BorrowedFd<'fd> { ... }
 pub struct OwnedFd { ... }
 
-pub trait AsFd<'fd> { ... }
+pub trait AsFd { ... }
 pub trait IntoFd { ... }
 pub trait FromFd { ... }
 
-impl<'fd> AsRawFd for BorrowedFd<'fd> { ... }
+impl AsRawFd for BorrowedFd<'_> { ... }
 impl AsRawFd for OwnedFd { ... }
 impl IntoRawFd for OwnedFd { ... }
 impl FromRawFd for OwnedFd { ... }
 
 impl Drop for OwnedFd { ... }
 
-impl<'fd> AsFd<'fd> for BorrowedFd<'fd> { ... }
-impl<'fd> AsFd<'fd> for &'fd OwnedFd { ... }
+impl AsFd for BorrowedFd<'_> { ... }
+impl AsFd for OwnedFd { ... }
 impl IntoFd for OwnedFd { ... }
 impl FromFd for OwnedFd { ... }
 ```
