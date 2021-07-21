@@ -1,10 +1,24 @@
+<div align="center">
+  <h1><code>io-lifetimes</code></h1>
+
+  <p>
+    <strong>A low-level I/O ownership and borrowing library</strong>
+  </p>
+
+  <p>
+    <a href="https://github.com/sunfishcode/io-lifetimes/actions?query=workflow%3ACI"><img src="https://github.com/sunfishcode/io-lifetimes/workflows/CI/badge.svg" alt="Github Actions CI Status" /></a>
+    <a href="https://crates.io/crates/io-lifetimes"><img src="https://img.shields.io/crates/v/io-lifetimes.svg" alt="crates.io page" /></a>
+    <a href="https://docs.rs/io-lifetimes"><img src="https://docs.rs/io-lifetimes/badge.svg" alt="docs.rs docs" /></a>
+  </p>
+</div>
+
 This library introduces `OwnedFd`, `BorrowedFd`, and supporting types and
 traits, and corresponding features for Windows, which implement safe owning
 and borrowing I/O lifetime patterns.
 
-This is associated with [RFC 3128], the I/O Safety RFC, which proposes that
-this API be added to `std`, with the goal being to eventually replace `RawFd`
-etc. for most use cases.
+This is associated with [RFC 3128], the I/O Safety RFC, which is now merged.
+Work is now underway to move the `OwnedFd` and `BorrowedFd` types and `AsFd`
+trait developed here into `std`.
 
 Some features currently require nightly Rust, as they depend on `rustc_attrs`
 to perform niche optimizations needed for FFI use cases.
@@ -150,4 +164,4 @@ to be provided by separate layers on top.
 
 [`OwnedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/struct.OwnedFd.html
 [`BorrowedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/struct.BorrowedFd.html
-[RFC 3128]: https://github.com/rust-lang/rfcs/pull/3128
+[RFC 3128]: https://github.com/rust-lang/rfcs/blob/master/text/3128-io-safety.md
