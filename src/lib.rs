@@ -57,6 +57,8 @@ pub mod views;
 // while we're prototyping, we provide a few impls on foreign types.
 #[cfg(feature = "async-std")]
 mod impls_async_std;
+#[cfg(feature = "fs_err")]
+mod impls_fs_err;
 #[cfg(feature = "mio")]
 mod impls_mio;
 #[cfg(feature = "os_pipe")]
