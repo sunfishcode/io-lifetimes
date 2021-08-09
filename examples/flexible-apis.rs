@@ -9,8 +9,9 @@ use io_lifetimes::{AsFd, BorrowedFd, IntoFd, OwnedFd};
 
 /// The simplest way to accept a borrowed I/O resource is to simply use a
 /// `BorrwedFd` as an argument. This doesn't require the function to have any
-/// type parameters. It also works in FFI signatures, as `BorrowedFd` and (on Rust nightly)
-/// `Option<BorrowedFd>` are guaranteed to have the same layout as `RawFd`.
+/// type parameters. It also works in FFI signatures, as `BorrowedFd` and (on
+/// Rust nightly) `Option<BorrowedFd>` are guaranteed to have the same layout
+/// as `RawFd`.
 ///
 /// Callers with an `AsFd`-implementing type would call `.as_fd()` and pass
 /// the result.
