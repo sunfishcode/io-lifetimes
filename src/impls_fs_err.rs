@@ -3,9 +3,9 @@
 //! just a temporary measure.
 
 #[cfg(any(unix, target_os = "wasi"))]
-use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
+use crate::{AsFd, BorrowedFd, IntoFd, OwnedFd};
 #[cfg(windows)]
-use crate::{AsHandle, BorrowedHandle, FromHandle, IntoHandle, OwnedHandle};
+use crate::{AsHandle, BorrowedHandle, IntoHandle, OwnedHandle};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(target_os = "wasi")]
@@ -42,21 +42,5 @@ impl IntoHandle for fs_err::File {
     #[inline]
     fn into_handle(self) -> OwnedHandle {
         unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl FromFd for fs_err::File {
-    #[inline]
-    fn from_fd(owned: OwnedFd) -> Self {
-        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
-    }
-}
-
-#[cfg(windows)]
-impl FromHandle for fs_err::File {
-    #[inline]
-    fn from_handle(owned: OwnedHandle) -> Self {
-        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }
