@@ -440,8 +440,19 @@ impl FromRawHandle for OptionFileHandle {
 impl Drop for OwnedFd {
     #[inline]
     fn drop(&mut self) {
+        #[cfg(feature = "close")]
         unsafe {
             let _ = libc::close(self.raw as std::os::raw::c_int);
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid letting
+        // `OwnedFd` instances drop, so that we don't have to call `close`.
+        #[cfg(not(feature = "close"))]
+        unsafe {
+            extern "C" {
+                fn __drop_called_without_the_close_feature();
+            }
+            __drop_called_without_the_close_feature();
         }
     }
 }

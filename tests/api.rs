@@ -1,4 +1,5 @@
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
+#![cfg(feature = "close")]
 
 use io_lifetimes::{
     AsFilelike, AsSocketlike, BorrowedFilelike, FromFilelike, FromSocketlike, IntoFilelike,

@@ -50,6 +50,7 @@ pub use portability::{
     IntoFilelike, IntoSocketlike, OwnedFilelike, OwnedSocketlike,
 };
 
+#[cfg(feature = "close")]
 pub mod example_ffi;
 pub mod views;
 

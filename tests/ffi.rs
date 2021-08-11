@@ -1,4 +1,5 @@
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
+#![cfg(feature = "close")]
 
 #[cfg(any(unix, windows))]
 use io_lifetimes::example_ffi::*;

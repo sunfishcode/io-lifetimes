@@ -4,7 +4,7 @@
 //! The following uses the POSIX-ish `Fd` types; similar considerations
 //! apply to the Windows and portable types.
 
-#[cfg(not(windows))]
+#[cfg(all(feature = "close", not(windows)))]
 use io_lifetimes::{AsFd, BorrowedFd, IntoFd, OwnedFd};
 
 /// The simplest way to accept a borrowed I/O resource is to simply use a
@@ -15,7 +15,7 @@ use io_lifetimes::{AsFd, BorrowedFd, IntoFd, OwnedFd};
 ///
 /// Callers with an `AsFd`-implementing type would call `.as_fd()` and pass
 /// the result.
-#[cfg(not(windows))]
+#[cfg(all(feature = "close", not(windows)))]
 fn use_fd_a(fd: BorrowedFd<'_>) {
     let _ = fd;
 }
@@ -24,7 +24,7 @@ fn use_fd_a(fd: BorrowedFd<'_>) {
 /// verbose at the function definition site, and entails monomorphization, but
 /// it has the advantage of allowing users to pass in any type implementing
 /// `AsFd` directly, without having to call `.as_fd()` themselves.
-#[cfg(not(windows))]
+#[cfg(all(feature = "close", not(windows)))]
 fn use_fd_b<Fd: AsFd>(fd: &Fd) {
     let _ = fd.as_fd();
 }
@@ -35,7 +35,7 @@ fn use_fd_b<Fd: AsFd>(fd: &Fd) {
 ///
 /// Callers with an `IntoFd`-implementing type would call `.into_fd()` and pass
 /// the result.
-#[cfg(not(windows))]
+#[cfg(all(feature = "close", not(windows)))]
 fn consume_fd_a(fd: OwnedFd) {
     let _ = fd;
 }
@@ -44,13 +44,13 @@ fn consume_fd_a(fd: OwnedFd) {
 /// `use_fd_b`, this is more verbose here and entails monomorphization, but it
 /// has the advantage of allowing users to pass in any type implementing
 /// `IntoFd` directly.
-#[cfg(not(windows))]
+#[cfg(all(feature = "close", not(windows)))]
 fn consume_fd_b<Fd: IntoFd>(fd: Fd) {
     let _ = fd.into_fd();
 }
 
 /// Now let's see how the APIs look for users.
-#[cfg(not(windows))]
+#[cfg(all(feature = "close", not(windows)))]
 fn main() {
     let f = std::fs::File::open("Cargo.toml").unwrap();
 
@@ -76,4 +76,9 @@ fn main() {
 #[cfg(windows)]
 fn main() {
     println!("This example uses non-Windows APIs.");
+}
+
+#[cfg(all(not(feature = "close"), not(windows)))]
+fn main() {
+    println!("This example requires the \"close\" feature.");
 }

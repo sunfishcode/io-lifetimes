@@ -3,11 +3,15 @@
 
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 
+#[cfg(feature = "close")]
 use io_lifetimes::example_ffi::*;
-use std::fs::File;
-use std::io::{self, Write};
+#[cfg(feature = "close")]
+use std::{
+    fs::File,
+    io::{self, Write},
+};
 
-#[cfg(unix)]
+#[cfg(all(unix, feature = "close"))]
 use io_lifetimes::{AsFd, FromFd, IntoFd, OwnedFd};
 
 #[cfg(windows)]
@@ -15,7 +19,7 @@ use io_lifetimes::{AsHandle, FromHandle, IntoHandle, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, ptr::null_mut};
 
-#[cfg(all(rustc_attrs, unix))]
+#[cfg(all(rustc_attrs, unix, feature = "close"))]
 fn main() -> io::Result<()> {
     let fd = unsafe {
         // Open a file, which returns an `Option<OwnedFd>`, which we can
@@ -131,7 +135,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-#[cfg(not(any(windows, rustc_attrs)))]
+#[cfg(all(not(all(rustc_attrs, unix, feature = "close")), not(windows)))]
 fn main() {
-    println!("On Unix, this example requires Rust nightly (for `rustc_attrs`).");
+    println!("On Unix, this example requires Rust nightly (for `rustc_attrs`) and the \"close\" feature.");
 }

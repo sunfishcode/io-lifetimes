@@ -71,6 +71,7 @@ impl FromHandle for Thing {
     }
 }
 
+#[cfg(feature = "close")]
 fn main() {
     use io_lifetimes::{AsFilelike, FromFilelike, IntoFilelike};
 
@@ -100,4 +101,9 @@ fn main() {
         let _ = thing.as_filelike();
         let _ = thing.into_filelike();
     }
+}
+
+#[cfg(not(feature = "close"))]
+fn main() {
+    println!("This example requires the \"close\" feature.");
 }
