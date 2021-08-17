@@ -69,7 +69,7 @@ fn main() -> io::Result<()> {
 #[cfg(windows)]
 fn main() -> io::Result<()> {
     let handle = unsafe {
-        // Open a file, which returns an `OptionFileHandle`, which we can fallibly
+        // Open a file, which returns an `HandleOrInvalid`, which we can fallibly
         // convert into an `OwnedFile`.
         let handle: OwnedHandle = CreateFileW(
             ['C' as u16, 'O' as _, 'N' as _, 0].as_ptr(),

@@ -10,7 +10,7 @@
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{BorrowedFd, OwnedFd};
 #[cfg(windows)]
-use crate::{BorrowedHandle, OptionFileHandle, OwnedHandle};
+use crate::{BorrowedHandle, HandleOrInvalid, OwnedHandle};
 
 #[cfg(any(unix, target_os = "wasi"))]
 use libc::{c_char, c_int, c_void, size_t, ssize_t};
@@ -35,7 +35,7 @@ extern "C" {
 #[cfg(any(unix, target_os = "wasi"))]
 pub use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
 
-/// The Windows analogs of the above. Note the use of [`OptionFileHandle`] as
+/// The Windows analogs of the above. Note the use of [`HandleOrInvalid`] as
 /// the return type for `CreateFileW`, since that function is defined to return
 /// [`INVALID_HANDLE_VALUE`] on error instead of null.
 #[cfg(windows)]
@@ -48,7 +48,7 @@ extern "C" {
         dwCreationDisposition: DWORD,
         dwFlagsAndAttributes: DWORD,
         hTemplateFile: HANDLE,
-    ) -> OptionFileHandle;
+    ) -> HandleOrInvalid;
     pub fn ReadFile(
         hFile: HANDLE,
         lpBuffer: LPVOID,

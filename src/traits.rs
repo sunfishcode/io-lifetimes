@@ -1,7 +1,7 @@
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{BorrowedFd, OwnedFd};
 #[cfg(windows)]
-use crate::{BorrowedHandle, BorrowedSocket, OptionFileHandle, OwnedHandle, OwnedSocket};
+use crate::{BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket};
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(target_os = "wasi")]
@@ -307,7 +307,7 @@ impl FromSocket for OwnedSocket {
 }
 
 #[cfg(windows)]
-impl FromHandle for OptionFileHandle {
+impl FromHandle for HandleOrInvalid {
     #[inline]
     fn from_handle(owned: OwnedHandle) -> Self {
         unsafe { Self::from_raw_handle(owned.into_raw_handle()) }

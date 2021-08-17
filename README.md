@@ -68,7 +68,7 @@ impl FromFd for OwnedFd { ... }
 ```
 
 On Windows, there are `Handle` and `Socket` versions of every `Fd` thing, and
-a special `OptionFileHandle` type to cope with inconsistent error reporting
+a special `HandleOrInvalid` type to cope with inconsistent error reporting
 in the Windows API.
 
 Full API documentation:
