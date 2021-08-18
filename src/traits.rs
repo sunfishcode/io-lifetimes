@@ -699,6 +699,38 @@ impl IntoHandle for std::process::ChildStderr {
 }
 
 #[cfg(unix)]
+impl FromFd for std::process::Stdio {
+    #[inline]
+    fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl FromHandle for std::process::Stdio {
+    #[inline]
+    fn from_handle(owned: OwnedHandle) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsHandle for std::process::Child {
+    #[inline]
+    fn as_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoHandle for std::process::Child {
+    #[inline]
+    fn into_handle(self) -> OwnedHandle {
+        unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
+    }
+}
+
+#[cfg(unix)]
 impl AsFd for std::os::unix::net::UnixStream {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
