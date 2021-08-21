@@ -47,3 +47,30 @@ jobs:
       with:
         toolchain: ${{ matrix.rust }}
     - run: cargo test --workspace --all-features
+
+  test_use_std:
+    name: Test with std's types and traits
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [ubuntu-nightly, windows-nightly]
+        include:
+          - build: ubuntu-nightly
+            os: ubuntu-latest
+            rust: nightly
+          - build: windows-nightly
+            os: windows-latest
+            rust: nightly
+
+    env:
+      RUSTFLAGS: --cfg io_lifetimes_use_std
+      RUSTDOCFLAGS: --cfg io_lifetimes_use_std
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: ${{ matrix.rust }}
+    - run: cargo test --workspace --all-features
