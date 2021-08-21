@@ -99,6 +99,39 @@ is what motivates having `BorrowedFd` instead of just using `&OwnedFd`.
 Note the use of `Option<OwnedFd>` as the return value of `open`, representing
 the fact that it can either succeed or fail.
 
+## I/O Safety in Rust Nightly
+
+The I/O Safety
+[implementation PR](https://github.com/rust-lang/rust/pull/87329) has now
+landed and is available on Rust Nightly. It can be used directly, or through
+io-lifetimes: when `io_lifetimes_use_std` mode is enabled, io-lifetimes uses
+the std's `OwnedFd`, `BorrowedFd`, and `AsFd` instead of defining its own.
+
+To enable `io_lifetimes_use_std` mode:
+  - Set the environment variable `RUSTFLAGS=--cfg=io_lifetimes_use_std`, and
+  - add `#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]` to your
+    lib.rs or main.rs.
+
+Note that, unfortunately, `io_lifetimes_use_std` mode doesn't support the
+optional impls for third-party crates.
+
+The code in `std` uses `From<OwnedFd>` and `Into<OwnedFd>` instead of `FromFd`
+and `IntoFd`. io-lifetimes is unable to provide impls for these for third-party
+types, so it continues to provide `FromFd` and `IntoFd` for now, with default
+impls that forward to `From<OwnedFd>` and `Into<OwnedFd>` in
+`io_lifetimes_use_std` mode.
+
+io-lifetimes also includes several features which are not (yet?) in std,
+including the portability traits `AsFilelike`/`AsSocketlike`/etc., the
+`from_into_*` functions in the `From*` traits, and [views].
+
+If you test a crate with the std I/O safety types and traits, or io-lifetimes
+in `io_lifetimes_use_std` mode, please post a note about it in the
+[I/O safety tracking issue] as an example of usage.
+
+[I/O safety tracking issue]: https://github.com/rust-lang/rust/issues/87074
+[views]: https://docs.rs/io-lifetimes/*/io_lifetimes/views/index.html
+
 ## Prior Art
 
 There are several similar crates: [fd](https://crates.io/crates/fd),

@@ -2,6 +2,8 @@
 //! implementing `IntoFilelike` and `FromSocketlike` to types implementing
 //! `FromFilelike` and `IntoSocketlike`, respectively.
 
+#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
+
 use io_lifetimes::FromFilelike;
 use std::fs::File;
 use std::io::{self, Read};
