@@ -42,8 +42,10 @@ libc = { version = "0.2.96", optional = true }
 winapi = { version = "0.3.9", features = ["handleapi", "std", "winsock2"] }
 
 [features]
-default = ["close"]
+default = ["close", "std"]
 close = ["libc"]
+std = []
+no_std_demo = []
 
 [badges]
 maintenance = { status = "actively-developed" }

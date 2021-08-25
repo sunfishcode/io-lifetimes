@@ -1,20 +1,18 @@
-use std::fmt;
-use std::marker::PhantomData;
-use std::mem::forget;
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+#[cfg(not(windows))]
+use crate::std_os_io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+use core::fmt;
+use core::marker::PhantomData;
+use core::mem::forget;
 #[cfg(windows)]
-use std::{
-    convert::TryFrom,
-    os::windows::io::{
+use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
+#[cfg(windows)]
+use {
+    crate::std_os_io::{
         AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
         RawHandle, RawSocket,
     },
+    core::convert::TryFrom,
 };
-#[cfg(windows)]
-use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
 
 /// A borrowed file descriptor.
 ///
@@ -422,7 +420,8 @@ impl Drop for OwnedHandle {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            let _ = winapi::um::handleapi::CloseHandle(self.handle);
+            let _ =
+                winapi::um::handleapi::CloseHandle(self.handle as winapi::shared::ntdef::HANDLE);
         }
     }
 }

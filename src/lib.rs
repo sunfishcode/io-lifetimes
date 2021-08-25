@@ -31,12 +31,14 @@
 #![cfg_attr(rustc_attrs, feature(rustc_attrs))]
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 mod portability;
 mod traits;
 #[cfg(not(io_lifetimes_use_std))]
 mod types;
 
+#[cfg(feature = "std")]
 #[cfg(not(io_lifetimes_use_std))]
 mod impls_std;
 
@@ -170,3 +172,58 @@ mod impls_socket2;
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(feature = "tokio")]
 mod impls_tokio;
+
+#[cfg(all(feature = "std", unix))]
+pub use std::os::unix::io as std_os_io;
+#[cfg(all(feature = "std", target_os = "wasi"))]
+pub use std::os::wasi::io as std_os_io;
+#[cfg(all(feature = "std", windows))]
+pub use std::os::windows::io as std_os_io;
+#[allow(missing_docs)]
+#[cfg(all(feature = "no_std_demo", not(windows)))]
+pub mod std_os_io {
+    // In a no_std build, we don't have std's `RawFd` or its traits, so define
+    // them ourselves. These won't be implemented by anything, but that's how
+    // no_std works.
+    pub type RawFd = i32;
+    pub trait AsRawFd {
+        fn as_raw_fd(&self) -> RawFd;
+    }
+    pub trait IntoRawFd {
+        fn into_raw_fd(self) -> RawFd;
+    }
+    pub trait FromRawFd {
+        unsafe fn from_raw_fd(raw_fd: RawFd) -> Self;
+    }
+}
+
+#[allow(missing_docs)]
+#[cfg(all(feature = "no_std_demo", windows))]
+pub mod std_os_io {
+    // In a no_std build, we don't have std's `RawHandle` or `RawSocket` or
+    // their traits, so define them ourselves. These won't be implemented by
+    // anything, but that's kind of what no_std is all about.
+    pub type RawHandle = *const core::ffi::c_void;
+    pub trait AsRawHandle {
+        fn as_raw_handle(&self) -> RawHandle;
+    }
+    pub trait IntoRawHandle {
+        fn into_raw_handle(self) -> RawHandle;
+    }
+    pub trait FromRawHandle {
+        unsafe fn from_raw_handle(raw_fd: RawHandle) -> Self;
+    }
+    #[cfg(target_pointer_width = "32")]
+    pub type RawSocket = u32;
+    #[cfg(target_pointer_width = "64")]
+    pub type RawSocket = u64;
+    pub trait AsRawSocket {
+        fn as_raw_socket(&self) -> RawSocket;
+    }
+    pub trait IntoRawSocket {
+        fn into_raw_socket(self) -> RawSocket;
+    }
+    pub trait FromRawSocket {
+        unsafe fn from_raw_socket(raw_fd: RawSocket) -> Self;
+    }
+}

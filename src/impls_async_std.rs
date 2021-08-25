@@ -2,6 +2,8 @@
 //! future, we'll prefer to have crates provide their own impls; this is
 //! just a temporary measure.
 
+#[cfg(not(windows))]
+use crate::std_os_io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
@@ -9,10 +11,6 @@ use crate::{
     AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, FromHandle, FromSocket, IntoHandle,
     IntoSocket, OwnedHandle, OwnedSocket,
 };
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(windows)]
 use std::os::windows::io::{
     AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,

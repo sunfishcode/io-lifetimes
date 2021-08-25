@@ -4,6 +4,13 @@
 //!
 //! TODO: Should this layer be folded into types.rs/traits.rs?
 
+#[cfg(not(windows))]
+use crate::std_os_io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+#[cfg(windows)]
+use crate::std_os_io::{
+    AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
+    RawHandle, RawSocket,
+};
 use crate::views::{FilelikeView, SocketlikeView};
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
@@ -11,15 +18,6 @@ use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 use crate::{
     AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, FromHandle, FromSocket, IntoHandle,
     IntoSocket, OwnedHandle, OwnedSocket,
-};
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
-#[cfg(windows)]
-use std::os::windows::io::{
-    AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
-    RawHandle, RawSocket,
 };
 
 /// A reference to a filelike object.

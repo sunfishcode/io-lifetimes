@@ -1,3 +1,9 @@
+#[cfg(not(windows))]
+use crate::std_os_io::{AsRawFd, FromRawFd, IntoRawFd};
+#[cfg(windows)]
+use crate::std_os_io::{
+    AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
+};
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::BorrowedFd;
@@ -7,7 +13,7 @@ use crate::OwnedFd;
 #[cfg(windows)]
 use crate::{BorrowedHandle, BorrowedSocket};
 #[cfg(windows)]
-use crate::{OwnedHandle, OwnedSocket};
+use crate::{HandleOrInvalid, OwnedHandle, OwnedSocket};
 
 /// A trait to borrow the file descriptor from an underlying object.
 ///
@@ -216,5 +222,109 @@ pub trait FromSocket {
         Self: Sized,
     {
         Self::from_socket(into_owned.into_socket())
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsFd for BorrowedFd<'_> {
+    #[inline]
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsHandle for BorrowedHandle<'_> {
+    #[inline]
+    fn as_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsSocket for BorrowedSocket<'_> {
+    #[inline]
+    fn as_socket(&self) -> BorrowedSocket<'_> {
+        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl AsFd for OwnedFd {
+    #[inline]
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsHandle for OwnedHandle {
+    #[inline]
+    fn as_handle(&self) -> BorrowedHandle<'_> {
+        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl AsSocket for OwnedSocket {
+    #[inline]
+    fn as_socket(&self) -> BorrowedSocket<'_> {
+        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl IntoFd for OwnedFd {
+    #[inline]
+    fn into_fd(self) -> OwnedFd {
+        unsafe { Self::from_raw_fd(self.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoHandle for OwnedHandle {
+    #[inline]
+    fn into_handle(self) -> OwnedHandle {
+        unsafe { Self::from_raw_handle(self.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl IntoSocket for OwnedSocket {
+    #[inline]
+    fn into_socket(self) -> OwnedSocket {
+        unsafe { Self::from_raw_socket(self.into_raw_socket()) }
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl FromFd for OwnedFd {
+    #[inline]
+    fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(windows)]
+impl FromHandle for OwnedHandle {
+    #[inline]
+    fn from_handle(owned: OwnedHandle) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl FromSocket for OwnedSocket {
+    #[inline]
+    fn from_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl FromHandle for HandleOrInvalid {
+    #[inline]
+    fn from_handle(owned: OwnedHandle) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }

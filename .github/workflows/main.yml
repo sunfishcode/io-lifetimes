@@ -47,6 +47,7 @@ jobs:
       with:
         toolchain: ${{ matrix.rust }}
     - run: cargo test --workspace --all-features
+    - run: cargo check --workspace --no-default-features --features no_std_demo
 
   test_use_std:
     name: Test with std's types and traits
@@ -74,3 +75,4 @@ jobs:
       with:
         toolchain: ${{ matrix.rust }}
     - run: cargo test --workspace --all-features
+    - run: cargo check --workspace --no-default-features --features no_std_demo

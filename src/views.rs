@@ -12,9 +12,9 @@ use crate::{
     AsSocketlike, FromSocketlike, IntoSocketlike, OwnedSocketlike,
 };
 use crate::{AsFilelike, FromFilelike, IntoFilelike, OwnedFilelike};
-use std::fmt;
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
+use core::fmt;
+use core::marker::PhantomData;
+use core::ops::{Deref, DerefMut};
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
 /// `&mut Target`. These are returned by [`AsFilelike::as_filelike_view`].
