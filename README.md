@@ -146,7 +146,7 @@ io-lifetimes omits these features, leaving them to to be provided as separate
 layers on top.
 
 Most of these crates provide ways to duplicate a file descriptor. io-lifetimes
-currently treats this as another feature than can be provided by a layer on
+currently treats this as another feature that can be provided by a layer on
 top, though if there are use cases where this is a common operation, it could
 be added.
 
