@@ -171,8 +171,8 @@ io-lifetimes's [`OwnedFd`] type is also similar to
 [filedesc](https://crates.io/crates/filedesc)'s
 [`FileDesc`](https://docs.rs/filedesc/0.3.0/filedesc/struct.FileDesc.html)
 io-lifetimes's `OwnedFd` reserves the value -1, so it doesn't need to test for
-`-1` in its `Drop`, and `Option<OwnedFd>` is the same size as `OwnedFd` (on
-nightly Rust).
+`-1` in its `Drop`, and `Option<OwnedFd>` (on nightly Rust) is the same size
+as `FileDesc`.
 
 io-lifetimes's [`OwnedFd`] type is also similar to
 [owned-fd](https://crates.io/crates/owned-fd)'s
