@@ -23,16 +23,6 @@ fn test_niche_optimizations() {
     assert_eq!(size_of::<Option<BorrowedFd<'static>>>(), size_of::<RawFd>());
 }
 
-#[cfg(windows)]
-#[test]
-fn test_niche_optimizations_handle() {
-    assert_eq!(size_of::<Option<OwnedHandle>>(), size_of::<RawHandle>());
-    assert_eq!(
-        size_of::<Option<BorrowedHandle<'static>>>(),
-        size_of::<RawHandle>(),
-    );
-}
-
 #[cfg(all(rustc_attrs, windows))]
 #[test]
 fn test_niche_optimizations_socket() {
