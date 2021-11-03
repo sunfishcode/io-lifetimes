@@ -8,12 +8,10 @@ use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 #[cfg(windows)]
 use std::{
     convert::TryFrom,
-    ffi::c_void,
     os::windows::io::{
         AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
         RawHandle, RawSocket,
     },
-    ptr::NonNull,
 };
 #[cfg(windows)]
 use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
@@ -57,7 +55,7 @@ pub struct BorrowedFd<'fd> {
 #[derive(Copy, Clone)]
 #[repr(transparent)]
 pub struct BorrowedHandle<'handle> {
-    handle: NonNull<c_void>,
+    handle: RawHandle,
     _phantom: PhantomData<&'handle OwnedHandle>,
 }
 
@@ -124,7 +122,7 @@ pub struct OwnedFd {
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OwnedHandle {
-    handle: NonNull<c_void>,
+    handle: RawHandle,
 }
 
 /// An owned socket.
@@ -165,7 +163,7 @@ pub struct OwnedSocket {
 #[cfg(windows)]
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct HandleOrInvalid(Option<OwnedHandle>);
+pub struct HandleOrInvalid(OwnedHandle);
 
 // The Windows [`HANDLE`] type may be transferred across and shared between
 // thread boundaries (despite containing a `*mut void`, which in general isn't
@@ -215,7 +213,7 @@ impl BorrowedHandle<'_> {
     pub unsafe fn borrow_raw_handle(handle: RawHandle) -> Self {
         debug_assert!(!handle.is_null());
         Self {
-            handle: NonNull::new_unchecked(handle),
+            handle,
             _phantom: PhantomData,
         }
     }
@@ -246,19 +244,8 @@ impl TryFrom<HandleOrInvalid> for OwnedHandle {
 
     #[inline]
     fn try_from(handle_or_invalid: HandleOrInvalid) -> Result<Self, ()> {
-        // In theory, we ought to be able to assume that the pointer here is
-        // never null, use `OwnedHandle` rather than `Option<OwnedHandle>`, and
-        // obviate the the panic path here.  Unfortunately, Win32 documentation
-        // doesn't explicitly guarantee this anywhere.
-        //
-        // APIs like [`CreateFileW`] itself have `HANDLE` arguments where a
-        // null handle indicates an absent value, which wouldn't work if null
-        // were a valid handle value, so it seems very unlikely that it could
-        // ever return null. But who knows?
-        //
-        // [`CreateFileW`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
-        let owned_handle = handle_or_invalid.0.expect("A `HandleOrInvalid` was null!");
-        if owned_handle.handle.as_ptr() == INVALID_HANDLE_VALUE {
+        let owned_handle = handle_or_invalid.0;
+        if owned_handle.handle == INVALID_HANDLE_VALUE {
             Err(())
         } else {
             Ok(owned_handle)
@@ -278,7 +265,7 @@ impl AsRawFd for BorrowedFd<'_> {
 impl AsRawHandle for BorrowedHandle<'_> {
     #[inline]
     fn as_raw_handle(&self) -> RawHandle {
-        self.handle.as_ptr()
+        self.handle
     }
 }
 
@@ -302,7 +289,7 @@ impl AsRawFd for OwnedFd {
 impl AsRawHandle for OwnedHandle {
     #[inline]
     fn as_raw_handle(&self) -> RawHandle {
-        self.handle.as_ptr()
+        self.handle
     }
 }
 
@@ -328,7 +315,7 @@ impl IntoRawFd for OwnedFd {
 impl IntoRawHandle for OwnedHandle {
     #[inline]
     fn into_raw_handle(self) -> RawHandle {
-        let handle = self.handle.as_ptr();
+        let handle = self.handle;
         forget(self);
         handle
     }
@@ -370,9 +357,7 @@ impl FromRawHandle for OwnedHandle {
     #[inline]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         debug_assert!(!handle.is_null());
-        Self {
-            handle: NonNull::new_unchecked(handle),
-        }
+        Self { handle }
     }
 }
 
@@ -410,8 +395,7 @@ impl FromRawHandle for HandleOrInvalid {
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
     #[inline]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {
-        // We require non-null here to catch errors earlier.
-        Self(Some(OwnedHandle::from_raw_handle(handle)))
+        Self(OwnedHandle::from_raw_handle(handle))
     }
 }
 
@@ -438,7 +422,7 @@ impl Drop for OwnedHandle {
     #[inline]
     fn drop(&mut self) {
         unsafe {
-            let _ = winapi::um::handleapi::CloseHandle(self.handle.as_ptr());
+            let _ = winapi::um::handleapi::CloseHandle(self.handle);
         }
     }
 }
