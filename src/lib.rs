@@ -148,6 +148,7 @@ pub use portability::{
 
 #[cfg(feature = "close")]
 pub mod example_ffi;
+pub mod raw;
 pub mod views;
 
 // Ideally, we'd want crates to implement our traits themselves. But for now,
