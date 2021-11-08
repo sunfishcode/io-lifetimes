@@ -93,13 +93,13 @@ impl<Target: FromSocketlike + IntoSocketlike> SocketlikeView<'_, Target> {
         }
     }
 
-    /// Construct a temporary `Target` from raw and wrap it in a `SocketlikeView`
-    /// object.
+    /// Construct a temporary `Target` from raw and wrap it in a
+    /// `SocketlikeView` object.
     ///
     /// # Safety
     ///
-    /// `raw` must be a valid raw socketlike referencing a resource that outlives
-    /// the resulting view.
+    /// `raw` must be a valid raw socketlike referencing a resource that
+    /// outlives the resulting view.
     #[inline]
     pub unsafe fn view_raw(raw: RawSocketlike) -> Self {
         let owned = OwnedSocketlike::from_raw_socketlike(raw);
