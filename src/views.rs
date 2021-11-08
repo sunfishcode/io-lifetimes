@@ -5,10 +5,10 @@
 //!
 //! [`AsSocketlike::as_socketlike_view`]: crate::AsSocketlike::as_socketlike_view
 
-use crate::portability::{AsRawFilelike, FromRawFilelike, IntoRawFilelike};
+use crate::raw::{AsRawFilelike, FromRawFilelike, IntoRawFilelike, RawFilelike};
 #[cfg(windows)]
 use crate::{
-    portability::{AsRawSocketlike, FromRawSocketlike, IntoRawSocketlike},
+    raw::{AsRawSocketlike, FromRawSocketlike, IntoRawSocketlike, RawSocketlike},
     AsSocketlike, FromSocketlike, IntoSocketlike, OwnedSocketlike,
 };
 use crate::{AsFilelike, FromFilelike, IntoFilelike, OwnedFilelike};
@@ -55,8 +55,19 @@ impl<Target: FromFilelike + IntoFilelike> FilelikeView<'_, Target> {
         // Safety: The returned `FilelikeView` is scoped to the lifetime of
         // `filelike`, which we've borrowed here, so the view won't outlive
         // the object it's borrowed from.
-        let owned =
-            unsafe { OwnedFilelike::from_raw_filelike(filelike.as_filelike().as_raw_filelike()) };
+        unsafe { Self::view_raw(filelike.as_filelike().as_raw_filelike()) }
+    }
+
+    /// Construct a temporary `Target` from raw and wrap it in a `FilelikeView`
+    /// object.
+    ///
+    /// # Safety
+    ///
+    /// `raw` must be a valid raw filelike referencing a resource that outlives
+    /// the resulting view.
+    #[inline]
+    pub unsafe fn view_raw(raw: RawFilelike) -> Self {
+        let owned = OwnedFilelike::from_raw_filelike(raw);
         Self {
             target: Some(Target::from_filelike(owned)),
             _phantom: PhantomData,
@@ -76,6 +87,22 @@ impl<Target: FromSocketlike + IntoSocketlike> SocketlikeView<'_, Target> {
         let owned = unsafe {
             OwnedSocketlike::from_raw_socketlike(socketlike.as_socketlike().as_raw_socketlike())
         };
+        Self {
+            target: Some(Target::from_socketlike(owned)),
+            _phantom: PhantomData,
+        }
+    }
+
+    /// Construct a temporary `Target` from raw and wrap it in a `SocketlikeView`
+    /// object.
+    ///
+    /// # Safety
+    ///
+    /// `raw` must be a valid raw socketlike referencing a resource that outlives
+    /// the resulting view.
+    #[inline]
+    pub unsafe fn view_raw(raw: RawSocketlike) -> Self {
+        let owned = OwnedSocketlike::from_raw_socketlike(raw);
         Self {
             target: Some(Target::from_socketlike(owned)),
             _phantom: PhantomData,

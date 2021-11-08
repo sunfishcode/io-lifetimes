@@ -1,3 +1,5 @@
+//! Portability abstractions over `Owned*` and `Borrowed*`.
+//!
 //! On Unix, "everything is a file descriptor". On Windows, file/pipe/process
 //! handles are distinct from socket descriptors. This file provides a minimal
 //! layer of portability over this difference.
@@ -11,15 +13,6 @@ use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 use crate::{
     AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, FromHandle, FromSocket, IntoHandle,
     IntoSocket, OwnedHandle, OwnedSocket,
-};
-#[cfg(unix)]
-use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
-#[cfg(target_os = "wasi")]
-use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
-#[cfg(windows)]
-use std::os::windows::io::{
-    AsRawHandle, AsRawSocket, FromRawHandle, FromRawSocket, IntoRawHandle, IntoRawSocket,
-    RawHandle, RawSocket,
 };
 
 /// A reference to a filelike object.
@@ -77,18 +70,6 @@ pub type OwnedSocketlike = OwnedFd;
 /// Windows' [`OwnedSocket`].
 #[cfg(windows)]
 pub type OwnedSocketlike = OwnedSocket;
-
-#[cfg(any(unix, target_os = "wasi"))]
-pub(crate) type RawFilelike = RawFd;
-
-#[cfg(windows)]
-pub(crate) type RawFilelike = RawHandle;
-
-#[cfg(any(unix, target_os = "wasi"))]
-pub(crate) type RawSocketlike = RawFd;
-
-#[cfg(windows)]
-pub(crate) type RawSocketlike = RawSocket;
 
 /// A portable trait to borrow a reference from an underlying filelike object.
 ///
@@ -507,148 +488,5 @@ impl<T: FromSocket> FromSocketlike for T {
     #[inline]
     fn from_into_socketlike<Owned: IntoSocketlike>(owned: Owned) -> Self {
         Self::from_socketlike(owned.into_socketlike())
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-pub(crate) trait AsRawFilelike: AsRawFd {
-    fn as_raw_filelike(&self) -> RawFilelike;
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl<T: AsRawFd> AsRawFilelike for T {
-    #[inline]
-    fn as_raw_filelike(&self) -> RawFilelike {
-        self.as_raw_fd()
-    }
-}
-
-#[cfg(windows)]
-pub(crate) trait AsRawFilelike: AsRawHandle {
-    fn as_raw_filelike(&self) -> RawFilelike;
-}
-
-#[cfg(windows)]
-impl<T: AsRawHandle> AsRawFilelike for T {
-    #[inline]
-    fn as_raw_filelike(&self) -> RawFilelike {
-        self.as_raw_handle()
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-pub(crate) trait AsRawSocketlike: AsRawFd {
-    fn as_raw_socketlike(&self) -> RawSocketlike;
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl<T: AsRawFd> AsRawSocketlike for T {
-    #[inline]
-    fn as_raw_socketlike(&self) -> RawSocketlike {
-        self.as_raw_fd()
-    }
-}
-
-#[cfg(windows)]
-pub(crate) trait AsRawSocketlike: AsRawSocket {
-    fn as_raw_socketlike(&self) -> RawSocketlike;
-}
-
-#[cfg(windows)]
-impl<T: AsRawSocket> AsRawSocketlike for T {
-    #[inline]
-    fn as_raw_socketlike(&self) -> RawSocketlike {
-        self.as_raw_socket()
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-pub(crate) trait IntoRawFilelike: IntoRawFd {
-    fn into_raw_filelike(self) -> RawFilelike;
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl<T: IntoRawFd> IntoRawFilelike for T {
-    #[inline]
-    fn into_raw_filelike(self) -> RawFilelike {
-        self.into_raw_fd()
-    }
-}
-
-#[cfg(windows)]
-pub(crate) trait IntoRawFilelike: IntoRawHandle {
-    fn into_raw_filelike(self) -> RawFilelike;
-}
-
-#[cfg(windows)]
-impl<T: IntoRawHandle> IntoRawFilelike for T {
-    #[inline]
-    fn into_raw_filelike(self) -> RawFilelike {
-        self.into_raw_handle()
-    }
-}
-
-#[cfg(windows)]
-pub(crate) trait IntoRawSocketlike: IntoRawSocket {
-    fn into_raw_socketlike(self) -> RawSocketlike;
-}
-
-#[cfg(windows)]
-impl<T: IntoRawSocket> IntoRawSocketlike for T {
-    #[inline]
-    fn into_raw_socketlike(self) -> RawSocketlike {
-        self.into_raw_socket()
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-pub(crate) trait FromRawFilelike: FromRawFd {
-    unsafe fn from_raw_filelike(raw: RawFilelike) -> Self;
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl<T: FromRawFd> FromRawFilelike for T {
-    #[inline]
-    unsafe fn from_raw_filelike(raw: RawFilelike) -> Self {
-        Self::from_raw_fd(raw)
-    }
-}
-
-#[cfg(windows)]
-pub(crate) trait FromRawFilelike: FromRawHandle {
-    unsafe fn from_raw_filelike(raw: RawFilelike) -> Self;
-}
-
-#[cfg(windows)]
-impl<T: FromRawHandle> FromRawFilelike for T {
-    #[inline]
-    unsafe fn from_raw_filelike(raw: RawFilelike) -> Self {
-        Self::from_raw_handle(raw)
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-pub(crate) trait FromRawSocketlike: FromRawFd {
-    unsafe fn from_raw_socketlike(raw: RawSocketlike) -> Self;
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl<T: FromRawFd> FromRawSocketlike for T {
-    #[inline]
-    unsafe fn from_raw_socketlike(raw: RawSocketlike) -> Self {
-        Self::from_raw_fd(raw)
-    }
-}
-
-#[cfg(windows)]
-pub(crate) trait FromRawSocketlike: FromRawSocket {
-    unsafe fn from_raw_socketlike(raw: RawSocketlike) -> Self;
-}
-
-#[cfg(windows)]
-impl<T: FromRawSocket> FromRawSocketlike for T {
-    #[inline]
-    unsafe fn from_raw_socketlike(raw: RawSocketlike) -> Self {
-        Self::from_raw_socket(raw)
     }
 }

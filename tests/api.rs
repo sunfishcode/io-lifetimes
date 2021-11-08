@@ -3,6 +3,8 @@
 #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
 
 use io_lifetimes::{
+    raw::{AsRawFilelike, AsRawSocketlike},
+    views::{FilelikeView, SocketlikeView},
     AsFilelike, AsSocketlike, BorrowedFilelike, FromFilelike, FromSocketlike, IntoFilelike,
     IntoSocketlike,
 };
@@ -12,12 +14,26 @@ impl Tester {
     fn use_file<Filelike: AsFilelike>(filelike: &Filelike) {
         let filelike = filelike.as_filelike();
         let _ = filelike.as_filelike_view::<std::fs::File>();
+        let _ = unsafe {
+            FilelikeView::<std::fs::File>::view_raw(
+                filelike
+                    .as_filelike_view::<std::fs::File>()
+                    .as_raw_filelike(),
+            )
+        };
         let _ = dbg!(filelike);
     }
 
     fn use_socket<Socketlike: AsSocketlike>(socketlike: &Socketlike) {
         let socketlike = socketlike.as_socketlike();
         let _ = socketlike.as_socketlike_view::<std::net::TcpStream>();
+        let _ = unsafe {
+            SocketlikeView::<std::net::TcpStream>::view_raw(
+                socketlike
+                    .as_socketlike_view::<std::net::TcpStream>()
+                    .as_raw_socketlike(),
+            )
+        };
         let _ = dbg!(socketlike);
     }
 
