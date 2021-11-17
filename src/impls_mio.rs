@@ -110,54 +110,6 @@ impl FromSocket for mio::net::TcpListener {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for mio::net::TcpSocket {
-    #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
-    }
-}
-
-#[cfg(windows)]
-impl AsSocket for mio::net::TcpSocket {
-    #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
-        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl IntoFd for mio::net::TcpSocket {
-    #[inline]
-    fn into_fd(self) -> OwnedFd {
-        unsafe { OwnedFd::from_raw_fd(self.into_raw_fd()) }
-    }
-}
-
-#[cfg(windows)]
-impl IntoSocket for mio::net::TcpSocket {
-    #[inline]
-    fn into_socket(self) -> OwnedSocket {
-        unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
-impl FromFd for mio::net::TcpSocket {
-    #[inline]
-    fn from_fd(owned: OwnedFd) -> Self {
-        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
-    }
-}
-
-#[cfg(windows)]
-impl FromSocket for mio::net::TcpSocket {
-    #[inline]
-    fn from_socket(owned: OwnedSocket) -> Self {
-        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
-    }
-}
-
-#[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for mio::net::UdpSocket {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
