@@ -10,9 +10,6 @@ edition = "2018"
 repository = "https://github.com/sunfishcode/io-lifetimes"
 exclude = ["/.github"]
 
-[build-dependencies]
-rustc_version = "0.4.0"
-
 [dependencies]
 # io-lifetimes only depends on libc/winapi for the ability to close
 # fds/handles/sockets. The following are just optional dependencies to add
