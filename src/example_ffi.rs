@@ -50,7 +50,7 @@ extern "C" {
         hTemplateFile: HANDLE,
     ) -> HandleOrInvalid;
     pub fn ReadFile(
-        hFile: HANDLE,
+        hFile: BorrowedHandle<'_>,
         lpBuffer: LPVOID,
         nNumberOfBytesToRead: DWORD,
         lpNumberOfBytesRead: LPDWORD,
