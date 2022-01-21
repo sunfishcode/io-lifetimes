@@ -109,18 +109,21 @@ pub struct OwnedFd {
 ///
 /// This closes the handle on drop.
 ///
-/// This uses `repr(transparent)` and has the representation of a host handle,
-/// so it can be used in FFI in places where a handle is passed as a consumed
-/// argument or returned as an owned value, and is never null.
+/// Note that it *may* have the value `INVALID_HANDLE_VALUE` (-1), which is
+/// sometimes a valid handle value. See [here] for the full story.
 ///
-/// Note that it *may* have the value [`INVALID_HANDLE_VALUE`]. See [here] for
-/// the full story. For APIs like `CreateFileW` which report errors with
-/// `INVALID_HANDLE_VALUE` instead of null, use [`HandleOrInvalid`] instead
-/// of `Option<OwnedHandle>`.
+/// And, it *may* have the value `NULL` (0), which can occur when consoles are
+/// detached from processes, or when `windows_subsystem` is used.
+///
+/// `OwnedHandle` uses [`CloseHandle`] to close its handle on drop. As such,
+/// it must not be used with handles to open registry keys which need to be
+/// closed with [`RegCloseKey`] instead.
+///
+/// [`CloseHandle`]: https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
+/// [`RegCloseKey`]: https://docs.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey
 ///
 /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
 #[cfg(windows)]
-#[repr(transparent)]
 pub struct OwnedHandle {
     handle: RawHandle,
 }
@@ -159,11 +162,35 @@ pub struct OwnedSocket {
 /// `INVALID_HANDLE_VALUE`. This ensures that such FFI calls cannot start using the handle without
 /// checking for `INVALID_HANDLE_VALUE` first.
 ///
+/// This type concerns any value other than `INVALID_HANDLE_VALUE` to be valid, including `NULL`.
+/// This is because APIs that use `INVALID_HANDLE_VALUE` as their sentry value may return `NULL`
+/// under `windows_subsystem = "windows"` or other situations where I/O devices are detached.
+///
 /// If this holds a valid handle, it will close the handle on drop.
 #[cfg(windows)]
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct HandleOrInvalid(OwnedHandle);
+pub struct HandleOrInvalid(RawHandle);
+
+/// FFI type for handles in return values or out parameters, where `NULL` is used
+/// as a sentry value to indicate errors, such as in the return value of `CreateThread`. This uses
+/// `repr(transparent)` and has the representation of a host handle, so that it can be used in such
+/// FFI declarations.
+///
+/// The only thing you can usefully do with a `HandleOrNull` is to convert it into an
+/// `OwnedHandle` using its [`TryFrom`] implementation; this conversion takes care of the check for
+/// `NULL`. This ensures that such FFI calls cannot start using the handle without
+/// checking for `NULL` first.
+///
+/// This type concerns any value other than `NULL` to be valid, including `INVALID_HANDLE_VALUE`.
+/// This is because APIs that use `NULL` as their sentry value don't treat `INVALID_HANDLE_VALUE`
+/// as special.
+///
+/// If this holds a valid handle, it will close the handle on drop.
+#[cfg(windows)]
+#[repr(transparent)]
+#[derive(Debug)]
+pub struct HandleOrNull(RawHandle);
 
 // The Windows [`HANDLE`] type may be transferred across and shared between
 // thread boundaries (despite containing a `*mut void`, which in general isn't
@@ -175,11 +202,15 @@ unsafe impl Send for OwnedHandle {}
 #[cfg(windows)]
 unsafe impl Send for HandleOrInvalid {}
 #[cfg(windows)]
+unsafe impl Send for HandleOrNull {}
+#[cfg(windows)]
 unsafe impl Send for BorrowedHandle<'_> {}
 #[cfg(windows)]
 unsafe impl Sync for OwnedHandle {}
 #[cfg(windows)]
 unsafe impl Sync for HandleOrInvalid {}
+#[cfg(windows)]
+unsafe impl Sync for HandleOrNull {}
 #[cfg(windows)]
 unsafe impl Sync for BorrowedHandle<'_> {}
 
@@ -244,11 +275,26 @@ impl TryFrom<HandleOrInvalid> for OwnedHandle {
 
     #[inline]
     fn try_from(handle_or_invalid: HandleOrInvalid) -> Result<Self, ()> {
-        let owned_handle = handle_or_invalid.0;
-        if owned_handle.handle == INVALID_HANDLE_VALUE {
+        let raw = handle_or_invalid.0;
+        if raw == INVALID_HANDLE_VALUE {
             Err(())
         } else {
-            Ok(owned_handle)
+            Ok(OwnedHandle { handle: raw })
+        }
+    }
+}
+
+#[cfg(windows)]
+impl TryFrom<HandleOrNull> for OwnedHandle {
+    type Error = ();
+
+    #[inline]
+    fn try_from(handle_or_null: HandleOrNull) -> Result<Self, ()> {
+        let raw = handle_or_null.0;
+        if raw.is_null() {
+            Err(())
+        } else {
+            Ok(OwnedHandle { handle: raw })
         }
     }
 }
@@ -356,7 +402,6 @@ impl FromRawHandle for OwnedHandle {
     /// ownership.
     #[inline]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {
-        debug_assert!(!handle.is_null());
         Self { handle }
     }
 }
@@ -382,20 +427,42 @@ impl FromRawHandle for HandleOrInvalid {
     /// from a Windows API that uses `INVALID_HANDLE_VALUE` to indicate
     /// failure, such as `CreateFileW`.
     ///
-    /// Use `Option<OwnedHandle>` instead of `HandleOrInvalid` for APIs that
+    /// Use `HandleOrNull` instead of `HandleOrInvalid` for APIs that
     /// use null to indicate failure.
     ///
     /// # Safety
     ///
-    /// The resource pointed to by `raw` must be either open and otherwise
-    /// unowned, or equal to [`INVALID_FILE_HANDLE]`. Note that not all Windows
-    /// APIs use [`INVALID_HANDLE_VALUE`] for errors; see [here] for the full
-    /// story.
+    /// The resource pointed to by `handle` must be either open and otherwise
+    /// unowned, null, or equal to `INVALID_HANDLE_VALUE` (-1). Note that not
+    /// all Windows APIs use `INVALID_HANDLE_VALUE` for errors; see [here] for
+    /// the full story.
     ///
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
     #[inline]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {
-        Self(OwnedHandle::from_raw_handle(handle))
+        Self(handle)
+    }
+}
+
+#[cfg(windows)]
+impl FromRawHandle for HandleOrNull {
+    /// Constructs a new instance of `Self` from the given `RawHandle` returned
+    /// from a Windows API that uses null to indicate failure, such as
+    /// `CreateThread`.
+    ///
+    /// Use `HandleOrInvalid` instead of `HandleOrNull` for APIs that
+    /// use `INVALID_HANDLE_VALUE` to indicate failure.
+    ///
+    /// # Safety
+    ///
+    /// The resource pointed to by `handle` must be either open and otherwise
+    /// unowned, or null. Note that not all Windows APIs use null for errors;
+    /// see [here] for the full story.
+    ///
+    /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
+    #[inline]
+    unsafe fn from_raw_handle(handle: RawHandle) -> Self {
+        Self(handle)
     }
 }
 
@@ -423,6 +490,26 @@ impl Drop for OwnedHandle {
     fn drop(&mut self) {
         unsafe {
             let _ = winapi::um::handleapi::CloseHandle(self.handle);
+        }
+    }
+}
+
+#[cfg(windows)]
+impl Drop for HandleOrInvalid {
+    #[inline]
+    fn drop(&mut self) {
+        unsafe {
+            let _ = winapi::um::handleapi::CloseHandle(self.0);
+        }
+    }
+}
+
+#[cfg(windows)]
+impl Drop for HandleOrNull {
+    #[inline]
+    fn drop(&mut self) {
+        unsafe {
+            let _ = winapi::um::handleapi::CloseHandle(self.0);
         }
     }
 }
