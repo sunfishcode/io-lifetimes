@@ -291,7 +291,11 @@ impl TryFrom<HandleOrNull> for OwnedHandle {
     #[inline]
     fn try_from(handle_or_null: HandleOrNull) -> Result<Self, ()> {
         let raw = handle_or_null.0;
-        if raw.is_null() { Err(()) } else { Ok(OwnedHandle { handle: raw }) }
+        if raw.is_null() {
+            Err(())
+        } else {
+            Ok(OwnedHandle { handle: raw })
+        }
     }
 }
 
