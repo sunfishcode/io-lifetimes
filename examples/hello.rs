@@ -13,10 +13,10 @@ use std::{
 };
 
 #[cfg(all(unix, feature = "close"))]
-use io_lifetimes::{AsFd, FromFd, IntoFd, OwnedFd};
+use io_lifetimes::{AsFd, FromFd, OwnedFd};
 
 #[cfg(windows)]
-use io_lifetimes::{AsHandle, FromHandle, IntoHandle, OwnedHandle};
+use io_lifetimes::{AsHandle, FromHandle, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, ptr::null_mut};
 
@@ -53,15 +53,7 @@ fn main() -> io::Result<()> {
         }
     }
 
-    // Now back to `OwnedFd`.
-    let fd = file.into_fd();
-
-    unsafe {
-        // This isn't needed, since `fd` is owned and would close itself on
-        // drop automatically, but it makes a nice demo of passing an `OwnedFd`
-        // into an FFI call.
-        close(fd);
-    }
+    // `OwnedFd` closes the fd in its `Drop` implementation.
 
     Ok(())
 }
@@ -106,7 +98,7 @@ fn main() -> io::Result<()> {
     let mut file = File::from_handle(handle);
     writeln!(&mut file, "greetings, y'all")?;
 
-    // We can borrow a `BorrowedFd` from a `File`.
+    // We can borrow a `BorrowedHandle` from a `File`.
     unsafe {
         let mut number_of_bytes_written = 0;
         let result = WriteFile(
@@ -123,15 +115,7 @@ fn main() -> io::Result<()> {
         }
     }
 
-    // Now back to `OwnedFd`.
-    let handle = file.into_handle();
-
-    unsafe {
-        // This isn't needed, since `handle` is owned and would close itself on
-        // drop automatically, but it makes a nice demo of passing an `OwnedHandle`
-        // into an FFI call.
-        CloseHandle(handle);
-    }
+    // `OwnedHandle` closes the handle in its `Drop` implementation.
 
     Ok(())
 }

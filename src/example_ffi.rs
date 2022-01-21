@@ -30,7 +30,6 @@ extern "C" {
 extern "C" {
     pub fn read(fd: BorrowedFd<'_>, ptr: *mut c_void, size: size_t) -> ssize_t;
     pub fn write(fd: BorrowedFd<'_>, ptr: *const c_void, size: size_t) -> ssize_t;
-    pub fn close(fd: OwnedFd) -> c_int;
 }
 #[cfg(any(unix, target_os = "wasi"))]
 pub use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
@@ -63,7 +62,6 @@ extern "C" {
         lpNumberOfBytesWritten: LPDWORD,
         lpOverlapped: LPOVERLAPPED,
     ) -> BOOL;
-    pub fn CloseHandle(handle: OwnedHandle) -> BOOL;
 }
 #[cfg(windows)]
 pub use winapi::{
