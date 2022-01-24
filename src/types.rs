@@ -13,8 +13,13 @@ use std::{
         RawHandle, RawSocket,
     },
 };
-#[cfg(windows)]
+#[cfg(all(windows, feature = "close"))]
 use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
+
+#[cfg(all(windows, not(feature = "winapi")))]
+const INVALID_HANDLE_VALUE: *mut core::ffi::c_void = !0 as _;
+#[cfg(all(windows, not(feature = "winapi")))]
+const INVALID_SOCKET: usize = !0 as _;
 
 /// A borrowed file descriptor.
 ///
@@ -488,8 +493,16 @@ impl Drop for OwnedFd {
 impl Drop for OwnedHandle {
     #[inline]
     fn drop(&mut self) {
+        #[cfg(feature = "close")]
         unsafe {
             let _ = winapi::um::handleapi::CloseHandle(self.handle);
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid letting
+        // `OwnedHandle` instances drop, so that we don't have to call `close`.
+        #[cfg(not(feature = "close"))]
+        {
+            unreachable!("drop called without the \"close\" feature in io-lifetimes");
         }
     }
 }
@@ -498,8 +511,16 @@ impl Drop for OwnedHandle {
 impl Drop for HandleOrInvalid {
     #[inline]
     fn drop(&mut self) {
+        #[cfg(feature = "close")]
         unsafe {
             let _ = winapi::um::handleapi::CloseHandle(self.0);
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid letting
+        // `HandleOrInvalid` instances drop, so that we don't have to call `close`.
+        #[cfg(not(feature = "close"))]
+        {
+            unreachable!("drop called without the \"close\" feature in io-lifetimes");
         }
     }
 }
@@ -508,8 +529,16 @@ impl Drop for HandleOrInvalid {
 impl Drop for HandleOrNull {
     #[inline]
     fn drop(&mut self) {
+        #[cfg(feature = "close")]
         unsafe {
             let _ = winapi::um::handleapi::CloseHandle(self.0);
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid letting
+        // `HandleOrNull` instances drop, so that we don't have to call `close`.
+        #[cfg(not(feature = "close"))]
+        {
+            unreachable!("drop called without the \"close\" feature in io-lifetimes");
         }
     }
 }
@@ -518,8 +547,16 @@ impl Drop for HandleOrNull {
 impl Drop for OwnedSocket {
     #[inline]
     fn drop(&mut self) {
+        #[cfg(feature = "close")]
         unsafe {
             let _ = winapi::um::winsock2::closesocket(self.socket as winapi::um::winsock2::SOCKET);
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid letting
+        // `OwnedSocket` instances drop, so that we don't have to call `close`.
+        #[cfg(not(feature = "close"))]
+        {
+            unreachable!("drop called without the \"close\" feature in io-lifetimes");
         }
     }
 }

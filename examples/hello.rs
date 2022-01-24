@@ -59,7 +59,7 @@ fn main() -> io::Result<()> {
 }
 
 /// The Windows analog of the above.
-#[cfg(windows)]
+#[cfg(all(windows, feature = "close"))]
 fn main() -> io::Result<()> {
     let handle = unsafe {
         // Open a file, which returns an `HandleOrInvalid`, which we can fallibly
@@ -120,7 +120,10 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-#[cfg(all(not(all(rustc_attrs, unix, feature = "close")), not(windows)))]
+#[cfg(all(
+    not(all(rustc_attrs, unix, feature = "close")),
+    not(all(windows, feature = "close"))
+))]
 fn main() {
     println!("On Unix, this example requires Rust nightly (for `rustc_attrs`) and the \"close\" feature.");
 }
