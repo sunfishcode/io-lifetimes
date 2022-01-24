@@ -1,5 +1,6 @@
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
+#[cfg(any(not(windows), feature = "close"))]
 use std::mem::size_of;
 
 #[cfg(unix)]
@@ -22,7 +23,7 @@ fn test_assumptions() {
     );
 }
 
-#[cfg(windows)]
+#[cfg(all(windows, feature = "close"))]
 #[test]
 fn test_assumptions() {
     assert_eq!(

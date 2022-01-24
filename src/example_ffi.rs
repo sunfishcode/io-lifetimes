@@ -38,7 +38,7 @@ pub use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
 /// the return type for `CreateFileW`, since that function is defined to return
 /// [`INVALID_HANDLE_VALUE`] on error instead of null.
 #[cfg(windows)]
-extern "C" {
+extern "system" {
     pub fn CreateFileW(
         lpFileName: LPCWSTR,
         dwDesiredAccess: DWORD,
