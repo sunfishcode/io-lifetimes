@@ -162,6 +162,7 @@ mod impls_fs_err;
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(feature = "mio")]
 mod impls_mio;
+#[cfg(not(target_os = "wasi"))]
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(feature = "os_pipe")]
 mod impls_os_pipe;
