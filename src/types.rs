@@ -597,12 +597,6 @@ impl FromRawFd for OwnedFd {
 
 #[cfg(windows)]
 impl FromRawHandle for OwnedHandle {
-    /// Constructs a new instance of `Self` from the given raw handle.
-    ///
-    /// # Safety
-    ///
-    /// The resource pointed to by `raw` must be open and suitable for assuming
-    /// ownership.
     #[inline]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         Self { handle }
@@ -611,12 +605,6 @@ impl FromRawHandle for OwnedHandle {
 
 #[cfg(windows)]
 impl FromRawSocket for OwnedSocket {
-    /// Constructs a new instance of `Self` from the given raw socket.
-    ///
-    /// # Safety
-    ///
-    /// The resource pointed to by `raw` must be open and suitable for assuming
-    /// ownership.
     #[inline]
     unsafe fn from_raw_socket(socket: RawSocket) -> Self {
         debug_assert_ne!(socket, INVALID_SOCKET as RawSocket);
@@ -625,7 +613,7 @@ impl FromRawSocket for OwnedSocket {
 }
 
 #[cfg(windows)]
-impl FromRawHandle for HandleOrInvalid {
+impl HandleOrInvalid {
     /// Constructs a new instance of `Self` from the given `RawHandle` returned
     /// from a Windows API that uses `INVALID_HANDLE_VALUE` to indicate
     /// failure, such as `CreateFileW`.
@@ -635,20 +623,20 @@ impl FromRawHandle for HandleOrInvalid {
     ///
     /// # Safety
     ///
-    /// The resource pointed to by `handle` must be either open and otherwise
-    /// unowned, null, or equal to `INVALID_HANDLE_VALUE` (-1). Note that not
-    /// all Windows APIs use `INVALID_HANDLE_VALUE` for errors; see [here] for
-    /// the full story.
+    /// The passed `handle` value must either satisfy the safety requirements
+    /// of [`FromRawHandle::from_raw_handle`], or be
+    /// `INVALID_HANDLE_VALUE` (-1). Note that not all Windows APIs use
+    /// `INVALID_HANDLE_VALUE` for errors; see [here] for the full story.
     ///
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
     #[inline]
-    unsafe fn from_raw_handle(handle: RawHandle) -> Self {
+    pub unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         Self(handle)
     }
 }
 
 #[cfg(windows)]
-impl FromRawHandle for HandleOrNull {
+impl HandleOrNull {
     /// Constructs a new instance of `Self` from the given `RawHandle` returned
     /// from a Windows API that uses null to indicate failure, such as
     /// `CreateThread`.
@@ -658,13 +646,13 @@ impl FromRawHandle for HandleOrNull {
     ///
     /// # Safety
     ///
-    /// The resource pointed to by `handle` must be either open and otherwise
-    /// unowned, or null. Note that not all Windows APIs use null for errors;
-    /// see [here] for the full story.
+    /// The passed `handle` value must either satisfy the safety requirements
+    /// of [`FromRawHandle::from_raw_handle`], or be null. Note that not all
+    /// Windows APIs use null for errors; see [here] for the full story.
     ///
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
     #[inline]
-    unsafe fn from_raw_handle(handle: RawHandle) -> Self {
+    pub unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         Self(handle)
     }
 }
