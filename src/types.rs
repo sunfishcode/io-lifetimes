@@ -14,7 +14,27 @@ use std::{
     },
 };
 #[cfg(all(windows, feature = "close"))]
-use winapi::{um::handleapi::INVALID_HANDLE_VALUE, um::winsock2::INVALID_SOCKET};
+use winapi::{
+    shared::minwindef::{BOOL, DWORD},
+    shared::ntdef::HANDLE,
+    um::handleapi::DuplicateHandle,
+    um::handleapi::SetHandleInformation,
+    um::handleapi::INVALID_HANDLE_VALUE,
+    um::processthreadsapi::GetCurrentProcess,
+    um::processthreadsapi::GetCurrentProcessId,
+    um::winbase::HANDLE_FLAG_INHERIT,
+    um::winnt::DUPLICATE_SAME_ACCESS,
+    um::winsock2::WSADuplicateSocketW,
+    um::winsock2::WSAGetLastError,
+    um::winsock2::WSASocketW,
+    um::winsock2::INVALID_SOCKET,
+    um::winsock2::SOCKET_ERROR,
+    um::winsock2::WSAEINVAL,
+    um::winsock2::WSAEPROTOTYPE,
+    um::winsock2::WSAPROTOCOL_INFOW,
+    um::winsock2::WSA_FLAG_NO_HANDLE_INHERIT,
+    um::winsock2::WSA_FLAG_OVERLAPPED,
+};
 
 #[cfg(all(windows, not(feature = "winapi")))]
 const INVALID_HANDLE_VALUE: *mut core::ffi::c_void = !0 as _;
@@ -110,6 +130,42 @@ pub struct OwnedFd {
     fd: RawFd,
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl OwnedFd {
+    /// Creates a new `OwnedFd` instance that shares the same underlying file handle
+    /// as the existing `OwnedFd` instance.
+    pub fn try_clone(&self) -> std::io::Result<Self> {
+        #[cfg(feature = "close")]
+        {
+            // We want to atomically duplicate this file descriptor and set the
+            // CLOEXEC flag, and currently that's done via F_DUPFD_CLOEXEC. This
+            // is a POSIX flag that was added to Linux in 2.6.24.
+            #[cfg(not(target_os = "espidf"))]
+            let cmd = libc::F_DUPFD_CLOEXEC;
+
+            // For ESP-IDF, F_DUPFD is used instead, because the CLOEXEC semantics
+            // will never be supported, as this is a bare metal framework with
+            // no capabilities for multi-process execution.  While F_DUPFD is also
+            // not supported yet, it might be (currently it returns ENOSYS).
+            #[cfg(target_os = "espidf")]
+            let cmd = libc::F_DUPFD;
+
+            let fd = match unsafe { libc::fcntl(self.as_raw_fd(), cmd, 0) } {
+                -1 => return Err(std::io::Error::last_os_error()),
+                fd => fd,
+            };
+            Ok(unsafe { Self::from_raw_fd(fd) })
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid cloning
+        // `OwnedFd` instances, so that we don't have to call `fcntl`.
+        #[cfg(not(feature = "close"))]
+        {
+            unreachable!("try_clone called without the \"close\" feature in io-lifetimes");
+        }
+    }
+}
+
 /// An owned handle.
 ///
 /// This closes the handle on drop.
@@ -131,6 +187,51 @@ pub struct OwnedFd {
 #[cfg(windows)]
 pub struct OwnedHandle {
     handle: RawHandle,
+}
+
+#[cfg(windows)]
+impl OwnedHandle {
+    /// Creates a new `OwnedHandle` instance that shares the same underlying file handle
+    /// as the existing `OwnedHandle` instance.
+    pub fn try_clone(&self) -> std::io::Result<OwnedHandle> {
+        #[cfg(feature = "close")]
+        {
+            self.duplicate(0, false, DUPLICATE_SAME_ACCESS)
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid cloning
+        // `OwnedHandle` instances, so that we don't have to call `fcntl`.
+        #[cfg(not(feature = "close"))]
+        {
+            unreachable!("try_clone called without the \"close\" feature in io-lifetimes");
+        }
+    }
+
+    #[cfg(feature = "close")]
+    pub(crate) fn duplicate(
+        &self,
+        access: DWORD,
+        inherit: bool,
+        options: DWORD,
+    ) -> std::io::Result<Self> {
+        let mut ret = 0 as HANDLE;
+        match unsafe {
+            let cur_proc = GetCurrentProcess();
+            DuplicateHandle(
+                cur_proc,
+                self.as_raw_handle(),
+                cur_proc,
+                &mut ret,
+                access,
+                inherit as BOOL,
+                options,
+            )
+        } {
+            0 => return Err(std::io::Error::last_os_error()),
+            _ => (),
+        }
+        unsafe { Ok(Self::from_raw_handle(ret)) }
+    }
 }
 
 /// An owned socket.
@@ -155,6 +256,94 @@ pub struct OwnedHandle {
 )]
 pub struct OwnedSocket {
     socket: RawSocket,
+}
+
+#[cfg(windows)]
+impl OwnedSocket {
+    /// Creates a new `OwnedSocket` instance that shares the same underlying socket
+    /// as the existing `OwnedSocket` instance.
+    pub fn try_clone(&self) -> std::io::Result<Self> {
+        #[cfg(feature = "close")]
+        {
+            let mut info = unsafe { std::mem::zeroed::<WSAPROTOCOL_INFOW>() };
+            let result = unsafe {
+                WSADuplicateSocketW(self.as_raw_socket() as _, GetCurrentProcessId(), &mut info)
+            };
+            match result {
+                SOCKET_ERROR => return Err(std::io::Error::last_os_error()),
+                0 => (),
+                _ => panic!(),
+            }
+            let socket = unsafe {
+                WSASocketW(
+                    info.iAddressFamily,
+                    info.iSocketType,
+                    info.iProtocol,
+                    &mut info,
+                    0,
+                    WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT,
+                )
+            };
+
+            if socket != INVALID_SOCKET {
+                unsafe { Ok(OwnedSocket::from_raw_socket(socket as _)) }
+            } else {
+                let error = unsafe { WSAGetLastError() };
+
+                if error != WSAEPROTOTYPE && error != WSAEINVAL {
+                    return Err(std::io::Error::from_raw_os_error(error));
+                }
+
+                let socket = unsafe {
+                    WSASocketW(
+                        info.iAddressFamily,
+                        info.iSocketType,
+                        info.iProtocol,
+                        &mut info,
+                        0,
+                        WSA_FLAG_OVERLAPPED,
+                    )
+                };
+
+                if socket == INVALID_SOCKET {
+                    return Err(std::io::Error::last_os_error());
+                }
+
+                unsafe {
+                    let socket = OwnedSocket::from_raw_socket(socket as _);
+                    socket.set_no_inherit()?;
+                    Ok(socket)
+                }
+            }
+        }
+
+        // If the `close` feature is disabled, we expect users to avoid cloning
+        // `OwnedSocket` instances, so that we don't have to call `fcntl`.
+        #[cfg(not(feature = "close"))]
+        {
+            unreachable!("try_clone called without the \"close\" feature in io-lifetimes");
+        }
+    }
+
+    #[cfg(feature = "close")]
+    #[cfg(not(target_vendor = "uwp"))]
+    fn set_no_inherit(&self) -> std::io::Result<()> {
+        match unsafe {
+            SetHandleInformation(self.as_raw_socket() as HANDLE, HANDLE_FLAG_INHERIT, 0)
+        } {
+            0 => return Err(std::io::Error::last_os_error()),
+            _ => Ok(()),
+        }
+    }
+
+    #[cfg(feature = "close")]
+    #[cfg(target_vendor = "uwp")]
+    fn set_no_inherit(&self) -> std::io::Result<()> {
+        Err(io::Error::new_const(
+            std::io::ErrorKind::Unsupported,
+            &"Unavailable on UWP",
+        ))
+    }
 }
 
 /// FFI type for handles in return values or out parameters, where `INVALID_HANDLE_VALUE` is used
