@@ -328,7 +328,7 @@ impl<'a> AsHandle<'a> for &'a std::io::Stdin {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'a> AsFd<'a> for &'a std::io::StdinLock<'a> {
+impl<'a, 'b> AsFd<'a> for &'a std::io::StdinLock<'b> {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -336,7 +336,7 @@ impl<'a> AsFd<'a> for &'a std::io::StdinLock<'a> {
 }
 
 #[cfg(windows)]
-impl<'a> AsHandle<'a> for &'a std::io::StdinLock<'a> {
+impl<'a, 'b> AsHandle<'a> for &'a std::io::StdinLock<'b> {
     #[inline]
     fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
@@ -360,7 +360,7 @@ impl<'a> AsHandle<'a> for &'a std::io::Stdout {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'a> AsFd<'a> for &'a std::io::StdoutLock<'a> {
+impl<'a, 'b> AsFd<'a> for &'a std::io::StdoutLock<'b> {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -368,7 +368,7 @@ impl<'a> AsFd<'a> for &'a std::io::StdoutLock<'a> {
 }
 
 #[cfg(windows)]
-impl<'a> AsHandle<'a> for &'a std::io::StdoutLock<'a> {
+impl<'a, 'b> AsHandle<'a> for &'a std::io::StdoutLock<'b> {
     #[inline]
     fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
@@ -392,7 +392,7 @@ impl<'a> AsHandle<'a> for &'a std::io::Stderr {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'a> AsFd<'a> for &'a std::io::StderrLock<'a> {
+impl<'a, 'b> AsFd<'a> for &'a std::io::StderrLock<'b> {
     #[inline]
     fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
@@ -400,7 +400,7 @@ impl<'a> AsFd<'a> for &'a std::io::StderrLock<'a> {
 }
 
 #[cfg(windows)]
-impl<'a> AsHandle<'a> for &'a std::io::StderrLock<'a> {
+impl<'a, 'b> AsHandle<'a> for &'a std::io::StderrLock<'b> {
     #[inline]
     fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
