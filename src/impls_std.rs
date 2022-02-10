@@ -16,49 +16,49 @@ use std::os::windows::io::{
 };
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for BorrowedFd<'_> {
+impl<'a> AsFd<'a> for BorrowedFd<'a> {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for BorrowedHandle<'_> {
+impl<'a> AsHandle<'a> for BorrowedHandle<'a> {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for BorrowedSocket<'_> {
+impl<'a> AsSocket<'a> for BorrowedSocket<'a> {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for OwnedFd {
+impl<'a> AsFd<'a> for &'a OwnedFd {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for OwnedHandle {
+impl<'a> AsHandle<'a> for &'a OwnedHandle {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for OwnedSocket {
+impl<'a> AsSocket<'a> for &'a OwnedSocket {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -120,17 +120,17 @@ impl FromHandle for HandleOrInvalid {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for std::fs::File {
+impl<'a> AsFd<'a> for &'a std::fs::File {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for std::fs::File {
+impl<'a> AsHandle<'a> for &'a std::fs::File {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -168,17 +168,17 @@ impl FromHandle for std::fs::File {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for std::net::TcpStream {
+impl<'a> AsFd<'a> for &'a std::net::TcpStream {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for std::net::TcpStream {
+impl<'a> AsSocket<'a> for &'a std::net::TcpStream {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -216,17 +216,17 @@ impl FromSocket for std::net::TcpStream {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for std::net::TcpListener {
+impl<'a> AsFd<'a> for &'a std::net::TcpListener {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for std::net::TcpListener {
+impl<'a> AsSocket<'a> for &'a std::net::TcpListener {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -264,17 +264,17 @@ impl FromSocket for std::net::TcpListener {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for std::net::UdpSocket {
+impl<'a> AsFd<'a> for &'a std::net::UdpSocket {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for std::net::UdpSocket {
+impl<'a> AsSocket<'a> for &'a std::net::UdpSocket {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -312,113 +312,113 @@ impl FromSocket for std::net::UdpSocket {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for std::io::Stdin {
+impl<'a> AsFd<'a> for &'a std::io::Stdin {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for std::io::Stdin {
+impl<'a> AsHandle<'a> for &'a std::io::Stdin {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'a> AsFd for std::io::StdinLock<'a> {
+impl<'a> AsFd<'a> for &'a std::io::StdinLock<'a> {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl<'a> AsHandle for std::io::StdinLock<'a> {
+impl<'a> AsHandle<'a> for &'a std::io::StdinLock<'a> {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for std::io::Stdout {
+impl<'a> AsFd<'a> for &'a std::io::Stdout {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for std::io::Stdout {
+impl<'a> AsHandle<'a> for &'a std::io::Stdout {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'a> AsFd for std::io::StdoutLock<'a> {
+impl<'a> AsFd<'a> for &'a std::io::StdoutLock<'a> {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl<'a> AsHandle for std::io::StdoutLock<'a> {
+impl<'a> AsHandle<'a> for &'a std::io::StdoutLock<'a> {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for std::io::Stderr {
+impl<'a> AsFd<'a> for &'a std::io::Stderr {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for std::io::Stderr {
+impl<'a> AsHandle<'a> for &'a std::io::Stderr {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl<'a> AsFd for std::io::StderrLock<'a> {
+impl<'a> AsFd<'a> for &'a std::io::StderrLock<'a> {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl<'a> AsHandle for std::io::StderrLock<'a> {
+impl<'a> AsHandle<'a> for &'a std::io::StderrLock<'a> {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(unix)]
-impl AsFd for std::process::ChildStdin {
+impl<'a> AsFd<'a> for &'a std::process::ChildStdin {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for std::process::ChildStdin {
+impl<'a> AsHandle<'a> for &'a std::process::ChildStdin {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -440,17 +440,17 @@ impl IntoHandle for std::process::ChildStdin {
 }
 
 #[cfg(unix)]
-impl AsFd for std::process::ChildStdout {
+impl<'a> AsFd<'a> for &'a std::process::ChildStdout {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for std::process::ChildStdout {
+impl<'a> AsHandle<'a> for &'a std::process::ChildStdout {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -472,17 +472,17 @@ impl IntoHandle for std::process::ChildStdout {
 }
 
 #[cfg(unix)]
-impl AsFd for std::process::ChildStderr {
+impl<'a> AsFd<'a> for &'a std::process::ChildStderr {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for std::process::ChildStderr {
+impl<'a> AsHandle<'a> for &'a std::process::ChildStderr {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -520,9 +520,9 @@ impl FromHandle for std::process::Stdio {
 }
 
 #[cfg(windows)]
-impl AsHandle for std::process::Child {
+impl<'a> AsHandle<'a> for &'a std::process::Child {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -536,9 +536,9 @@ impl IntoHandle for std::process::Child {
 }
 
 #[cfg(unix)]
-impl AsFd for std::os::unix::net::UnixStream {
+impl<'a> AsFd<'a> for &'a std::os::unix::net::UnixStream {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -560,9 +560,9 @@ impl FromFd for std::os::unix::net::UnixStream {
 }
 
 #[cfg(unix)]
-impl AsFd for std::os::unix::net::UnixListener {
+impl<'a> AsFd<'a> for &'a std::os::unix::net::UnixListener {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -584,9 +584,9 @@ impl FromFd for std::os::unix::net::UnixListener {
 }
 
 #[cfg(unix)]
-impl AsFd for std::os::unix::net::UnixDatagram {
+impl<'a> AsFd<'a> for &'a std::os::unix::net::UnixDatagram {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -608,9 +608,9 @@ impl FromFd for std::os::unix::net::UnixDatagram {
 }
 
 #[cfg(windows)]
-impl<T> AsHandle for std::thread::JoinHandle<T> {
+impl<'a, T> AsHandle<'a> for &'a std::thread::JoinHandle<T> {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }

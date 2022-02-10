@@ -14,17 +14,17 @@ use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 use std::os::windows::io::{AsRawHandle, FromRawHandle, IntoRawHandle};
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for fs_err::File {
+impl<'a> AsFd<'a> for &'a fs_err::File {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for fs_err::File {
+impl<'a> AsHandle<'a> for &'a fs_err::File {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }

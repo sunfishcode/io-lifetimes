@@ -16,7 +16,7 @@ use crate::{OwnedHandle, OwnedSocket};
 /// `AsSocket` set of traits.
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(any(unix, target_os = "wasi"))]
-pub trait AsFd {
+pub trait AsFd<'a> {
     /// Borrows the file descriptor.
     ///
     /// # Example
@@ -31,13 +31,13 @@ pub trait AsFd {
     /// let borrowed_fd: BorrowedFd<'_> = f.as_fd();
     /// # Ok::<(), io::Error>(())
     /// ```
-    fn as_fd(&self) -> BorrowedFd<'_>;
+    fn as_fd(self) -> BorrowedFd<'a>;
 }
 
 /// A trait to borrow the handle from an underlying object.
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
-pub trait AsHandle {
+pub trait AsHandle<'a> {
     /// Borrows the handle.
     ///
     /// # Example
@@ -52,15 +52,15 @@ pub trait AsHandle {
     /// let borrowed_handle: BorrowedHandle<'_> = f.as_handle();
     /// # Ok::<(), io::Error>(())
     /// ```
-    fn as_handle(&self) -> BorrowedHandle<'_>;
+    fn as_handle(self) -> BorrowedHandle<'a>;
 }
 
 /// A trait to borrow the socket from an underlying object.
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
-pub trait AsSocket {
+pub trait AsSocket<'a> {
     /// Borrows the socket.
-    fn as_socket(&self) -> BorrowedSocket<'_>;
+    fn as_socket(self) -> BorrowedSocket<'a>;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership

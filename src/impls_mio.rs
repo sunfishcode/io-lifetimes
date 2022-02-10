@@ -14,17 +14,17 @@ use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket};
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for mio::net::TcpStream {
+impl<'a> AsFd<'a> for &'a mio::net::TcpStream {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for mio::net::TcpStream {
+impl<'a> AsSocket<'a> for &'a mio::net::TcpStream {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -62,17 +62,17 @@ impl FromSocket for mio::net::TcpStream {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for mio::net::TcpListener {
+impl<'a> AsFd<'a> for &'a mio::net::TcpListener {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for mio::net::TcpListener {
+impl<'a> AsSocket<'a> for &'a mio::net::TcpListener {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -110,17 +110,17 @@ impl FromSocket for mio::net::TcpListener {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for mio::net::UdpSocket {
+impl<'a> AsFd<'a> for &'a mio::net::UdpSocket {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for mio::net::UdpSocket {
+impl<'a> AsSocket<'a> for &'a mio::net::UdpSocket {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
@@ -158,9 +158,9 @@ impl FromSocket for mio::net::UdpSocket {
 }
 
 #[cfg(unix)]
-impl AsFd for mio::net::UnixDatagram {
+impl<'a> AsFd<'a> for &'a mio::net::UnixDatagram {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -182,9 +182,9 @@ impl FromFd for mio::net::UnixDatagram {
 }
 
 #[cfg(unix)]
-impl AsFd for mio::net::UnixListener {
+impl<'a> AsFd<'a> for &'a mio::net::UnixListener {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -206,9 +206,9 @@ impl FromFd for mio::net::UnixListener {
 }
 
 #[cfg(unix)]
-impl AsFd for mio::net::UnixStream {
+impl<'a> AsFd<'a> for &'a mio::net::UnixStream {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -230,9 +230,9 @@ impl FromFd for mio::net::UnixStream {
 }
 
 #[cfg(unix)]
-impl AsFd for mio::unix::pipe::Receiver {
+impl<'a> AsFd<'a> for &'a mio::unix::pipe::Receiver {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
@@ -254,9 +254,9 @@ impl FromFd for mio::unix::pipe::Receiver {
 }
 
 #[cfg(unix)]
-impl AsFd for mio::unix::pipe::Sender {
+impl<'a> AsFd<'a> for &'a mio::unix::pipe::Sender {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }

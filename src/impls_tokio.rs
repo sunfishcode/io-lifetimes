@@ -14,17 +14,17 @@ use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 use std::os::windows::io::{AsRawHandle, AsRawSocket, FromRawHandle, IntoRawHandle};
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::fs::File {
+impl<'a> AsFd<'a> for &'a tokio::fs::File {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for tokio::fs::File {
+impl<'a> AsHandle<'a> for &'a tokio::fs::File {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
@@ -46,153 +46,153 @@ impl FromHandle for tokio::fs::File {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::net::TcpStream {
+impl<'a> AsFd<'a> for &'a tokio::net::TcpStream {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for tokio::net::TcpStream {
+impl<'a> AsSocket<'a> for &'a tokio::net::TcpStream {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::net::TcpListener {
+impl<'a> AsFd<'a> for &'a tokio::net::TcpListener {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for tokio::net::TcpListener {
+impl<'a> AsSocket<'a> for &'a tokio::net::TcpListener {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::net::UdpSocket {
+impl<'a> AsFd<'a> for &'a tokio::net::UdpSocket {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for tokio::net::UdpSocket {
+impl<'a> AsSocket<'a> for &'a tokio::net::UdpSocket {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::io::Stdin {
+impl<'a> AsFd<'a> for &'a tokio::io::Stdin {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for tokio::io::Stdin {
+impl<'a> AsHandle<'a> for &'a tokio::io::Stdin {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::io::Stdout {
+impl<'a> AsFd<'a> for &'a tokio::io::Stdout {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for tokio::io::Stdout {
+impl<'a> AsHandle<'a> for &'a tokio::io::Stdout {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::io::Stderr {
+impl<'a> AsFd<'a> for &'a tokio::io::Stderr {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for tokio::io::Stderr {
+impl<'a> AsHandle<'a> for &'a tokio::io::Stderr {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(unix)]
-impl AsFd for tokio::net::UnixStream {
+impl<'a> AsFd<'a> for &'a tokio::net::UnixStream {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(unix)]
-impl AsFd for tokio::net::UnixListener {
+impl<'a> AsFd<'a> for &'a tokio::net::UnixListener {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(unix)]
-impl AsFd for tokio::net::UnixDatagram {
+impl<'a> AsFd<'a> for &'a tokio::net::UnixDatagram {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for tokio::process::ChildStdout {
+impl<'a> AsFd<'a> for &'a tokio::process::ChildStdout {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for tokio::process::ChildStdin {
+impl<'a> AsHandle<'a> for &'a tokio::process::ChildStdin {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for tokio::process::ChildStdout {
+impl<'a> AsHandle<'a> for &'a tokio::process::ChildStdout {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }
 
 #[cfg(windows)]
-impl AsHandle for tokio::process::ChildStderr {
+impl<'a> AsHandle<'a> for &'a tokio::process::ChildStderr {
     #[inline]
-    fn as_handle(&self) -> BorrowedHandle {
+    fn as_handle(self) -> BorrowedHandle<'a> {
         unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
     }
 }

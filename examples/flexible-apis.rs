@@ -27,7 +27,7 @@ fn use_fd_a(fd: BorrowedFd<'_>) {
 /// it has the advantage of allowing users to pass in any type implementing
 /// `AsFd` directly, without having to call `.as_fd()` themselves.
 #[cfg(all(feature = "close", not(windows)))]
-fn use_fd_b<Fd: AsFd>(fd: &Fd) {
+fn use_fd_b<'a, Fd: AsFd<'a>>(fd: Fd) {
     let _ = fd.as_fd();
 }
 
@@ -63,7 +63,7 @@ fn main() {
     use_fd_b(&f);
 
     // Of course, users can still pass in `BorrowedFd` values if they want to.
-    use_fd_b(&f.as_fd());
+    use_fd_b(f.as_fd());
 
     let a = std::fs::File::open("Cargo.toml").unwrap();
     let b = std::fs::File::open("Cargo.toml").unwrap();

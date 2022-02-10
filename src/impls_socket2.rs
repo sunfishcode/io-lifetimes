@@ -14,17 +14,17 @@ use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket};
 
 #[cfg(any(unix, target_os = "wasi"))]
-impl AsFd for socket2::Socket {
+impl<'a> AsFd<'a> for &'a socket2::Socket {
     #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
+    fn as_fd(self) -> BorrowedFd<'a> {
         unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
     }
 }
 
 #[cfg(windows)]
-impl AsSocket for socket2::Socket {
+impl<'a> AsSocket<'a> for &'a socket2::Socket {
     #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
+    fn as_socket(self) -> BorrowedSocket<'a> {
         unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
     }
 }
