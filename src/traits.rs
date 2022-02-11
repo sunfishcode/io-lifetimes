@@ -218,3 +218,51 @@ pub trait FromSocket {
         Self::from_socket(into_owned.into_socket())
     }
 }
+
+#[cfg(not(windows))]
+impl<T: AsFd> AsFd for &T {
+    #[inline]
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        T::as_fd(self)
+    }
+}
+
+#[cfg(not(windows))]
+impl<T: AsFd> AsFd for &mut T {
+    #[inline]
+    fn as_fd(&self) -> BorrowedFd<'_> {
+        T::as_fd(self)
+    }
+}
+
+#[cfg(windows)]
+impl<T: AsHandle> AsHandle for &T {
+    #[inline]
+    fn as_handle(&self) -> BorrowedHandle<'_> {
+        T::as_handle(self)
+    }
+}
+
+#[cfg(windows)]
+impl<T: AsHandle> AsHandle for &mut T {
+    #[inline]
+    fn as_handle(&self) -> BorrowedHandle<'_> {
+        T::as_handle(self)
+    }
+}
+
+#[cfg(windows)]
+impl<T: AsSocket> AsSocket for &T {
+    #[inline]
+    fn as_socket(&self) -> BorrowedSocket<'_> {
+        T::as_socket(self)
+    }
+}
+
+#[cfg(windows)]
+impl<T: AsSocket> AsSocket for &mut T {
+    #[inline]
+    fn as_socket(&self) -> BorrowedSocket<'_> {
+        T::as_socket(self)
+    }
+}
