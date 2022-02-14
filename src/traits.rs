@@ -219,7 +219,8 @@ pub trait FromSocket {
     }
 }
 
-#[cfg(not(windows))]
+#[cfg(not(io_lifetimes_use_std))]
+#[cfg(any(unix, target_os = "wasi"))]
 impl<T: AsFd> AsFd for &T {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -227,7 +228,8 @@ impl<T: AsFd> AsFd for &T {
     }
 }
 
-#[cfg(not(windows))]
+#[cfg(not(io_lifetimes_use_std))]
+#[cfg(any(unix, target_os = "wasi"))]
 impl<T: AsFd> AsFd for &mut T {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -235,6 +237,7 @@ impl<T: AsFd> AsFd for &mut T {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl<T: AsHandle> AsHandle for &T {
     #[inline]
@@ -243,6 +246,7 @@ impl<T: AsHandle> AsHandle for &T {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl<T: AsHandle> AsHandle for &mut T {
     #[inline]
@@ -251,6 +255,7 @@ impl<T: AsHandle> AsHandle for &mut T {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl<T: AsSocket> AsSocket for &T {
     #[inline]
@@ -259,6 +264,7 @@ impl<T: AsSocket> AsSocket for &T {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl<T: AsSocket> AsSocket for &mut T {
     #[inline]
