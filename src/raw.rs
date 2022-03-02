@@ -25,8 +25,8 @@ pub type RawFilelike = RawFd;
 
 /// A raw filelike object.
 ///
-/// This is a portability abstraction over Unix-like [`RawFd`] and
-/// Windows' `RawHandle`.
+/// This is a portability abstraction over Unix-like `RawFd` and
+/// Windows' [`RawHandle`].
 #[cfg(windows)]
 pub type RawFilelike = RawHandle;
 
@@ -39,8 +39,8 @@ pub type RawSocketlike = RawFd;
 
 /// A raw socketlike object.
 ///
-/// This is a portability abstraction over Unix-like [`RawFd`] and
-/// Windows' `RawSocket`.
+/// This is a portability abstraction over Unix-like `RawFd` and
+/// Windows' [`RawSocket`].
 #[cfg(windows)]
 pub type RawSocketlike = RawSocket;
 
@@ -62,8 +62,8 @@ impl<T: AsRawFd> AsRawFilelike for T {
     }
 }
 
-/// This is a portability abstraction over Unix-like [`AsRawFd`] and Windows'
-/// `AsRawHandle`.
+/// This is a portability abstraction over Unix-like `AsRawFd` and Windows'
+/// [`AsRawHandle`].
 #[cfg(windows)]
 pub trait AsRawFilelike: AsRawHandle {
     /// Returns the raw value.
@@ -94,8 +94,8 @@ impl<T: AsRawFd> AsRawSocketlike for T {
     }
 }
 
-/// This is a portability abstraction over Unix-like [`AsRawFd`] and Windows'
-/// `AsRawSocket`.
+/// This is a portability abstraction over Unix-like `AsRawFd` and Windows'
+/// [`AsRawSocket`].
 #[cfg(windows)]
 pub trait AsRawSocketlike: AsRawSocket {
     /// Returns the raw value.
@@ -126,8 +126,8 @@ impl<T: IntoRawFd> IntoRawFilelike for T {
     }
 }
 
-/// This is a portability abstraction over Unix-like [`IntoRawFd`] and Windows'
-/// `IntoRawHandle`.
+/// This is a portability abstraction over Unix-like `IntoRawFd` and Windows'
+/// [`IntoRawHandle`].
 #[cfg(windows)]
 pub trait IntoRawFilelike: IntoRawHandle {
     /// Returns the raw value.
@@ -150,8 +150,8 @@ pub trait IntoRawSocketlike: IntoRawFd {
     fn into_raw_socketlike(self) -> RawSocketlike;
 }
 
-/// This is a portability abstraction over Unix-like [`IntoRawFd`] and Windows'
-/// `IntoRawSocket`.
+/// This is a portability abstraction over Unix-like `IntoRawFd` and Windows'
+/// [`IntoRawSocket`].
 #[cfg(windows)]
 pub trait IntoRawSocketlike: IntoRawSocket {
     /// Returns the raw value.
@@ -190,8 +190,8 @@ impl<T: FromRawFd> FromRawFilelike for T {
     }
 }
 
-/// This is a portability abstraction over Unix-like [`FromRawFd`] and Windows'
-/// `FromRawHandle`.
+/// This is a portability abstraction over Unix-like `FromRawFd` and Windows'
+/// [`FromRawHandle`].
 #[cfg(windows)]
 pub trait FromRawFilelike: FromRawHandle {
     /// Constructs `Self` from the raw value.
@@ -230,8 +230,8 @@ impl<T: FromRawFd> FromRawSocketlike for T {
     }
 }
 
-/// This is a portability abstraction over Unix-like [`FromRawFd`] and Windows'
-/// `FromRawSocket`.
+/// This is a portability abstraction over Unix-like `FromRawFd` and Windows'
+/// [`FromRawSocket`].
 #[cfg(windows)]
 pub trait FromRawSocketlike: FromRawSocket {
     /// Constructs `Self` from the raw value.
