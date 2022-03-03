@@ -17,7 +17,7 @@ use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket};
 impl AsFd for socket2::Socket {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -25,7 +25,7 @@ impl AsFd for socket2::Socket {
 impl AsSocket for socket2::Socket {
     #[inline]
     fn as_socket(&self) -> BorrowedSocket<'_> {
-        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+        unsafe { BorrowedSocket::borrow_raw(self.as_raw_socket()) }
     }
 }
 

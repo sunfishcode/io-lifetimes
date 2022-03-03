@@ -17,7 +17,7 @@ use std::os::windows::io::{AsRawHandle, FromRawHandle, IntoRawHandle};
 impl AsFd for os_pipe::PipeReader {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -25,7 +25,7 @@ impl AsFd for os_pipe::PipeReader {
 impl AsHandle for os_pipe::PipeReader {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+        unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
 
@@ -65,7 +65,7 @@ impl FromHandle for os_pipe::PipeReader {
 impl AsFd for os_pipe::PipeWriter {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -73,7 +73,7 @@ impl AsFd for os_pipe::PipeWriter {
 impl AsHandle for os_pipe::PipeWriter {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+        unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
 
