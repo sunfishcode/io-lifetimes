@@ -17,7 +17,7 @@ use std::os::windows::io::{AsRawHandle, FromRawHandle, IntoRawHandle};
 impl AsFd for fs_err::File {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -25,7 +25,7 @@ impl AsFd for fs_err::File {
 impl AsHandle for fs_err::File {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+        unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
 

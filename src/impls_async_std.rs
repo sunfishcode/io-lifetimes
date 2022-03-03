@@ -22,7 +22,7 @@ use std::os::windows::io::{
 impl AsFd for async_std::fs::File {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -30,7 +30,7 @@ impl AsFd for async_std::fs::File {
 impl AsHandle for async_std::fs::File {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+        unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
 
@@ -70,7 +70,7 @@ impl FromHandle for async_std::fs::File {
 impl AsFd for async_std::net::TcpStream {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -78,7 +78,7 @@ impl AsFd for async_std::net::TcpStream {
 impl AsSocket for async_std::net::TcpStream {
     #[inline]
     fn as_socket(&self) -> BorrowedSocket<'_> {
-        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+        unsafe { BorrowedSocket::borrow_raw(self.as_raw_socket()) }
     }
 }
 
@@ -118,7 +118,7 @@ impl FromSocket for async_std::net::TcpStream {
 impl AsFd for async_std::net::TcpListener {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -126,7 +126,7 @@ impl AsFd for async_std::net::TcpListener {
 impl AsSocket for async_std::net::TcpListener {
     #[inline]
     fn as_socket(&self) -> BorrowedSocket<'_> {
-        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+        unsafe { BorrowedSocket::borrow_raw(self.as_raw_socket()) }
     }
 }
 
@@ -166,7 +166,7 @@ impl FromSocket for async_std::net::TcpListener {
 impl AsFd for async_std::net::UdpSocket {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -174,7 +174,7 @@ impl AsFd for async_std::net::UdpSocket {
 impl AsSocket for async_std::net::UdpSocket {
     #[inline]
     fn as_socket(&self) -> BorrowedSocket<'_> {
-        unsafe { BorrowedSocket::borrow_raw_socket(self.as_raw_socket()) }
+        unsafe { BorrowedSocket::borrow_raw(self.as_raw_socket()) }
     }
 }
 
@@ -214,7 +214,7 @@ impl FromSocket for async_std::net::UdpSocket {
 impl AsFd for async_std::io::Stdin {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -222,7 +222,7 @@ impl AsFd for async_std::io::Stdin {
 impl AsHandle for async_std::io::Stdin {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+        unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
 
@@ -230,7 +230,7 @@ impl AsHandle for async_std::io::Stdin {
 impl AsFd for async_std::io::Stdout {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -238,7 +238,7 @@ impl AsFd for async_std::io::Stdout {
 impl AsHandle for async_std::io::Stdout {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+        unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
 
@@ -246,7 +246,7 @@ impl AsHandle for async_std::io::Stdout {
 impl AsFd for async_std::io::Stderr {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -254,7 +254,7 @@ impl AsFd for async_std::io::Stderr {
 impl AsHandle for async_std::io::Stderr {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
-        unsafe { BorrowedHandle::borrow_raw_handle(self.as_raw_handle()) }
+        unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
 
@@ -262,7 +262,7 @@ impl AsHandle for async_std::io::Stderr {
 impl AsFd for async_std::os::unix::net::UnixStream {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -286,7 +286,7 @@ impl FromFd for async_std::os::unix::net::UnixStream {
 impl AsFd for async_std::os::unix::net::UnixListener {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
@@ -310,7 +310,7 @@ impl FromFd for async_std::os::unix::net::UnixListener {
 impl AsFd for async_std::os::unix::net::UnixDatagram {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
-        unsafe { BorrowedFd::borrow_raw_fd(self.as_raw_fd()) }
+        unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
