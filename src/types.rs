@@ -50,6 +50,10 @@ const INVALID_SOCKET: usize = !0 as _;
 /// descriptor, so it can be used in FFI in places where a file descriptor is
 /// passed as an argument, it is not captured or consumed, and it never has the
 /// value `-1`.
+///
+/// This type's `.to_owned()` implementation returns another `BorrowedFd`
+/// rather than an `OwnedFd`. It just makes a trivial copy of the raw file
+/// descriptor, which is then borrowed under the same lifetime.
 #[cfg(any(unix, target_os = "wasi"))]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
@@ -75,6 +79,10 @@ pub struct BorrowedFd<'fd> {
 /// Note that it *may* have the value [`INVALID_HANDLE_VALUE`]. See [here] for
 /// the full story.
 ///
+/// This type's `.to_owned()` implementation returns another `BorrowedHandle`
+/// rather than an `OwnedHandle`. It just makes a trivial copy of the raw
+/// handle, which is then borrowed under the same lifetime.
+///
 /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
 #[cfg(windows)]
 #[derive(Copy, Clone)]
@@ -93,6 +101,10 @@ pub struct BorrowedHandle<'handle> {
 /// so it can be used in FFI in places where a socket is passed as an argument,
 /// it is not captured or consumed, and it never has the value
 /// [`INVALID_SOCKET`].
+///
+/// This type's `.to_owned()` implementation returns another `BorrowedSocket`
+/// rather than an `OwnedSocket`. It just makes a trivial copy of the raw
+/// socket, which is then borrowed under the same lifetime.
 #[cfg(windows)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
