@@ -21,7 +21,7 @@ use winapi::{
     um::minwinbase::{LPOVERLAPPED, LPSECURITY_ATTRIBUTES},
 };
 
-/// Declare a few FFI functions ourselves, to show off the FFI ergonomics.
+// Declare a few FFI functions ourselves, to show off the FFI ergonomics.
 #[cfg(all(rustc_attrs, any(unix, target_os = "wasi")))]
 extern "C" {
     pub fn open(pathname: *const c_char, flags: c_int, ...) -> Option<OwnedFd>;

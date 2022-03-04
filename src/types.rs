@@ -206,6 +206,7 @@ impl OwnedFd {
 ///
 /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
 #[cfg(windows)]
+#[repr(transparent)]
 pub struct OwnedHandle {
     handle: RawHandle,
 }
