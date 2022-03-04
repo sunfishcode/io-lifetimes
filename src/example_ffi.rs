@@ -1,9 +1,5 @@
 //! This is just a sample of what FFI using this crate can look like.
 
-// Disable `improper_ctypes` warnings so that we don't lint about
-// `Option<OwnedFd>` appearing in an FFI signature. In the future rustc
-// would be modified to recognize this case.
-#![cfg_attr(rustc_attrs, allow(improper_ctypes))]
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 #![allow(missing_docs)]
 

@@ -57,6 +57,7 @@ const INVALID_SOCKET: usize = !0 as _;
 #[cfg(any(unix, target_os = "wasi"))]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
+#[cfg_attr(rustc_attrs, rustc_nonnull_optimization_guaranteed)]
 #[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
 // 32-bit c_int. Below is -2, in two's complement, but that only works out
@@ -108,6 +109,7 @@ pub struct BorrowedHandle<'handle> {
 #[cfg(windows)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
+#[cfg_attr(rustc_attrs, rustc_nonnull_optimization_guaranteed)]
 #[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // This is -2, in two's complement. -1 is `INVALID_SOCKET`.
 #[cfg_attr(
@@ -133,6 +135,7 @@ pub struct BorrowedSocket<'socket> {
 /// has the value `-1`.
 #[cfg(any(unix, target_os = "wasi"))]
 #[repr(transparent)]
+#[cfg_attr(rustc_attrs, rustc_nonnull_optimization_guaranteed)]
 #[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // libstd/os/raw/mod.rs assures me that every libstd-supported platform has a
 // 32-bit c_int. Below is -2, in two's complement, but that only works out
@@ -266,6 +269,7 @@ impl OwnedHandle {
 /// [`INVALID_SOCKET`].
 #[cfg(windows)]
 #[repr(transparent)]
+#[cfg_attr(rustc_attrs, rustc_nonnull_optimization_guaranteed)]
 #[cfg_attr(rustc_attrs, rustc_layout_scalar_valid_range_start(0))]
 // This is -2, in two's complement. -1 is `INVALID_SOCKET`.
 #[cfg_attr(
