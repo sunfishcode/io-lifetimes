@@ -46,6 +46,10 @@ fn test_file_not_found() {
     }
     .try_into();
     assert!(handle.is_err());
+    assert_eq!(
+        std::io::Error::last_os_error().kind(),
+        std::io::ErrorKind::NotFound
+    );
 }
 
 #[cfg(all(rustc_attrs, unix))]
