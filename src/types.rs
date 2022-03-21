@@ -497,6 +497,10 @@ impl TryFrom<HandleOrInvalid> for OwnedHandle {
     fn try_from(handle_or_invalid: HandleOrInvalid) -> Result<Self, ()> {
         let raw = handle_or_invalid.0;
         if raw == INVALID_HANDLE_VALUE {
+            // Don't call `CloseHandle`; it'd be harmless, except that it could
+            // overwrite the `GetLastError` error.
+            forget(handle_or_invalid);
+
             Err(())
         } else {
             Ok(OwnedHandle { handle: raw })
@@ -512,6 +516,10 @@ impl TryFrom<HandleOrNull> for OwnedHandle {
     fn try_from(handle_or_null: HandleOrNull) -> Result<Self, ()> {
         let raw = handle_or_null.0;
         if raw.is_null() {
+            // Don't call `CloseHandle`; it'd be harmless, except that it could
+            // overwrite the `GetLastError` error.
+            forget(handle_or_null);
+
             Err(())
         } else {
             Ok(OwnedHandle { handle: raw })
