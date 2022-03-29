@@ -70,7 +70,8 @@ pub use std::os::wasi::io::{AsFd, BorrowedFd, OwnedFd};
 #[cfg(io_lifetimes_use_std)]
 #[cfg(windows)]
 pub use std::os::windows::io::{
-    AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket,
+    AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, HandleOrInvalid, InvalidHandleError,
+    NullHandleError, OwnedHandle, OwnedSocket,
 };
 
 // io-lifetimes defined `FromFd`/`IntoFd` traits instead of just using
