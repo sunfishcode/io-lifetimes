@@ -538,7 +538,7 @@ impl fmt::Display for NullHandleError {
     }
 }
 
-impl crate::error::Error for NullHandleError {}
+impl std::error::Error for NullHandleError {}
 
 /// This is the error type used by [`HandleOrInvalid`] when attempting to
 /// convert into a handle, to indicate that the value is
@@ -555,7 +555,7 @@ impl fmt::Display for InvalidHandleError {
     }
 }
 
-impl crate::error::Error for InvalidHandleError {}
+impl std::error::Error for InvalidHandleError {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsRawFd for BorrowedFd<'_> {
