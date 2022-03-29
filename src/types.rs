@@ -543,11 +543,9 @@ impl std::error::Error for NullHandleError {}
 /// This is the error type used by [`HandleOrInvalid`] when attempting to
 /// convert into a handle, to indicate that the value is
 /// `INVALID_HANDLE_VALUE`.
-#[unstable(feature = "io_safety", issue = "87074")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InvalidHandleError(());
 
-#[unstable(feature = "io_safety", issue = "87074")]
 impl fmt::Display for InvalidHandleError {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         "A HandleOrInvalid could not be converted to a handle because it was INVALID_HANDLE_VALUE"
