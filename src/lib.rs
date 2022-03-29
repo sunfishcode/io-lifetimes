@@ -56,7 +56,10 @@ pub use traits::{FromHandle, FromSocket, IntoHandle, IntoSocket};
 pub use types::{BorrowedFd, OwnedFd};
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
-pub use types::{BorrowedHandle, BorrowedSocket, HandleOrInvalid, OwnedHandle, OwnedSocket};
+pub use types::{
+    BorrowedHandle, BorrowedSocket, HandleOrInvalid, InvalidHandleError, NullHandleError,
+    OwnedHandle, OwnedSocket,
+};
 
 #[cfg(io_lifetimes_use_std)]
 #[cfg(unix)]
