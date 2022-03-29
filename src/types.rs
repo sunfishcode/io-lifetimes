@@ -520,7 +520,7 @@ impl TryFrom<HandleOrNull> for OwnedHandle {
             // overwrite the `GetLastError` error.
             forget(handle_or_null);
 
-            Err(NullHandleError())
+            Err(NullHandleError(()))
         } else {
             Ok(OwnedHandle { handle: raw })
         }
