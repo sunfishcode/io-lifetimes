@@ -6,7 +6,7 @@
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{BorrowedFd, OwnedFd};
 #[cfg(windows)]
-use crate::{BorrowedHandle, HandleOrInvalid, OwnedHandle};
+use crate::{BorrowedHandle, HandleOrInvalid};
 
 #[cfg(any(unix, target_os = "wasi"))]
 use libc::{c_char, c_int, c_void, size_t, ssize_t};
