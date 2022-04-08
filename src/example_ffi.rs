@@ -6,7 +6,7 @@
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{BorrowedFd, OwnedFd};
 #[cfg(windows)]
-use crate::{BorrowedHandle, HandleOrInvalid, OwnedHandle};
+use crate::{BorrowedHandle, HandleOrInvalid};
 
 #[cfg(any(unix, target_os = "wasi"))]
 use libc::{c_char, c_int, c_void, size_t, ssize_t};
@@ -35,9 +35,9 @@ extern "C" {
 #[cfg(any(unix, target_os = "wasi"))]
 pub use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
 
-/// The Windows analogs of the above. Note the use of [`HandleOrInvalid`] as
-/// the return type for `CreateFileW`, since that function is defined to return
-/// [`INVALID_HANDLE_VALUE`] on error instead of null.
+// The Windows analogs of the above. Note the use of [`HandleOrInvalid`] as
+// the return type for `CreateFileW`, since that function is defined to return
+// [`INVALID_HANDLE_VALUE`] on error instead of null.
 #[cfg(windows)]
 extern "system" {
     pub fn CreateFileW(

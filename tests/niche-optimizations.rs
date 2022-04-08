@@ -7,14 +7,14 @@ use std::mem::size_of;
 #[cfg(any(unix, target_os = "wasi"))]
 use io_lifetimes::{BorrowedFd, OwnedFd};
 #[cfg(windows)]
-use io_lifetimes::{BorrowedHandle, BorrowedSocket, OwnedHandle, OwnedSocket};
+use io_lifetimes::{BorrowedSocket, OwnedSocket};
 
 #[cfg(unix)]
 use std::os::unix::io::RawFd;
 #[cfg(target_os = "wasi")]
 use std::os::wasi::io::RawFd;
 #[cfg(windows)]
-use std::os::windows::io::{RawHandle, RawSocket};
+use std::os::windows::io::RawSocket;
 
 #[cfg(all(rustc_attrs, any(unix, target_os = "wasi")))]
 #[test]
