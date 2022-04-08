@@ -14,31 +14,24 @@ use std::{
     },
 };
 #[cfg(all(windows, feature = "close"))]
-use winapi::{
-    shared::minwindef::{BOOL, DWORD},
-    shared::ntdef::HANDLE,
-    um::handleapi::DuplicateHandle,
-    um::handleapi::SetHandleInformation,
-    um::handleapi::INVALID_HANDLE_VALUE,
-    um::processthreadsapi::GetCurrentProcess,
-    um::processthreadsapi::GetCurrentProcessId,
-    um::winbase::HANDLE_FLAG_INHERIT,
-    um::winnt::DUPLICATE_SAME_ACCESS,
-    um::winsock2::WSADuplicateSocketW,
-    um::winsock2::WSAGetLastError,
-    um::winsock2::WSASocketW,
-    um::winsock2::INVALID_SOCKET,
-    um::winsock2::SOCKET_ERROR,
-    um::winsock2::WSAEINVAL,
-    um::winsock2::WSAEPROTOTYPE,
-    um::winsock2::WSAPROTOCOL_INFOW,
-    um::winsock2::WSA_FLAG_NO_HANDLE_INHERIT,
-    um::winsock2::WSA_FLAG_OVERLAPPED,
+use {
+    windows_sys::Win32::Foundation::{
+        CloseHandle, DuplicateHandle, SetHandleInformation, BOOL, DUPLICATE_HANDLE_OPTIONS,
+        DUPLICATE_SAME_ACCESS, HANDLE, HANDLE_FLAG_INHERIT, INVALID_HANDLE_VALUE,
+    },
+    windows_sys::Win32::Networking::WinSock::{
+        closesocket, WSADuplicateSocketW, WSAGetLastError, WSASocketW, INVALID_SOCKET, SOCKET,
+        SOCKET_ERROR, WSAEINVAL, WSAEPROTOTYPE, WSAPROTOCOL_INFOW, WSA_FLAG_NO_HANDLE_INHERIT,
+        WSA_FLAG_OVERLAPPED,
+    },
+    windows_sys::Win32::System::Threading::{GetCurrentProcess, GetCurrentProcessId},
 };
 
-#[cfg(all(windows, not(feature = "winapi")))]
-const INVALID_HANDLE_VALUE: *mut core::ffi::c_void = !0 as _;
-#[cfg(all(windows, not(feature = "winapi")))]
+#[cfg(all(windows, not(feature = "close")))]
+type HANDLE = isize;
+#[cfg(all(windows, not(feature = "close")))]
+const INVALID_HANDLE_VALUE: HANDLE = !0 as _;
+#[cfg(all(windows, not(feature = "close")))]
 const INVALID_SOCKET: usize = !0 as _;
 
 /// A borrowed file descriptor.
@@ -235,16 +228,16 @@ impl OwnedHandle {
     #[cfg(feature = "close")]
     pub(crate) fn duplicate(
         &self,
-        access: DWORD,
+        access: u32,
         inherit: bool,
-        options: DWORD,
+        options: DUPLICATE_HANDLE_OPTIONS,
     ) -> std::io::Result<Self> {
         let mut ret = 0 as HANDLE;
         match unsafe {
             let cur_proc = GetCurrentProcess();
             DuplicateHandle(
                 cur_proc,
-                self.as_raw_handle(),
+                self.as_raw_handle() as HANDLE,
                 cur_proc,
                 &mut ret,
                 access,
@@ -255,7 +248,7 @@ impl OwnedHandle {
             0 => return Err(std::io::Error::last_os_error()),
             _ => (),
         }
-        unsafe { Ok(Self::from_raw_handle(ret)) }
+        unsafe { Ok(Self::from_raw_handle(ret as RawHandle)) }
     }
 }
 
@@ -496,7 +489,7 @@ impl TryFrom<HandleOrInvalid> for OwnedHandle {
     #[inline]
     fn try_from(handle_or_invalid: HandleOrInvalid) -> Result<Self, ()> {
         let raw = handle_or_invalid.0;
-        if raw == INVALID_HANDLE_VALUE {
+        if raw as HANDLE == INVALID_HANDLE_VALUE {
             // Don't call `CloseHandle`; it'd be harmless, except that it could
             // overwrite the `GetLastError` error.
             forget(handle_or_invalid);
@@ -706,7 +699,7 @@ impl Drop for OwnedHandle {
     fn drop(&mut self) {
         #[cfg(feature = "close")]
         unsafe {
-            let _ = winapi::um::handleapi::CloseHandle(self.handle);
+            let _ = CloseHandle(self.handle as HANDLE);
         }
 
         // If the `close` feature is disabled, we expect users to avoid letting
@@ -724,7 +717,7 @@ impl Drop for HandleOrInvalid {
     fn drop(&mut self) {
         #[cfg(feature = "close")]
         unsafe {
-            let _ = winapi::um::handleapi::CloseHandle(self.0);
+            let _ = CloseHandle(self.0 as HANDLE);
         }
 
         // If the `close` feature is disabled, we expect users to avoid letting
@@ -742,7 +735,7 @@ impl Drop for HandleOrNull {
     fn drop(&mut self) {
         #[cfg(feature = "close")]
         unsafe {
-            let _ = winapi::um::handleapi::CloseHandle(self.0);
+            let _ = CloseHandle(self.0 as HANDLE);
         }
 
         // If the `close` feature is disabled, we expect users to avoid letting
@@ -760,7 +753,7 @@ impl Drop for OwnedSocket {
     fn drop(&mut self) {
         #[cfg(feature = "close")]
         unsafe {
-            let _ = winapi::um::winsock2::closesocket(self.socket as winapi::um::winsock2::SOCKET);
+            let _ = closesocket(self.socket as SOCKET);
         }
 
         // If the `close` feature is disabled, we expect users to avoid letting

@@ -11,10 +11,15 @@ use crate::{BorrowedHandle, HandleOrInvalid, OwnedHandle};
 #[cfg(any(unix, target_os = "wasi"))]
 use libc::{c_char, c_int, c_void, size_t, ssize_t};
 #[cfg(windows)]
-use winapi::{
-    shared::minwindef::{BOOL, DWORD, LPCVOID, LPDWORD, LPVOID},
-    shared::ntdef::{HANDLE, LPCWSTR},
-    um::minwinbase::{LPOVERLAPPED, LPSECURITY_ATTRIBUTES},
+use {
+    core::ffi::c_void,
+    windows_sys::core::PCWSTR,
+    windows_sys::Win32::Foundation::BOOL,
+    windows_sys::Win32::Security::SECURITY_ATTRIBUTES,
+    windows_sys::Win32::Storage::FileSystem::{
+        FILE_ACCESS_FLAGS, FILE_CREATION_DISPOSITION, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_MODE,
+    },
+    windows_sys::Win32::System::IO::OVERLAPPED,
 };
 
 // Declare a few FFI functions ourselves, to show off the FFI ergonomics.
@@ -36,32 +41,35 @@ pub use libc::{O_CLOEXEC, O_CREAT, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY};
 #[cfg(windows)]
 extern "system" {
     pub fn CreateFileW(
-        lpFileName: LPCWSTR,
-        dwDesiredAccess: DWORD,
-        dwShareMode: DWORD,
-        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
-        dwCreationDisposition: DWORD,
-        dwFlagsAndAttributes: DWORD,
-        hTemplateFile: HANDLE,
+        lpfilename: PCWSTR,
+        dwdesiredaccess: FILE_ACCESS_FLAGS,
+        dwsharemode: FILE_SHARE_MODE,
+        lpsecurityattributes: *const SECURITY_ATTRIBUTES,
+        dwcreationdisposition: FILE_CREATION_DISPOSITION,
+        dwflagsandattributes: FILE_FLAGS_AND_ATTRIBUTES,
+        htemplatefile: HANDLE,
     ) -> HandleOrInvalid;
     pub fn ReadFile(
-        hFile: BorrowedHandle<'_>,
-        lpBuffer: LPVOID,
-        nNumberOfBytesToRead: DWORD,
-        lpNumberOfBytesRead: LPDWORD,
-        lpOverlapped: LPOVERLAPPED,
+        hfile: BorrowedHandle<'_>,
+        lpbuffer: *mut c_void,
+        nnumberofbytestoread: u32,
+        lpnumberofbytesread: *mut u32,
+        lpoverlapped: *mut OVERLAPPED,
     ) -> BOOL;
     pub fn WriteFile(
-        hFile: BorrowedHandle<'_>,
-        lpBuffer: LPCVOID,
-        nNumberOfBytesToWrite: DWORD,
-        lpNumberOfBytesWritten: LPDWORD,
-        lpOverlapped: LPOVERLAPPED,
+        hfile: BorrowedHandle<'_>,
+        lpbuffer: *const c_void,
+        nnumberofbytestowrite: u32,
+        lpnumberofbyteswritten: *mut u32,
+        lpoverlapped: *mut OVERLAPPED,
     ) -> BOOL;
 }
+
 #[cfg(windows)]
-pub use winapi::{
-    shared::minwindef::{FALSE, TRUE},
-    um::fileapi::{CREATE_ALWAYS, CREATE_NEW, OPEN_EXISTING},
-    um::winnt::{FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ, FILE_GENERIC_WRITE},
+pub use {
+    windows_sys::Win32::Foundation::HANDLE,
+    windows_sys::Win32::Storage::FileSystem::{
+        CREATE_ALWAYS, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ, FILE_GENERIC_WRITE,
+        OPEN_EXISTING,
+    },
 };

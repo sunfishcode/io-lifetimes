@@ -28,12 +28,18 @@ fn test_assumptions() {
 fn test_assumptions() {
     assert_eq!(
         size_of::<std::os::windows::io::RawSocket>(),
-        size_of::<winapi::um::winsock2::SOCKET>()
+        size_of::<windows_sys::Win32::Networking::WinSock::SOCKET>()
     );
-    assert_eq!(winapi::um::winsock2::INVALID_SOCKET, usize::MAX);
-
+    assert_eq!(
+        size_of::<std::os::windows::io::RawHandle>(),
+        size_of::<windows_sys::Win32::Foundation::HANDLE>()
+    );
+    assert_eq!(
+        windows_sys::Win32::Networking::WinSock::INVALID_SOCKET,
+        usize::MAX
+    );
     assert_ne!(
-        winapi::um::handleapi::INVALID_HANDLE_VALUE,
-        std::ptr::null_mut()
+        windows_sys::Win32::Foundation::INVALID_HANDLE_VALUE,
+        std::ptr::null_mut() as std::os::windows::io::RawHandle as _
     );
 }

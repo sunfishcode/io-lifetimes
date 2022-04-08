@@ -11,10 +11,11 @@ repository = "https://github.com/sunfishcode/io-lifetimes"
 exclude = ["/.github"]
 
 [dependencies]
-# io-lifetimes only depends on libc/winapi for the ability to close
-# fds/handles/sockets. The following are just optional dependencies to add
-# foreign-type impls for the traits. In the future, we'll prefer to have
-# crates provide their own impls; this is just a temporary measure.
+# io-lifetimes only depends on libc/windows-sys for the ability to close
+# and duplicate fds/handles/sockets. The following are just optional
+# dependencies to add foreign-type impls for the traits. In the future,
+# we'll prefer to have crates provide their own impls; this is just a
+# temporary measure.
 
 # Optionally depend on async-std just to provide impls for its types for now.
 #
@@ -37,9 +38,18 @@ os_pipe = { version = "1.0.0", optional = true }
 [target.'cfg(not(windows))'.dependencies]
 libc = { version = "0.2.96", optional = true }
 
-[target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3.9", optional = true, features = ["handleapi", "std", "winsock2"] }
+[target.'cfg(windows)'.dependencies.windows-sys]
+version = "0.35.0"
+optional = true
+features = [
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+    "Win32_Networking_WinSock",
+    "Win32_Security",
+    "Win32_System_IO",
+    "Win32_System_Threading",
+]
 
 [features]
 default = ["close"]
-close = ["libc", "winapi"]
+close = ["libc", "windows-sys"]

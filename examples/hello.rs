@@ -18,7 +18,7 @@ use io_lifetimes::{AsFd, FromFd, OwnedFd};
 #[cfg(windows)]
 use io_lifetimes::{AsHandle, FromHandle, OwnedHandle};
 #[cfg(windows)]
-use std::{convert::TryInto, ptr::null_mut};
+use std::{convert::TryInto, os::windows::io::RawHandle, ptr::null_mut};
 
 #[cfg(all(rustc_attrs, unix, feature = "close"))]
 fn main() -> io::Result<()> {
@@ -71,7 +71,7 @@ fn main() -> io::Result<()> {
             null_mut(),
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            null_mut(),
+            null_mut() as RawHandle as HANDLE,
         )
         .try_into()
         .map_err(|()| io::Error::last_os_error())?;
@@ -86,7 +86,7 @@ fn main() -> io::Result<()> {
             null_mut(),
         );
         match (result, number_of_bytes_written) {
-            (FALSE, _) => return Err(io::Error::last_os_error()),
+            (0, _) => return Err(io::Error::last_os_error()),
             (_, 13) => (),
             (_, _) => return Err(io::Error::new(io::ErrorKind::Other, "short write")),
         }
@@ -109,7 +109,7 @@ fn main() -> io::Result<()> {
             null_mut(),
         );
         match (result, number_of_bytes_written) {
-            (FALSE, _) => return Err(io::Error::last_os_error()),
+            (0, _) => return Err(io::Error::last_os_error()),
             (_, 5) => (),
             (_, _) => return Err(io::Error::new(io::ErrorKind::Other, "short write")),
         }
