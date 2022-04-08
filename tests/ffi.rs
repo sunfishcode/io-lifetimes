@@ -7,11 +7,10 @@ use io_lifetimes::example_ffi::*;
 #[cfg(windows)]
 use io_lifetimes::OwnedHandle;
 #[cfg(windows)]
-use std::{convert::TryInto, ptr::null_mut};
+use std::{convert::TryInto, os::windows::io::RawHandle, ptr::null_mut};
 #[cfg(windows)]
-use winapi::{
-    um::fileapi::OPEN_EXISTING,
-    um::winnt::{FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ},
+use windows_sys::Win32::Storage::FileSystem::{
+    FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ, OPEN_EXISTING,
 };
 
 #[cfg(all(rustc_attrs, unix))]
@@ -41,7 +40,7 @@ fn test_file_not_found() {
             null_mut(),
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            null_mut(),
+            null_mut() as RawHandle as HANDLE,
         )
     }
     .try_into();
@@ -73,7 +72,7 @@ fn test_file_found() {
             null_mut(),
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            null_mut(),
+            null_mut() as RawHandle as HANDLE,
         )
     }
     .try_into();
