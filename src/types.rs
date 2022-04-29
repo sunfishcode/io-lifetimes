@@ -484,17 +484,17 @@ impl BorrowedSocket<'_> {
 
 #[cfg(windows)]
 impl TryFrom<HandleOrInvalid> for OwnedHandle {
-    type Error = ();
+    type Error = InvalidHandleError;
 
     #[inline]
-    fn try_from(handle_or_invalid: HandleOrInvalid) -> Result<Self, ()> {
+    fn try_from(handle_or_invalid: HandleOrInvalid) -> Result<Self, InvalidHandleError> {
         let raw = handle_or_invalid.0;
         if raw as HANDLE == INVALID_HANDLE_VALUE {
             // Don't call `CloseHandle`; it'd be harmless, except that it could
             // overwrite the `GetLastError` error.
             forget(handle_or_invalid);
 
-            Err(())
+            Err(InvalidHandleError(()))
         } else {
             Ok(OwnedHandle { handle: raw })
         }
@@ -503,22 +503,50 @@ impl TryFrom<HandleOrInvalid> for OwnedHandle {
 
 #[cfg(windows)]
 impl TryFrom<HandleOrNull> for OwnedHandle {
-    type Error = ();
+    type Error = NullHandleError;
 
     #[inline]
-    fn try_from(handle_or_null: HandleOrNull) -> Result<Self, ()> {
+    fn try_from(handle_or_null: HandleOrNull) -> Result<Self, NullHandleError> {
         let raw = handle_or_null.0;
         if raw.is_null() {
             // Don't call `CloseHandle`; it'd be harmless, except that it could
             // overwrite the `GetLastError` error.
             forget(handle_or_null);
 
-            Err(())
+            Err(NullHandleError(()))
         } else {
             Ok(OwnedHandle { handle: raw })
         }
     }
 }
+
+/// This is the error type used by [`HandleOrNull`] when attempting to convert
+/// into a handle, to indicate that the value is null.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NullHandleError(());
+
+impl fmt::Display for NullHandleError {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        "A HandleOrNull could not be converted to a handle because it was null".fmt(fmt)
+    }
+}
+
+impl std::error::Error for NullHandleError {}
+
+/// This is the error type used by [`HandleOrInvalid`] when attempting to
+/// convert into a handle, to indicate that the value is
+/// `INVALID_HANDLE_VALUE`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InvalidHandleError(());
+
+impl fmt::Display for InvalidHandleError {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        "A HandleOrInvalid could not be converted to a handle because it was INVALID_HANDLE_VALUE"
+            .fmt(fmt)
+    }
+}
+
+impl std::error::Error for InvalidHandleError {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsRawFd for BorrowedFd<'_> {

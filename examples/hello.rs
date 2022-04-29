@@ -16,7 +16,7 @@ use std::{
 use io_lifetimes::{AsFd, FromFd, OwnedFd};
 
 #[cfg(windows)]
-use io_lifetimes::{AsHandle, FromHandle, OwnedHandle};
+use io_lifetimes::{AsHandle, FromHandle, InvalidHandleError, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, os::windows::io::RawHandle, ptr::null_mut};
 
@@ -74,7 +74,7 @@ fn main() -> io::Result<()> {
             null_mut() as RawHandle as HANDLE,
         )
         .try_into()
-        .map_err(|()| io::Error::last_os_error())?;
+        .map_err(|_err| io::Error::last_os_error())?;
 
         // Borrow the handle to write to it.
         let mut number_of_bytes_written = 0;
