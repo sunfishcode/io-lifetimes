@@ -436,8 +436,8 @@ impl BorrowedFd<'_> {
     /// The resource pointed to by `raw` must remain open for the duration of
     /// the returned `BorrowedFd`, and it must not have the value `-1`.
     #[inline]
-    pub unsafe fn borrow_raw(fd: RawFd) -> Self {
-        debug_assert_ne!(fd, -1_i32 as RawFd);
+    pub const unsafe fn borrow_raw(fd: RawFd) -> Self {
+        debug_assert!(fd != -1_i32 as RawFd);
         Self {
             fd,
             _phantom: PhantomData,
@@ -451,11 +451,18 @@ impl BorrowedHandle<'_> {
     ///
     /// # Safety
     ///
-    /// The resource pointed to by `raw` must remain open for the duration of
-    /// the returned `BorrowedHandle`, and it must not be null.
+    /// The resource pointed to by `handle` must be a valid open handle, it
+    /// must remain open for the duration of the returned `BorrowedHandle`.
+    ///
+    /// Note that it *may* have the value `INVALID_HANDLE_VALUE` (-1), which is
+    /// sometimes a valid handle value. See [here] for the full story.
+    ///
+    /// And, it *may* have the value `NULL` (0), which can occur when consoles are
+    /// detached from processes, or when `windows_subsystem` is used.
+    ///
+    /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
     #[inline]
-    pub unsafe fn borrow_raw(handle: RawHandle) -> Self {
-        debug_assert!(!handle.is_null());
+    pub const unsafe fn borrow_raw(handle: RawHandle) -> Self {
         Self {
             handle,
             _phantom: PhantomData,
@@ -473,8 +480,8 @@ impl BorrowedSocket<'_> {
     /// the returned `BorrowedSocket`, and it must not have the value
     /// [`INVALID_SOCKET`].
     #[inline]
-    pub unsafe fn borrow_raw(socket: RawSocket) -> Self {
-        debug_assert_ne!(socket, INVALID_SOCKET as RawSocket);
+    pub const unsafe fn borrow_raw(socket: RawSocket) -> Self {
+        debug_assert!(socket != INVALID_SOCKET as RawSocket);
         Self {
             socket,
             _phantom: PhantomData,
