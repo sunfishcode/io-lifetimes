@@ -48,9 +48,9 @@ fn test_niche_optimizations_socket() {
         size_of::<RawSocket>(),
     );
     unsafe {
-        #[cfg(target_pointer_size = "32")]
+        #[cfg(target_pointer_width = "32")]
         let (min, max) = (i32::MIN as u32, i32::MAX as u32);
-        #[cfg(target_pointer_size = "64")]
+        #[cfg(target_pointer_width = "64")]
         let (min, max) = (i64::MIN as u64, i64::MAX as u64);
 
         assert_eq!(OwnedSocket::from_raw_socket(min).into_raw_socket(), min);
