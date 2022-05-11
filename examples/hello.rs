@@ -16,7 +16,7 @@ use std::{
 use io_lifetimes::{AsFd, FromFd, OwnedFd};
 
 #[cfg(windows)]
-use io_lifetimes::{AsHandle, FromHandle, InvalidHandleError, OwnedHandle};
+use io_lifetimes::{AsHandle, FromHandle, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, os::windows::io::RawHandle, ptr::null_mut};
 
