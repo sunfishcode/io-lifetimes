@@ -71,14 +71,16 @@ pub struct BorrowedFd<'fd> {
 /// it is not captured or consumed, and it is never null.
 ///
 /// Note that it *may* have the value `-1`, which in `BorrowedHandle` always
-/// represents the current process handle, and not `INVALID_HANDLE_VALUE`,
-/// despite the two having the same value. See [here] for the full story.
+/// represents a valid handle value, such as [the current process handle], and
+/// not `INVALID_HANDLE_VALUE`, despite the two having the same value. See
+/// [here] for the full story.
 ///
 /// This type's `.to_owned()` implementation returns another `BorrowedHandle`
 /// rather than an `OwnedHandle`. It just makes a trivial copy of the raw
 /// handle, which is then borrowed under the same lifetime.
 ///
 /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
+/// [the current process handle]: https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocess#remarks
 #[cfg(windows)]
 #[derive(Copy, Clone)]
 #[repr(transparent)]
@@ -189,8 +191,9 @@ impl OwnedFd {
 /// This closes the handle on drop.
 ///
 /// Note that it *may* have the value `-1`, which in `OwnedHandle` always
-/// represents the current process handle, and not `INVALID_HANDLE_VALUE`,
-/// despite the two having the same value. See [here] for the full story.
+/// represents a valid handle value, such as [the current process handle], and
+/// not `INVALID_HANDLE_VALUE`, despite the two having the same value. See
+/// [here] for the full story.
 ///
 /// And, it *may* have the value `NULL` (0), which can occur when consoles are
 /// detached from processes, or when `windows_subsystem` is used.
@@ -203,6 +206,7 @@ impl OwnedFd {
 /// [`RegCloseKey`]: https://docs.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regclosekey
 ///
 /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
+/// [the current process handle]: https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocess#remarks
 #[cfg(windows)]
 #[repr(transparent)]
 pub struct OwnedHandle {
@@ -397,10 +401,12 @@ pub struct HandleOrInvalid(RawHandle);
 /// checking for `NULL` first.
 ///
 /// This type may hold any handle value that [`OwnedHandle`] may hold. As with `OwnedHandle`, when
-/// it holds `-1`, that value is interpreted as the current process handle, and not
-/// `INVALID_HANDLE_VALUE`.
+/// it holds `-1`, that value is interpreted as a valid handle value, such as
+/// [the current process handle], and not `INVALID_HANDLE_VALUE`.
 ///
 /// If this holds a non-null handle, it will close the handle on drop.
+///
+/// [the current process handle]: https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocess#remarks
 #[cfg(windows)]
 #[repr(transparent)]
 #[derive(Debug)]
