@@ -1,4 +1,3 @@
-use crate::views::{FilelikeViewType, SocketlikeViewType};
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, FromFd, IntoFd};
 #[cfg(windows)]
@@ -41,9 +40,6 @@ impl AsSocket for BorrowedSocket<'_> {
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
-unsafe impl FilelikeViewType for OwnedFd {}
-
-#[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for OwnedFd {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -52,18 +48,12 @@ impl AsFd for OwnedFd {
 }
 
 #[cfg(windows)]
-unsafe impl FilelikeViewType for OwnedHandle {}
-
-#[cfg(windows)]
 impl AsHandle for OwnedHandle {
     #[inline]
     fn as_handle(&self) -> BorrowedHandle<'_> {
         unsafe { BorrowedHandle::borrow_raw(self.as_raw_handle()) }
     }
 }
-
-#[cfg(windows)]
-unsafe impl SocketlikeViewType for OwnedSocket {}
 
 #[cfg(windows)]
 impl AsSocket for OwnedSocket {
@@ -129,8 +119,6 @@ impl FromHandle for HandleOrInvalid {
     }
 }
 
-unsafe impl FilelikeViewType for std::fs::File {}
-
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for std::fs::File {
     #[inline]
@@ -178,8 +166,6 @@ impl FromHandle for std::fs::File {
         unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }
-
-unsafe impl SocketlikeViewType for std::net::TcpStream {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for std::net::TcpStream {
@@ -229,8 +215,6 @@ impl FromSocket for std::net::TcpStream {
     }
 }
 
-unsafe impl SocketlikeViewType for std::net::TcpListener {}
-
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for std::net::TcpListener {
     #[inline]
@@ -278,8 +262,6 @@ impl FromSocket for std::net::TcpListener {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
-
-unsafe impl SocketlikeViewType for std::net::UdpSocket {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for std::net::UdpSocket {
@@ -554,9 +536,6 @@ impl IntoHandle for std::process::Child {
 }
 
 #[cfg(unix)]
-unsafe impl SocketlikeViewType for std::os::unix::net::UnixStream {}
-
-#[cfg(unix)]
 impl AsFd for std::os::unix::net::UnixStream {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -581,9 +560,6 @@ impl FromFd for std::os::unix::net::UnixStream {
 }
 
 #[cfg(unix)]
-unsafe impl SocketlikeViewType for std::os::unix::net::UnixListener {}
-
-#[cfg(unix)]
 impl AsFd for std::os::unix::net::UnixListener {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -606,9 +582,6 @@ impl FromFd for std::os::unix::net::UnixListener {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }
-
-#[cfg(unix)]
-unsafe impl SocketlikeViewType for std::os::unix::net::UnixDatagram {}
 
 #[cfg(unix)]
 impl AsFd for std::os::unix::net::UnixDatagram {
