@@ -1,6 +1,6 @@
 use crate::views::{FilelikeViewType, SocketlikeViewType};
 #[cfg(any(unix, target_os = "wasi"))]
-use crate::{OwnedFd};
+use crate::OwnedFd;
 #[cfg(windows)]
 use crate::{OwnedHandle, OwnedSocket};
 
