@@ -8,45 +8,75 @@ use io_lifetimes::{
     AsFilelike, AsSocketlike, BorrowedFilelike, FromFilelike, FromSocketlike, IntoFilelike,
     IntoSocketlike,
 };
+use std::io::{Read, Write};
 
 struct Tester {}
 impl Tester {
     fn use_file<Filelike: AsFilelike>(filelike: Filelike) {
+        let mut buf = Vec::new();
+
         let filelike = filelike.as_filelike();
-        let _ = filelike.as_filelike_view::<std::fs::File>();
-        let _ = unsafe {
+
+        let view = filelike.as_filelike_view::<std::fs::File>();
+        let _ = (&*view).read(&mut buf).is_ok();
+        let _ = (&*view).write(&buf).is_ok();
+
+        let view = unsafe {
             FilelikeView::<std::fs::File>::view_raw(
                 filelike
                     .as_filelike_view::<std::fs::File>()
                     .as_raw_filelike(),
             )
         };
+        let _ = (&*view).read(&mut buf).is_ok();
+        let _ = (&*view).write(&buf).is_ok();
+
         let _ = dbg!(filelike);
     }
 
     fn use_socket<Socketlike: AsSocketlike>(socketlike: Socketlike) {
+        let mut buf = Vec::new();
+
         let socketlike = socketlike.as_socketlike();
-        let _ = socketlike.as_socketlike_view::<std::net::TcpStream>();
-        let _ = unsafe {
+        let view = socketlike.as_socketlike_view::<std::net::TcpStream>();
+        let _ = (&*view).read(&mut buf).is_ok();
+        let _ = (&*view).write(&buf).is_ok();
+
+        let view = unsafe {
             SocketlikeView::<std::net::TcpStream>::view_raw(
                 socketlike
                     .as_socketlike_view::<std::net::TcpStream>()
                     .as_raw_socketlike(),
             )
         };
+        let _ = (&*view).read(&mut buf).is_ok();
+        let _ = (&*view).write(&buf).is_ok();
+
         let _ = dbg!(socketlike);
     }
 
     fn from_file<Filelike: IntoFilelike>(filelike: Filelike) {
+        let mut buf = Vec::new();
+
         let filelike = filelike.into_filelike();
-        let _ = filelike.as_filelike_view::<std::fs::File>();
+        let view = filelike.as_filelike_view::<std::fs::File>();
+        let _ = (&*view).read(&mut buf).is_ok();
+        let _ = (&*view).write(&buf).is_ok();
+        drop(view);
+
         let _ = dbg!(&filelike);
         let _ = std::fs::File::from_filelike(filelike);
     }
 
     fn from_socket<Socketlike: IntoSocketlike>(socketlike: Socketlike) {
+        let mut buf = Vec::new();
+
         let socketlike = socketlike.into_socketlike();
-        let _ = socketlike.as_socketlike_view::<std::net::TcpStream>();
+        let view = socketlike.as_socketlike_view::<std::net::TcpStream>();
+        let _ = (&*view).read(&mut buf).is_ok();
+        let _ = (&*view).write(&buf).is_ok();
+        drop(view);
+
         let _ = dbg!(&socketlike);
         let _ = std::net::TcpStream::from_socketlike(socketlike);
     }
