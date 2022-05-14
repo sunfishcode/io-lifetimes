@@ -2,6 +2,7 @@
 //! future, we'll prefer to have crates provide their own impls; this is
 //! just a temporary measure.
 
+use crate::views::FilelikeViewType;
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
@@ -12,6 +13,8 @@ use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
 use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(windows)]
 use std::os::windows::io::{AsRawHandle, FromRawHandle, IntoRawHandle};
+
+unsafe impl FilelikeViewType for os_pipe::PipeReader {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for os_pipe::PipeReader {
@@ -60,6 +63,8 @@ impl FromHandle for os_pipe::PipeReader {
         unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }
+
+unsafe impl FilelikeViewType for os_pipe::PipeWriter {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for os_pipe::PipeWriter {

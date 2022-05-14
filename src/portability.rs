@@ -6,7 +6,7 @@
 //!
 //! TODO: Should this layer be folded into types.rs/traits.rs?
 
-use crate::views::{FilelikeView, SocketlikeView};
+use crate::views::{FilelikeView, FilelikeViewType, SocketlikeView, SocketlikeViewType};
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
@@ -97,7 +97,7 @@ pub trait AsFilelike: AsFd {
     /// or `&mut Target`.
     ///
     /// [`File`]: std::fs::File
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target>;
+    fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target>;
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -108,7 +108,7 @@ impl<T: AsFd> AsFilelike for T {
     }
 
     #[inline]
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target> {
+    fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target> {
         FilelikeView::new(self)
     }
 }
@@ -139,7 +139,7 @@ pub trait AsFilelike: AsHandle {
     /// or `&mut Target`.
     ///
     /// [`File`]: std::fs::File
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target>;
+    fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target>;
 }
 
 #[cfg(windows)]
@@ -150,7 +150,7 @@ impl<T: AsHandle> AsFilelike for T {
     }
 
     #[inline]
-    fn as_filelike_view<Target: FromFilelike + IntoFilelike>(&self) -> FilelikeView<'_, Target> {
+    fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target> {
         FilelikeView::new(self)
     }
 }
@@ -170,9 +170,7 @@ pub trait AsSocketlike: AsFd {
     /// or `&mut Target`.
     ///
     /// [`TcpStream`]: std::net::TcpStream
-    fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        &self,
-    ) -> SocketlikeView<'_, Target>;
+    fn as_socketlike_view<Target: SocketlikeViewType>(&self) -> SocketlikeView<'_, Target>;
 }
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -183,9 +181,7 @@ impl<T: AsFd> AsSocketlike for T {
     }
 
     #[inline]
-    fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        &self,
-    ) -> SocketlikeView<'_, Target> {
+    fn as_socketlike_view<Target: SocketlikeViewType>(&self) -> SocketlikeView<'_, Target> {
         SocketlikeView::new(self)
     }
 }
@@ -205,9 +201,7 @@ pub trait AsSocketlike: AsSocket {
     /// or `&mut Target`.
     ///
     /// [`TcpStream`]: std::net::TcpStream
-    fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        &self,
-    ) -> SocketlikeView<'_, Target>;
+    fn as_socketlike_view<Target: SocketlikeViewType>(&self) -> SocketlikeView<'_, Target>;
 }
 
 #[cfg(windows)]
@@ -218,9 +212,7 @@ impl<T: AsSocket> AsSocketlike for T {
     }
 
     #[inline]
-    fn as_socketlike_view<Target: FromSocketlike + IntoSocketlike>(
-        &self,
-    ) -> SocketlikeView<'_, Target> {
+    fn as_socketlike_view<Target: SocketlikeViewType>(&self) -> SocketlikeView<'_, Target> {
         SocketlikeView::new(self)
     }
 }

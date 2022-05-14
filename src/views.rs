@@ -5,20 +5,41 @@
 //!
 //! [`AsSocketlike::as_socketlike_view`]: crate::AsSocketlike::as_socketlike_view
 
-use crate::raw::{AsRawFilelike, FromRawFilelike, IntoRawFilelike, RawFilelike};
-#[cfg(windows)]
-use crate::{
-    raw::{AsRawSocketlike, FromRawSocketlike, IntoRawSocketlike, RawSocketlike},
-    AsSocketlike, FromSocketlike, IntoSocketlike, OwnedSocketlike,
+use crate::raw::{
+    AsRawFilelike, AsRawSocketlike, FromRawFilelike, FromRawSocketlike, IntoRawFilelike,
+    IntoRawSocketlike, RawFilelike, RawSocketlike,
 };
-use crate::{AsFilelike, FromFilelike, IntoFilelike, OwnedFilelike};
+use crate::{
+    AsFilelike, AsSocketlike, FromFilelike, FromSocketlike, IntoFilelike, IntoSocketlike,
+    OwnedFilelike, OwnedSocketlike,
+};
 use std::fmt;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 
+/// Declare that a type is safe to use in a [`FilelikeView`].
+///
+/// # Safety
+///
+/// Types implementing this trait declare that if they are constructed with
+/// [`FromFilelike`] and consumed with [`IntoFilelike`], their `IntoFilelike`
+/// will return the same `OwnedFd` value that was passed to their
+/// `FromFilelike`.
+pub unsafe trait FilelikeViewType: FromFilelike + IntoFilelike {}
+
+/// Declare that a type is safe to use in a [`SocketlikeView`].
+///
+/// # Safety
+///
+/// Types implementing this trait declare that if they are constructed with
+/// [`FromSocketlike`] and consumed with [`IntoSocketlike`], their
+/// `IntoSocketlike` will return the same `OwnedFd` value that was passed to
+/// their `FromSocketlike`.
+pub unsafe trait SocketlikeViewType: FromSocketlike + IntoSocketlike {}
+
 /// A non-owning view of a resource which dereferences to a `&Target` or
 /// `&mut Target`. These are returned by [`AsFilelike::as_filelike_view`].
-pub struct FilelikeView<'filelike, Target: FromFilelike + IntoFilelike> {
+pub struct FilelikeView<'filelike, Target: FilelikeViewType> {
     /// The value to dereference to. This is an `Option` so that we can consume
     /// it in our `Drop` impl.
     target: Option<Target>,
@@ -30,15 +51,7 @@ pub struct FilelikeView<'filelike, Target: FromFilelike + IntoFilelike> {
 
 /// A non-owning view of a resource which dereferences to a `&Target` or
 /// `&mut Target`. These are returned by [`AsSocketlike::as_socketlike_view`].
-///
-/// [`AsSocketlike::as_socketlike_view`]: crate::AsSocketlike::as_socketlike_view
-#[cfg(any(unix, target_os = "wasi"))]
-pub type SocketlikeView<'socketlike, Target> = FilelikeView<'socketlike, Target>;
-
-/// A non-owning view of a resource which dereferences to a `&Target` or
-/// `&mut Target`. These are returned by [`AsSocketlike::as_socketlike_view`].
-#[cfg(windows)]
-pub struct SocketlikeView<'socketlike, Target: FromSocketlike + IntoSocketlike> {
+pub struct SocketlikeView<'socketlike, Target: SocketlikeViewType> {
     /// The value to dereference to. This is an `Option` so that we can consume
     /// it in our `Drop` impl.
     target: Option<Target>,
@@ -48,7 +61,7 @@ pub struct SocketlikeView<'socketlike, Target: FromSocketlike + IntoSocketlike> 
     _phantom: PhantomData<&'socketlike OwnedSocketlike>,
 }
 
-impl<Target: FromFilelike + IntoFilelike> FilelikeView<'_, Target> {
+impl<Target: FilelikeViewType> FilelikeView<'_, Target> {
     /// Construct a temporary `Target` and wrap it in a `FilelikeView` object.
     #[inline]
     pub(crate) fn new<T: AsFilelike>(filelike: &T) -> Self {
@@ -75,8 +88,7 @@ impl<Target: FromFilelike + IntoFilelike> FilelikeView<'_, Target> {
     }
 }
 
-#[cfg(windows)]
-impl<Target: FromSocketlike + IntoSocketlike> SocketlikeView<'_, Target> {
+impl<Target: SocketlikeViewType> SocketlikeView<'_, Target> {
     /// Construct a temporary `Target` and wrap it in a `SocketlikeView`
     /// object.
     #[inline]
@@ -110,7 +122,7 @@ impl<Target: FromSocketlike + IntoSocketlike> SocketlikeView<'_, Target> {
     }
 }
 
-impl<Target: FromFilelike + IntoFilelike> Deref for FilelikeView<'_, Target> {
+impl<Target: FilelikeViewType> Deref for FilelikeView<'_, Target> {
     type Target = Target;
 
     #[inline]
@@ -119,8 +131,7 @@ impl<Target: FromFilelike + IntoFilelike> Deref for FilelikeView<'_, Target> {
     }
 }
 
-#[cfg(windows)]
-impl<Target: FromSocketlike + IntoSocketlike> Deref for SocketlikeView<'_, Target> {
+impl<Target: SocketlikeViewType> Deref for SocketlikeView<'_, Target> {
     type Target = Target;
 
     #[inline]
@@ -129,22 +140,21 @@ impl<Target: FromSocketlike + IntoSocketlike> Deref for SocketlikeView<'_, Targe
     }
 }
 
-impl<Target: FromFilelike + IntoFilelike> DerefMut for FilelikeView<'_, Target> {
+impl<Target: FilelikeViewType> DerefMut for FilelikeView<'_, Target> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.target.as_mut().unwrap()
     }
 }
 
-#[cfg(windows)]
-impl<Target: FromSocketlike + IntoSocketlike> DerefMut for SocketlikeView<'_, Target> {
+impl<Target: SocketlikeViewType> DerefMut for SocketlikeView<'_, Target> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.target.as_mut().unwrap()
     }
 }
 
-impl<Target: FromFilelike + IntoFilelike> Drop for FilelikeView<'_, Target> {
+impl<Target: FilelikeViewType> Drop for FilelikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
         let _ = self
@@ -156,8 +166,7 @@ impl<Target: FromFilelike + IntoFilelike> Drop for FilelikeView<'_, Target> {
     }
 }
 
-#[cfg(windows)]
-impl<Target: FromSocketlike + IntoSocketlike> Drop for SocketlikeView<'_, Target> {
+impl<Target: SocketlikeViewType> Drop for SocketlikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
         let _ = self
@@ -169,7 +178,7 @@ impl<Target: FromSocketlike + IntoSocketlike> Drop for SocketlikeView<'_, Target
     }
 }
 
-impl<Target: FromFilelike + IntoFilelike + fmt::Debug> fmt::Debug for FilelikeView<'_, Target> {
+impl<Target: FilelikeViewType> fmt::Debug for FilelikeView<'_, Target> {
     #[allow(clippy::missing_inline_in_public_items)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("FilelikeView")
@@ -178,10 +187,7 @@ impl<Target: FromFilelike + IntoFilelike + fmt::Debug> fmt::Debug for FilelikeVi
     }
 }
 
-#[cfg(windows)]
-impl<Target: FromSocketlike + IntoSocketlike + fmt::Debug> fmt::Debug
-    for SocketlikeView<'_, Target>
-{
+impl<Target: SocketlikeViewType> fmt::Debug for SocketlikeView<'_, Target> {
     #[allow(clippy::missing_inline_in_public_items)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("SocketlikeView")
