@@ -15,7 +15,7 @@ use crate::{
 };
 use std::fmt;
 use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
 
 /// Declare that a type is safe to use in a [`FilelikeView`].
 ///
@@ -137,20 +137,6 @@ impl<Target: SocketlikeViewType> Deref for SocketlikeView<'_, Target> {
     #[inline]
     fn deref(&self) -> &Self::Target {
         self.target.as_ref().unwrap()
-    }
-}
-
-impl<Target: FilelikeViewType> DerefMut for FilelikeView<'_, Target> {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.target.as_mut().unwrap()
-    }
-}
-
-impl<Target: SocketlikeViewType> DerefMut for SocketlikeView<'_, Target> {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.target.as_mut().unwrap()
     }
 }
 

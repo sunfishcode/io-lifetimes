@@ -93,8 +93,17 @@ pub trait AsFilelike: AsFd {
     /// ```
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
-    /// Return a borrowing view of a resource which dereferences to a `&Target`
-    /// or `&mut Target`.
+    /// Return a borrowing view of a resource which dereferences to a `&Target`.
+    ///
+    /// Note that [`Read`] or [`Write`] require `&mut Target`, but in some cases,
+    /// such as [`File`], `Read` and `Write` are implemented for `&Target` in
+    /// addition to `Target`, and you can get a `&mut &Target` by doing `&*` on
+    /// the resuting view, like this:
+    ///
+    /// ```rust,ignore
+    /// let v = f.as_filelike_view::<std::fs::File>();
+    /// (&*v).read(&mut buf).unwrap();
+    /// ```
     ///
     /// [`File`]: std::fs::File
     fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target>;
@@ -135,8 +144,17 @@ pub trait AsFilelike: AsHandle {
     /// ```
     fn as_filelike(&self) -> BorrowedFilelike<'_>;
 
-    /// Return a borrowing view of a resource which dereferences to a `&Target`
-    /// or `&mut Target`.
+    /// Return a borrowing view of a resource which dereferences to a `&Target`.
+    ///
+    /// Note that [`Read`] or [`Write`] require `&mut Target`, but in some cases,
+    /// such as [`File`], `Read` and `Write` are implemented for `&Target` in
+    /// addition to `Target`, and you can get a `&mut &Target` by doing `&*` on
+    /// the resuting view, like this:
+    ///
+    /// ```rust,ignore
+    /// let v = f.as_filelike_view::<std::fs::File>();
+    /// (&*v).read(&mut buf).unwrap();
+    /// ```
     ///
     /// [`File`]: std::fs::File
     fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target>;
@@ -166,8 +184,17 @@ pub trait AsSocketlike: AsFd {
     /// Borrows the reference.
     fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
 
-    /// Return a borrowing view of a resource which dereferences to a `&Target`
-    /// or `&mut Target`.
+    /// Return a borrowing view of a resource which dereferences to a `&Target`.
+    ///
+    /// Note that [`Read`] or [`Write`] require `&mut Target`, but in some cases,
+    /// such as [`TcpStream`], `Read` and `Write` are implemented for `&Target` in
+    /// addition to `Target`, and you can get a `&mut &Target` by doing `&*` on
+    /// the resuting view, like this:
+    ///
+    /// ```rust,ignore
+    /// let v = s.as_socketlike_view::<std::net::TcpStream>();
+    /// (&*v).read(&mut buf).unwrap();
+    /// ```
     ///
     /// [`TcpStream`]: std::net::TcpStream
     fn as_socketlike_view<Target: SocketlikeViewType>(&self) -> SocketlikeView<'_, Target>;
@@ -197,8 +224,17 @@ pub trait AsSocketlike: AsSocket {
     /// Borrows the reference.
     fn as_socketlike(&self) -> BorrowedSocketlike;
 
-    /// Return a borrowing view of a resource which dereferences to a `&Target`
-    /// or `&mut Target`.
+    /// Return a borrowing view of a resource which dereferences to a `&Target`.
+    ///
+    /// Note that [`Read`] or [`Write`] require `&mut Target`, but in some cases,
+    /// such as [`TcpStream`], `Read` and `Write` are implemented for `&Target` in
+    /// addition to `Target`, and you can get a `&mut &Target` by doing `&*` on
+    /// the resuting view, like this:
+    ///
+    /// ```rust,ignore
+    /// let v = s.as_socketlike_view::<std::net::TcpStream>();
+    /// (&*v).read(&mut buf).unwrap();
+    /// ```
     ///
     /// [`TcpStream`]: std::net::TcpStream
     fn as_socketlike_view<Target: SocketlikeViewType>(&self) -> SocketlikeView<'_, Target>;
