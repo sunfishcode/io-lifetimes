@@ -44,6 +44,12 @@ pub struct FilelikeView<'filelike, Target: FilelikeViewType> {
     /// it in our `Drop` impl.
     target: Option<Target>,
 
+    /// `FilelikeViewType` implementors guarantee that their `Into<OwnedFd>`
+    /// returns the same fd as their `From<OwnedFd>` gave them. This field
+    /// allows us to verify this.
+    #[cfg(debug_assertions)]
+    orig: RawFilelike,
+
     /// This field exists because we don't otherwise explicitly use
     /// `'filelike`.
     _phantom: PhantomData<&'filelike OwnedFilelike>,
@@ -55,6 +61,12 @@ pub struct SocketlikeView<'socketlike, Target: SocketlikeViewType> {
     /// The value to dereference to. This is an `Option` so that we can consume
     /// it in our `Drop` impl.
     target: Option<Target>,
+
+    /// `SocketlikeViewType` implementors guarantee that their `Into<OwnedFd>`
+    /// returns the same fd as their `From<OwnedFd>` gave them. This field
+    /// allows us to verify this.
+    #[cfg(debug_assertions)]
+    orig: RawSocketlike,
 
     /// This field exists because we don't otherwise explicitly use
     /// `'socketlike`.
@@ -83,6 +95,8 @@ impl<Target: FilelikeViewType> FilelikeView<'_, Target> {
         let owned = OwnedFilelike::from_raw_filelike(raw);
         Self {
             target: Some(Target::from_filelike(owned)),
+            #[cfg(debug_assertions)]
+            orig: raw,
             _phantom: PhantomData,
         }
     }
@@ -96,13 +110,7 @@ impl<Target: SocketlikeViewType> SocketlikeView<'_, Target> {
         // Safety: The returned `SocketlikeView` is scoped to the lifetime of
         // `socketlike`, which we've borrowed here, so the view won't outlive
         // the object it's borrowed from.
-        let owned = unsafe {
-            OwnedSocketlike::from_raw_socketlike(socketlike.as_socketlike().as_raw_socketlike())
-        };
-        Self {
-            target: Some(Target::from_socketlike(owned)),
-            _phantom: PhantomData,
-        }
+        unsafe { Self::view_raw(socketlike.as_socketlike().as_raw_socketlike()) }
     }
 
     /// Construct a temporary `Target` from raw and wrap it in a
@@ -117,6 +125,8 @@ impl<Target: SocketlikeViewType> SocketlikeView<'_, Target> {
         let owned = OwnedSocketlike::from_raw_socketlike(raw);
         Self {
             target: Some(Target::from_socketlike(owned)),
+            #[cfg(debug_assertions)]
+            orig: raw,
             _phantom: PhantomData,
         }
     }
@@ -143,24 +153,26 @@ impl<Target: SocketlikeViewType> Deref for SocketlikeView<'_, Target> {
 impl<Target: FilelikeViewType> Drop for FilelikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
-        let _ = self
+        let raw = self
             .target
             .take()
             .unwrap()
             .into_filelike()
             .into_raw_filelike();
+        debug_assert_eq!(self.orig, raw);
     }
 }
 
 impl<Target: SocketlikeViewType> Drop for SocketlikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
-        let _ = self
+        let raw = self
             .target
             .take()
             .unwrap()
             .into_socketlike()
             .into_raw_socketlike();
+        debug_assert_eq!(self.orig, raw);
     }
 }
 
