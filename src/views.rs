@@ -153,26 +153,30 @@ impl<Target: SocketlikeViewType> Deref for SocketlikeView<'_, Target> {
 impl<Target: FilelikeViewType> Drop for FilelikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
-        let raw = self
+        let _raw = self
             .target
             .take()
             .unwrap()
             .into_filelike()
             .into_raw_filelike();
-        debug_assert_eq!(self.orig, raw);
+
+        #[cfg(debug_assertions)]
+        debug_assert_eq!(self.orig, _raw);
     }
 }
 
 impl<Target: SocketlikeViewType> Drop for SocketlikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
-        let raw = self
+        let _raw = self
             .target
             .take()
             .unwrap()
             .into_socketlike()
             .into_raw_socketlike();
-        debug_assert_eq!(self.orig, raw);
+
+        #[cfg(debug_assertions)]
+        debug_assert_eq!(self.orig, _raw);
     }
 }
 
