@@ -143,9 +143,18 @@ pub struct OwnedFd {
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl OwnedFd {
-    /// Creates a new `OwnedFd` instance that shares the same underlying file handle
-    /// as the existing `OwnedFd` instance.
+    /// Creates a new `OwnedFd` instance that shares the same underlying file
+    /// description as the existing `OwnedFd` instance.
     pub fn try_clone(&self) -> std::io::Result<Self> {
+        crate::AsFd::as_fd(self).try_clone_to_owned()
+    }
+}
+
+#[cfg(any(unix, target_os = "wasi"))]
+impl BorrowedFd<'_> {
+    /// Creates a new `OwnedFd` instance that shares the same underlying file
+    /// description as the existing `BorrowedFd` instance.
+    pub fn try_clone_to_owned(&self) -> std::io::Result<OwnedFd> {
         #[cfg(feature = "close")]
         {
             #[cfg(unix)]
@@ -168,7 +177,7 @@ impl OwnedFd {
                     fd => fd,
                 };
 
-                Ok(unsafe { Self::from_raw_fd(fd) })
+                Ok(unsafe { OwnedFd::from_raw_fd(fd) })
             }
 
             #[cfg(target_os = "wasi")]
@@ -215,9 +224,18 @@ pub struct OwnedHandle {
 
 #[cfg(windows)]
 impl OwnedHandle {
-    /// Creates a new `OwnedHandle` instance that shares the same underlying file handle
-    /// as the existing `OwnedHandle` instance.
-    pub fn try_clone(&self) -> std::io::Result<OwnedHandle> {
+    /// Creates a new `OwnedHandle` instance that shares the same underlying
+    /// object as the existing `OwnedHandle` instance.
+    pub fn try_clone(&self) -> std::io::Result<Self> {
+        crate::AsHandle::as_handle(self).try_clone_to_owned()
+    }
+}
+
+#[cfg(windows)]
+impl BorrowedHandle<'_> {
+    /// Creates a new `OwnedHandle` instance that shares the same underlying
+    /// object as the existing `BorrowedHandle` instance.
+    pub fn try_clone_to_owned(&self) -> std::io::Result<OwnedHandle> {
         #[cfg(feature = "close")]
         {
             self.duplicate(0, false, DUPLICATE_SAME_ACCESS)
@@ -237,7 +255,7 @@ impl OwnedHandle {
         access: u32,
         inherit: bool,
         options: DUPLICATE_HANDLE_OPTIONS,
-    ) -> std::io::Result<Self> {
+    ) -> std::io::Result<OwnedHandle> {
         let mut ret = 0 as HANDLE;
         match unsafe {
             let cur_proc = GetCurrentProcess();
@@ -254,7 +272,7 @@ impl OwnedHandle {
             0 => return Err(std::io::Error::last_os_error()),
             _ => (),
         }
-        unsafe { Ok(Self::from_raw_handle(ret as RawHandle)) }
+        unsafe { Ok(OwnedHandle::from_raw_handle(ret as RawHandle)) }
     }
 }
 
@@ -285,9 +303,38 @@ pub struct OwnedSocket {
 
 #[cfg(windows)]
 impl OwnedSocket {
-    /// Creates a new `OwnedSocket` instance that shares the same underlying socket
-    /// as the existing `OwnedSocket` instance.
+    /// Creates a new `OwnedSocket` instance that shares the same underlying
+    /// object as the existing `OwnedSocket` instance.
     pub fn try_clone(&self) -> std::io::Result<Self> {
+        crate::AsSocket::as_socket(self).try_clone_to_owned()
+    }
+
+    #[cfg(feature = "close")]
+    #[cfg(not(target_vendor = "uwp"))]
+    fn set_no_inherit(&self) -> std::io::Result<()> {
+        match unsafe {
+            SetHandleInformation(self.as_raw_socket() as HANDLE, HANDLE_FLAG_INHERIT, 0)
+        } {
+            0 => return Err(std::io::Error::last_os_error()),
+            _ => Ok(()),
+        }
+    }
+
+    #[cfg(feature = "close")]
+    #[cfg(target_vendor = "uwp")]
+    fn set_no_inherit(&self) -> std::io::Result<()> {
+        Err(io::Error::new_const(
+            std::io::ErrorKind::Unsupported,
+            &"Unavailable on UWP",
+        ))
+    }
+}
+
+#[cfg(windows)]
+impl BorrowedSocket<'_> {
+    /// Creates a new `OwnedSocket` instance that shares the same underlying
+    /// object as the existing `BorrowedSocket` instance.
+    pub fn try_clone_to_owned(&self) -> std::io::Result<OwnedSocket> {
         #[cfg(feature = "close")]
         {
             let mut info = unsafe { std::mem::zeroed::<WSAPROTOCOL_INFOW>() };
@@ -348,26 +395,6 @@ impl OwnedSocket {
         {
             unreachable!("try_clone called without the \"close\" feature in io-lifetimes");
         }
-    }
-
-    #[cfg(feature = "close")]
-    #[cfg(not(target_vendor = "uwp"))]
-    fn set_no_inherit(&self) -> std::io::Result<()> {
-        match unsafe {
-            SetHandleInformation(self.as_raw_socket() as HANDLE, HANDLE_FLAG_INHERIT, 0)
-        } {
-            0 => return Err(std::io::Error::last_os_error()),
-            _ => Ok(()),
-        }
-    }
-
-    #[cfg(feature = "close")]
-    #[cfg(target_vendor = "uwp")]
-    fn set_no_inherit(&self) -> std::io::Result<()> {
-        Err(io::Error::new_const(
-            std::io::ErrorKind::Unsupported,
-            &"Unavailable on UWP",
-        ))
     }
 }
 
