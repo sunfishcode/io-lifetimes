@@ -444,7 +444,9 @@ impl BorrowedFd<'_> {
     /// the returned `BorrowedFd`, and it must not have the value `-1`.
     #[inline]
     pub const unsafe fn borrow_raw(fd: RawFd) -> Self {
+        #[cfg(panic_in_const_fn)]
         debug_assert!(fd != -1_i32 as RawFd);
+
         Self {
             fd,
             _phantom: PhantomData,
