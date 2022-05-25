@@ -15,6 +15,7 @@ use crate::{
 };
 use std::fmt;
 use std::marker::PhantomData;
+use std::mem::ManuallyDrop;
 use std::ops::Deref;
 
 /// Declare that a type is safe to use in a [`FilelikeView`].
@@ -40,9 +41,9 @@ pub unsafe trait SocketlikeViewType: FromSocketlike + IntoSocketlike {}
 /// A non-owning view of a resource which dereferences to a `&Target` or
 /// `&mut Target`. These are returned by [`AsFilelike::as_filelike_view`].
 pub struct FilelikeView<'filelike, Target: FilelikeViewType> {
-    /// The value to dereference to. This is an `Option` so that we can consume
-    /// it in our `Drop` impl.
-    target: Option<Target>,
+    /// The value to dereference to. This is a `ManuallyDrop` so that we can
+    /// consume it in our `Drop` impl.
+    target: ManuallyDrop<Target>,
 
     /// `FilelikeViewType` implementors guarantee that their `Into<OwnedFd>`
     /// returns the same fd as their `From<OwnedFd>` gave them. This field
@@ -58,9 +59,9 @@ pub struct FilelikeView<'filelike, Target: FilelikeViewType> {
 /// A non-owning view of a resource which dereferences to a `&Target` or
 /// `&mut Target`. These are returned by [`AsSocketlike::as_socketlike_view`].
 pub struct SocketlikeView<'socketlike, Target: SocketlikeViewType> {
-    /// The value to dereference to. This is an `Option` so that we can consume
-    /// it in our `Drop` impl.
-    target: Option<Target>,
+    /// The value to dereference to. This is a `ManuallyDrop` so that we can
+    /// consume it in our `Drop` impl.
+    target: ManuallyDrop<Target>,
 
     /// `SocketlikeViewType` implementors guarantee that their `Into<OwnedFd>`
     /// returns the same fd as their `From<OwnedFd>` gave them. This field
@@ -94,7 +95,7 @@ impl<Target: FilelikeViewType> FilelikeView<'_, Target> {
     pub unsafe fn view_raw(raw: RawFilelike) -> Self {
         let owned = OwnedFilelike::from_raw_filelike(raw);
         Self {
-            target: Some(Target::from_filelike(owned)),
+            target: ManuallyDrop::new(Target::from_filelike(owned)),
             #[cfg(debug_assertions)]
             orig: raw,
             _phantom: PhantomData,
@@ -124,7 +125,7 @@ impl<Target: SocketlikeViewType> SocketlikeView<'_, Target> {
     pub unsafe fn view_raw(raw: RawSocketlike) -> Self {
         let owned = OwnedSocketlike::from_raw_socketlike(raw);
         Self {
-            target: Some(Target::from_socketlike(owned)),
+            target: ManuallyDrop::new(Target::from_socketlike(owned)),
             #[cfg(debug_assertions)]
             orig: raw,
             _phantom: PhantomData,
@@ -137,7 +138,7 @@ impl<Target: FilelikeViewType> Deref for FilelikeView<'_, Target> {
 
     #[inline]
     fn deref(&self) -> &Self::Target {
-        self.target.as_ref().unwrap()
+        &self.target
     }
 }
 
@@ -146,17 +147,18 @@ impl<Target: SocketlikeViewType> Deref for SocketlikeView<'_, Target> {
 
     #[inline]
     fn deref(&self) -> &Self::Target {
-        self.target.as_ref().unwrap()
+        &self.target
     }
 }
 
 impl<Target: FilelikeViewType> Drop for FilelikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
-        let _raw = self
-            .target
-            .take()
-            .unwrap()
+        //
+        // Safety: Using `ManuallyDrop::take` requires us to ensure that
+        // `self.target` is not used again. We don't use it again here, and
+        // this is the `drop` function, so we know it's not used afterward.
+        let _raw = unsafe { ManuallyDrop::take(&mut self.target) }
             .into_filelike()
             .into_raw_filelike();
 
@@ -168,10 +170,11 @@ impl<Target: FilelikeViewType> Drop for FilelikeView<'_, Target> {
 impl<Target: SocketlikeViewType> Drop for SocketlikeView<'_, Target> {
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
-        let _raw = self
-            .target
-            .take()
-            .unwrap()
+        //
+        // Safety: Using `ManuallyDrop::take` requires us to ensure that
+        // `self.target` is not used again. We don't use it again here, and
+        // this is the `drop` function, so we know it's not used afterward.
+        let _raw = unsafe { ManuallyDrop::take(&mut self.target) }
             .into_socketlike()
             .into_raw_socketlike();
 
