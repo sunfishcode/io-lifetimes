@@ -150,6 +150,14 @@ pub trait IntoRawSocketlike: IntoRawFd {
     fn into_raw_socketlike(self) -> RawSocketlike;
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl<T: IntoRawFd> IntoRawSocketlike for T {
+    #[inline]
+    fn into_raw_socketlike(self) -> RawSocketlike {
+        self.into_raw_fd()
+    }
+}
+
 /// This is a portability abstraction over Unix-like `IntoRawFd` and Windows'
 /// [`IntoRawSocket`].
 #[cfg(windows)]

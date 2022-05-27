@@ -2,6 +2,9 @@
 //! future, we'll prefer to have crates provide their own impls; this is
 //! just a temporary measure.
 
+#[cfg(unix)]
+use crate::views::FilelikeViewType;
+use crate::views::SocketlikeViewType;
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
@@ -12,6 +15,8 @@ use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
 use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(windows)]
 use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket};
+
+unsafe impl SocketlikeViewType for mio::net::TcpStream {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for mio::net::TcpStream {
@@ -61,6 +66,8 @@ impl FromSocket for mio::net::TcpStream {
     }
 }
 
+unsafe impl SocketlikeViewType for mio::net::TcpListener {}
+
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for mio::net::TcpListener {
     #[inline]
@@ -108,6 +115,8 @@ impl FromSocket for mio::net::TcpListener {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
+
+unsafe impl SocketlikeViewType for mio::net::UdpSocket {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for mio::net::UdpSocket {
@@ -158,6 +167,9 @@ impl FromSocket for mio::net::UdpSocket {
 }
 
 #[cfg(unix)]
+unsafe impl SocketlikeViewType for mio::net::UnixDatagram {}
+
+#[cfg(unix)]
 impl AsFd for mio::net::UnixDatagram {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -180,6 +192,9 @@ impl FromFd for mio::net::UnixDatagram {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }
+
+#[cfg(unix)]
+unsafe impl SocketlikeViewType for mio::net::UnixListener {}
 
 #[cfg(unix)]
 impl AsFd for mio::net::UnixListener {
@@ -206,6 +221,9 @@ impl FromFd for mio::net::UnixListener {
 }
 
 #[cfg(unix)]
+unsafe impl SocketlikeViewType for mio::net::UnixStream {}
+
+#[cfg(unix)]
 impl AsFd for mio::net::UnixStream {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -230,6 +248,9 @@ impl FromFd for mio::net::UnixStream {
 }
 
 #[cfg(unix)]
+unsafe impl FilelikeViewType for mio::unix::pipe::Receiver {}
+
+#[cfg(unix)]
 impl AsFd for mio::unix::pipe::Receiver {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -252,6 +273,9 @@ impl FromFd for mio::unix::pipe::Receiver {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }
+
+#[cfg(unix)]
+unsafe impl FilelikeViewType for mio::unix::pipe::Sender {}
 
 #[cfg(unix)]
 impl AsFd for mio::unix::pipe::Sender {
