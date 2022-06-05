@@ -71,10 +71,6 @@ On Windows, there are `Handle` and `Socket` versions of every `Fd` thing, and
 a special `HandleOrInvalid` type to cope with inconsistent error reporting
 in the Windows API.
 
-Full API documentation:
- - [for `x86_64-unknown-linux-gnu`](https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/index.html)
- - [for `x86_64-pc-windows-msvc`](https://io-experiment.sunfishcode.online/x86_64-pc-windows-msvc/io_lifetimes/index.html)
-
 ## The magic of transparency
 
 Here's the fun part. `BorrowedFd` and `OwnedFd` are `repr(transparent)` and
@@ -195,6 +191,6 @@ they're simpler and safer to use. io-lifetimes doesn't include unsafe-io's
 `*ReadWrite*` or `*HandleOrSocket*` abstractions, and leaves these as features
 to be provided by separate layers on top.
 
-[`OwnedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/struct.OwnedFd.html
-[`BorrowedFd`]: https://io-experiment.sunfishcode.online/x86_64-unknown-linux-gnu/io_lifetimes/struct.BorrowedFd.html
+[`OwnedFd`]: https://doc.rust-lang.org/stable/std/os/unix/io/struct.OwnedFd.html
+[`BorrowedFd`]: https://doc.rust-lang.org/stable/std/os/unix/io/struct.BorrowedFd.html
 [RFC 3128]: https://github.com/rust-lang/rfcs/blob/master/text/3128-io-safety.md
