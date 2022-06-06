@@ -282,7 +282,7 @@ impl FromSocket for std::net::TcpStream {
 #[cfg(windows)]
 impl From<OwnedSocket> for std::net::TcpStream {
     #[inline]
-    fn from_socket(owned: OwnedSocket) -> Self {
+    fn from(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
@@ -362,7 +362,7 @@ impl FromSocket for std::net::TcpListener {
 #[cfg(windows)]
 impl From<OwnedSocket> for std::net::TcpListener {
     #[inline]
-    fn from_socket(owned: OwnedSocket) -> Self {
+    fn from(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
@@ -442,7 +442,7 @@ impl FromSocket for std::net::UdpSocket {
 #[cfg(windows)]
 impl From<OwnedSocket> for std::net::UdpSocket {
     #[inline]
-    fn from_socket(owned: OwnedSocket) -> Self {
+    fn from(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }

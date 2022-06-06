@@ -104,8 +104,8 @@ impl FromHandle for Thing {
 #[cfg(windows)]
 impl From<OwnedHandle> for Thing {
     #[inline]
-    fn from(owned: Thing) -> Self {
-        Self { filelike: owned }
+    fn from(filelike: OwnedHandle) -> Self {
+        Self { filelike }
     }
 }
 

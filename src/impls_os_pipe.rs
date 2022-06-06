@@ -139,7 +139,7 @@ impl IntoHandle for os_pipe::PipeWriter {
 }
 
 #[cfg(windows)]
-impl From<os_pipe::PipeWriter> for OwnedFd {
+impl From<os_pipe::PipeWriter> for OwnedHandle {
     #[inline]
     fn from(owned: os_pipe::PipeWriter) -> Self {
         unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
