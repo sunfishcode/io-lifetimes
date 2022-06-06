@@ -152,6 +152,7 @@ impl<Target: SocketlikeViewType> Deref for SocketlikeView<'_, Target> {
 }
 
 impl<Target: FilelikeViewType> Drop for FilelikeView<'_, Target> {
+    #[inline]
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
         //
@@ -168,6 +169,7 @@ impl<Target: FilelikeViewType> Drop for FilelikeView<'_, Target> {
 }
 
 impl<Target: SocketlikeViewType> Drop for SocketlikeView<'_, Target> {
+    #[inline]
     fn drop(&mut self) {
         // Use `Into*` to consume `self.target` without freeing its resource.
         //
