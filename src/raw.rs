@@ -3,8 +3,6 @@
 //! On Unix, "everything is a file descriptor". On Windows, file/pipe/process
 //! handles are distinct from socket descriptors. This file provides a minimal
 //! layer of portability over this difference.
-//!
-//! TODO: Should this layer be folded into types.rs/traits.rs?
 
 #[cfg(unix)]
 use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
