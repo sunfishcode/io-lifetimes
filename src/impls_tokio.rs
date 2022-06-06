@@ -37,10 +37,26 @@ impl FromFd for tokio::fs::File {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<OwnedFd> for tokio::fs::File {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl FromHandle for tokio::fs::File {
     #[inline]
     fn from_handle(owned: OwnedHandle) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<OwnedHandle> for tokio::fs::File {
+    #[inline]
+    fn from(owned: OwnedHandle) -> Self {
         unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }

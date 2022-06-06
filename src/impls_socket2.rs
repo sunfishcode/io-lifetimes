@@ -40,11 +40,27 @@ impl IntoFd for socket2::Socket {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<socket2::Socket> for OwnedFd {
+    #[inline]
+    fn from(owned: socket2::Socket) -> Self {
+        unsafe { OwnedFd::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl IntoSocket for socket2::Socket {
     #[inline]
     fn into_socket(self) -> OwnedSocket {
         unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<socket2::Socket> for OwnedSocket {
+    #[inline]
+    fn from(owned: socket2::Socket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
 
@@ -56,10 +72,26 @@ impl FromFd for socket2::Socket {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<OwnedFd> for socket2::Socket {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl FromSocket for socket2::Socket {
     #[inline]
     fn from_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<OwnedSocket> for socket2::Socket {
+    #[inline]
+    fn from(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }

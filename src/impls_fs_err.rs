@@ -37,10 +37,26 @@ impl IntoFd for fs_err::File {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<fs_err::File> for OwnedFd {
+    #[inline]
+    fn from(owned: fs_err::File) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl IntoHandle for fs_err::File {
     #[inline]
     fn into_handle(self) -> OwnedHandle {
         unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<fs_err::File> for OwnedHandle {
+    #[inline]
+    fn from(owned: fs_err::File) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }
