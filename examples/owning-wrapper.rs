@@ -83,6 +83,7 @@ impl IntoHandle for Thing {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl From<Thing> for OwnedHandle {
     #[inline]
@@ -99,6 +100,7 @@ impl FromHandle for Thing {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl From<OwnedHandle> for Thing {
     #[inline]
