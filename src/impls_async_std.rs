@@ -45,11 +45,27 @@ impl IntoFd for async_std::fs::File {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<async_std::fs::File> for OwnedFd {
+    #[inline]
+    fn from(owned: async_std::fs::File) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl IntoHandle for async_std::fs::File {
     #[inline]
     fn into_handle(self) -> OwnedHandle {
         unsafe { OwnedHandle::from_raw_handle(self.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<async_std::fs::File> for OwnedHandle {
+    #[inline]
+    fn from(owned: async_std::fs::File) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }
 
@@ -61,10 +77,26 @@ impl FromFd for async_std::fs::File {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<OwnedFd> for async_std::fs::File {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl FromHandle for async_std::fs::File {
     #[inline]
     fn from_handle(owned: OwnedHandle) -> Self {
+        unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<OwnedHandle> for async_std::fs::File {
+    #[inline]
+    fn from(owned: OwnedHandle) -> Self {
         unsafe { Self::from_raw_handle(owned.into_raw_handle()) }
     }
 }
@@ -95,11 +127,27 @@ impl IntoFd for async_std::net::TcpStream {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<async_std::net::TcpStream> for OwnedFd {
+    #[inline]
+    fn from(owned: async_std::net::TcpStream) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl IntoSocket for async_std::net::TcpStream {
     #[inline]
     fn into_socket(self) -> OwnedSocket {
         unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<async_std::net::TcpStream> for OwnedSocket {
+    #[inline]
+    fn from(owned: async_std::net::TcpStream) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
 
@@ -111,10 +159,26 @@ impl FromFd for async_std::net::TcpStream {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<OwnedFd> for async_std::net::TcpStream {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl FromSocket for async_std::net::TcpStream {
     #[inline]
     fn from_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<OwnedSocket> for async_std::net::TcpStream {
+    #[inline]
+    fn from(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
@@ -145,11 +209,27 @@ impl IntoFd for async_std::net::TcpListener {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<async_std::net::TcpListener> for OwnedFd {
+    #[inline]
+    fn from(owned: async_std::net::TcpListener) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl IntoSocket for async_std::net::TcpListener {
     #[inline]
     fn into_socket(self) -> OwnedSocket {
         unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<async_std::net::TcpListener> for OwnedSocket {
+    #[inline]
+    fn from(owned: async_std::net::TcpListener) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
 
@@ -161,10 +241,26 @@ impl FromFd for async_std::net::TcpListener {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<OwnedFd> for async_std::net::TcpListener {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl FromSocket for async_std::net::TcpListener {
     #[inline]
     fn from_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<OwnedSocket> for async_std::net::TcpListener {
+    #[inline]
+    fn from(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
@@ -195,11 +291,27 @@ impl IntoFd for async_std::net::UdpSocket {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<async_std::net::UdpSocket> for OwnedFd {
+    #[inline]
+    fn from(owned: async_std::net::UdpSocket) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl IntoSocket for async_std::net::UdpSocket {
     #[inline]
     fn into_socket(self) -> OwnedSocket {
         unsafe { OwnedSocket::from_raw_socket(self.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<async_std::net::UdpSocket> for OwnedSocket {
+    #[inline]
+    fn from(owned: async_std::net::UdpSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
 
@@ -211,10 +323,26 @@ impl FromFd for async_std::net::UdpSocket {
     }
 }
 
+#[cfg(any(unix, target_os = "wasi"))]
+impl From<OwnedFd> for async_std::net::UdpSocket {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
 #[cfg(windows)]
 impl FromSocket for async_std::net::UdpSocket {
     #[inline]
     fn from_socket(owned: OwnedSocket) -> Self {
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
+    }
+}
+
+#[cfg(windows)]
+impl From<OwnedSocket> for async_std::net::UdpSocket {
+    #[inline]
+    fn from(owned: OwnedSocket) -> Self {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
@@ -287,9 +415,25 @@ impl IntoFd for async_std::os::unix::net::UnixStream {
 }
 
 #[cfg(unix)]
+impl From<async_std::os::unix::net::UnixStream> for OwnedFd {
+    #[inline]
+    fn from(owned: async_std::os::unix::net::UnixStream) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
 impl FromFd for async_std::os::unix::net::UnixStream {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl From<OwnedFd> for async_std::os::unix::net::UnixStream {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }
@@ -314,9 +458,25 @@ impl IntoFd for async_std::os::unix::net::UnixListener {
 }
 
 #[cfg(unix)]
+impl From<async_std::os::unix::net::UnixListener> for OwnedFd {
+    #[inline]
+    fn from(owned: async_std::os::unix::net::UnixListener) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
 impl FromFd for async_std::os::unix::net::UnixListener {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl From<OwnedFd> for async_std::os::unix::net::UnixListener {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }
@@ -341,9 +501,25 @@ impl IntoFd for async_std::os::unix::net::UnixDatagram {
 }
 
 #[cfg(unix)]
+impl From<async_std::os::unix::net::UnixDatagram> for OwnedFd {
+    #[inline]
+    fn from(owned: async_std::os::unix::net::UnixDatagram) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
 impl FromFd for async_std::os::unix::net::UnixDatagram {
     #[inline]
     fn from_fd(owned: OwnedFd) -> Self {
+        unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
+    }
+}
+
+#[cfg(unix)]
+impl From<OwnedFd> for async_std::os::unix::net::UnixDatagram {
+    #[inline]
+    fn from(owned: OwnedFd) -> Self {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }

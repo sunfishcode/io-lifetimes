@@ -41,10 +41,28 @@ impl IntoFd for Thing {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(windows))]
+impl From<Thing> for OwnedFd {
+    #[inline]
+    fn from(owned: Thing) -> Self {
+        owned.filelike
+    }
+}
+
 #[cfg(not(windows))]
 impl FromFd for Thing {
     #[inline]
     fn from_fd(filelike: OwnedFd) -> Self {
+        Self { filelike }
+    }
+}
+
+#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(windows))]
+impl From<OwnedFd> for Thing {
+    #[inline]
+    fn from(filelike: OwnedFd) -> Self {
         Self { filelike }
     }
 }
@@ -65,10 +83,28 @@ impl IntoHandle for Thing {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
+#[cfg(windows)]
+impl From<Thing> for OwnedHandle {
+    #[inline]
+    fn from(owned: Thing) -> Self {
+        owned.filelike
+    }
+}
+
 #[cfg(windows)]
 impl FromHandle for Thing {
     #[inline]
     fn from_handle(filelike: OwnedHandle) -> Self {
+        Self { filelike }
+    }
+}
+
+#[cfg(not(io_lifetimes_use_std))]
+#[cfg(windows)]
+impl From<OwnedHandle> for Thing {
+    #[inline]
+    fn from(filelike: OwnedHandle) -> Self {
         Self { filelike }
     }
 }
