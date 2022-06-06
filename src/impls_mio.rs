@@ -226,7 +226,7 @@ impl IntoSocket for mio::net::UdpSocket {
 impl From<mio::net::UdpSocket> for OwnedSocket {
     #[inline]
     fn from(owned: mio::net::UdpSocket) -> Self {
-        unsafe { Self::from_raw_socket(listener.into_raw_socket()) }
+        unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
 
