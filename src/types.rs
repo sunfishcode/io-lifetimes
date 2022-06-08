@@ -490,6 +490,7 @@ impl BorrowedSocket<'_> {
     /// [`INVALID_SOCKET`].
     #[inline]
     pub const unsafe fn borrow_raw(socket: RawSocket) -> Self {
+        #[cfg(panic_in_const_fn)]
         debug_assert!(socket != INVALID_SOCKET as RawSocket);
         Self {
             socket,
