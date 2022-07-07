@@ -8,7 +8,7 @@ keywords = ["api", "io"]
 categories = ["os", "rust-patterns"]
 edition = "2018"
 repository = "https://github.com/sunfishcode/io-lifetimes"
-exclude = ["/.github"]
+include = ["src", "build.rs", "Cargo.toml", "COPYRIGHT", "LICENSE*", "/*.md"]
 
 [dependencies]
 # io-lifetimes only depends on libc/windows-sys for the ability to close
