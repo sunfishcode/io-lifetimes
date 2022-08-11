@@ -12,7 +12,7 @@ use std::{
 };
 
 #[cfg(all(unix, feature = "close"))]
-use io_lifetimes::{AsFd, FromFd, OwnedFd};
+use io_lifetimes::{AsFd, OwnedFd};
 
 #[cfg(windows)]
 use io_lifetimes::{AsHandle, FromHandle, OwnedHandle};
@@ -39,7 +39,7 @@ fn main() -> io::Result<()> {
     };
 
     // Convert into a `File`. No `unsafe` here!
-    let mut file = File::from_fd(fd);
+    let mut file = File::from(fd);
     writeln!(&mut file, "greetings, y'all")?;
 
     // We can borrow a `BorrowedFd` from a `File`.
@@ -94,7 +94,7 @@ fn main() -> io::Result<()> {
     };
 
     // Convert into a `File`. No `unsafe` here!
-    let mut file = File::from_handle(handle);
+    let mut file = File::from(handle);
     writeln!(&mut file, "greetings, y'all")?;
 
     // We can borrow a `BorrowedHandle` from a `File`.

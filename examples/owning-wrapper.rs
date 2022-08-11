@@ -1,10 +1,16 @@
 //! A simple example implementing the main traits for a type.
 
+#[cfg(not(windows))]
+#[cfg(not(io_lifetimes_use_std))]
+use io_lifetimes::IntoFd;
+#[cfg(windows)]
+#[cfg(not(io_lifetimes_use_std))]
+use io_lifetimes::IntoHandle;
 use io_lifetimes::OwnedFilelike;
 #[cfg(not(windows))]
-use io_lifetimes::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
+use io_lifetimes::{AsFd, BorrowedFd, FromFd, OwnedFd};
 #[cfg(windows)]
-use io_lifetimes::{AsHandle, BorrowedHandle, FromHandle, IntoHandle, OwnedHandle};
+use io_lifetimes::{AsHandle, BorrowedHandle, FromHandle, OwnedHandle};
 
 /// A wrapper around a file descriptor.
 ///
@@ -31,6 +37,7 @@ impl AsFd for Thing {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(not(windows))]
 impl IntoFd for Thing {
     #[inline]
@@ -39,7 +46,6 @@ impl IntoFd for Thing {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
 #[cfg(not(windows))]
 impl From<Thing> for OwnedFd {
     #[inline]
@@ -48,6 +54,7 @@ impl From<Thing> for OwnedFd {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(not(windows))]
 impl FromFd for Thing {
     #[inline]
@@ -56,7 +63,6 @@ impl FromFd for Thing {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
 #[cfg(not(windows))]
 impl From<OwnedFd> for Thing {
     #[inline]
@@ -73,6 +79,7 @@ impl AsHandle for Thing {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl IntoHandle for Thing {
     #[inline]
@@ -81,7 +88,6 @@ impl IntoHandle for Thing {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl From<Thing> for OwnedHandle {
     #[inline]
@@ -90,6 +96,7 @@ impl From<Thing> for OwnedHandle {
     }
 }
 
+#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl FromHandle for Thing {
     #[inline]
@@ -98,7 +105,6 @@ impl FromHandle for Thing {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
 #[cfg(windows)]
 impl From<OwnedHandle> for Thing {
     #[inline]
@@ -117,7 +123,7 @@ fn main() {
         let file = std::fs::File::open("Cargo.toml").unwrap();
         let thing = Thing::from_into_fd(file);
         let _ = thing.as_fd();
-        let _ = thing.into_fd();
+        let _: OwnedFd = thing.into();
     }
 
     // Minimally exercise `Thing`'s Windows API.
@@ -126,7 +132,7 @@ fn main() {
         let file = std::fs::File::open("Cargo.toml").unwrap();
         let thing = Thing::from_into_handle(file);
         let _ = thing.as_handle();
-        let _ = thing.into_handle();
+        let _: OwnedHandle = thing.into();
     }
 
     // Implementing the above traits makes the blanket impls for the portable
