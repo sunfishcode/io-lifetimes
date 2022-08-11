@@ -1,6 +1,12 @@
 //! A simple example implementing the main traits for a type.
 
 #[cfg(not(windows))]
+#[cfg(any(feature = "close", not(io_lifetimes_use_std)))]
+use io_lifetimes::FromFd;
+#[cfg(windows)]
+#[cfg(any(feature = "close", not(io_lifetimes_use_std)))]
+use io_lifetimes::FromHandle;
+#[cfg(not(windows))]
 #[cfg(not(io_lifetimes_use_std))]
 use io_lifetimes::IntoFd;
 #[cfg(windows)]
@@ -8,9 +14,9 @@ use io_lifetimes::IntoFd;
 use io_lifetimes::IntoHandle;
 use io_lifetimes::OwnedFilelike;
 #[cfg(not(windows))]
-use io_lifetimes::{AsFd, BorrowedFd, FromFd, OwnedFd};
+use io_lifetimes::{AsFd, BorrowedFd, OwnedFd};
 #[cfg(windows)]
-use io_lifetimes::{AsHandle, BorrowedHandle, FromHandle, OwnedHandle};
+use io_lifetimes::{AsHandle, BorrowedHandle, OwnedHandle};
 
 /// A wrapper around a file descriptor.
 ///
