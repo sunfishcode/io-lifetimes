@@ -2,7 +2,6 @@
 //! the io-lifetimes API.
 
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
-#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
 
 #[cfg(feature = "close")]
 use io_lifetimes::example_ffi::*;

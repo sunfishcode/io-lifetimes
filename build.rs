@@ -2,6 +2,11 @@ use std::env::var;
 use std::io::Write;
 
 fn main() {
+    // I/O safety is stabilized in Rust 1.63.
+    if has_io_safety() {
+        use_feature("io_lifetimes_use_std")
+    }
+
     // Niche optimizations for `Borrowed*` and `Owned*` depend on `rustc_attrs`
     // which, outside of `std`, are only available on nightly.
     use_feature_or_nothing("rustc_attrs");
@@ -62,6 +67,39 @@ fn has_panic_in_const_fn() -> bool {
         .unwrap();
 
     writeln!(child.stdin.take().unwrap(), "const fn foo() {{ panic!() }}").unwrap();
+
+    child.wait().unwrap().success()
+}
+
+/// Test whether the rustc at `var("RUSTC")` supports the I/O safety feature.
+fn has_io_safety() -> bool {
+    let out_dir = var("OUT_DIR").unwrap();
+    let rustc = var("RUSTC").unwrap();
+
+    let mut child = std::process::Command::new(rustc)
+        .arg("--crate-type=rlib") // Don't require `main`.
+        .arg("--emit=metadata") // Do as little as possible but still parse.
+        .arg("--out-dir")
+        .arg(out_dir) // Put the output somewhere inconsequential.
+        .arg("-") // Read from stdin.
+        .stdin(std::process::Stdio::piped()) // Stdin is a pipe.
+        .spawn()
+        .unwrap();
+
+    writeln!(
+        child.stdin.take().unwrap(),
+        "\
+    #[cfg(unix)]\n\
+    use std::os::unix::io::OwnedFd as Owned;\n\
+    #[cfg(target_os = \"wasi\")]\n\
+    use std::os::wasi::io::OwnedFd as Owned;\n\
+    #[cfg(windows)]\n\
+    use std::os::windows::io::OwnedHandle as Owned;\n\
+    \n\
+    pub type Success = Owned;\n\
+    "
+    )
+    .unwrap();
 
     child.wait().unwrap().success()
 }

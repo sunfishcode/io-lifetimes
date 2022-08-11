@@ -1,7 +1,5 @@
 //! A simple example implementing the main traits for a type.
 
-#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
-
 use io_lifetimes::OwnedFilelike;
 #[cfg(not(windows))]
 use io_lifetimes::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};

@@ -1,6 +1,5 @@
 #![cfg_attr(not(rustc_attrs), allow(unused_imports))]
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
-#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
 
 use std::mem::size_of;
 

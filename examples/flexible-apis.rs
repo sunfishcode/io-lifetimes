@@ -4,8 +4,6 @@
 //! The following uses the POSIX-ish `Fd` types; similar considerations
 //! apply to the Windows and portable types.
 
-#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
-
 #[cfg(all(feature = "close", not(windows)))]
 use io_lifetimes::{AsFd, BorrowedFd, IntoFd, OwnedFd};
 
