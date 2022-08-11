@@ -68,6 +68,7 @@ pub trait AsSocket {
     since = "1.0.0",
     note = "`IntoFd` is replaced by `From<...> for OwnedFd` or `Into<OwnedFd>`"
 )]
+#[allow(deprecated)]
 pub trait IntoFd {
     /// Consumes this object, returning the underlying file descriptor.
     ///
@@ -92,6 +93,7 @@ pub trait IntoFd {
     since = "1.0.0",
     note = "`IntoHandle` is replaced by `From<...> for OwnedHandle` or `Into<OwnedHandle>`"
 )]
+#[allow(deprecated)]
 pub trait IntoHandle {
     /// Consumes this object, returning the underlying handle.
     ///
@@ -116,6 +118,7 @@ pub trait IntoHandle {
     since = "1.0.0",
     note = "`IntoSocket` is replaced by `From<...> for OwnedSocket` or `Into<OwnedSocket>`"
 )]
+#[allow(deprecated)]
 pub trait IntoSocket {
     /// Consumes this object, returning the underlying socket.
     fn into_socket(self) -> OwnedSocket;
@@ -125,6 +128,7 @@ pub trait IntoSocket {
 /// descriptor.
 #[cfg(any(unix, target_os = "wasi"))]
 #[deprecated(since = "1.0.0", note = "`FromFd` is replaced by `From<OwnedFd>`")]
+#[allow(deprecated)]
 pub trait FromFd {
     /// Constructs a new instance of `Self` from the given file descriptor.
     ///
@@ -171,6 +175,7 @@ pub trait FromFd {
     since = "1.0.0",
     note = "`FromHandle` is replaced by `From<OwnedHandle>`"
 )]
+#[allow(deprecated)]
 pub trait FromHandle {
     /// Constructs a new instance of `Self` from the given handle.
     ///
@@ -217,6 +222,7 @@ pub trait FromHandle {
     since = "1.0.0",
     note = "`FromSocket` is replaced by `From<OwnedSocket>`"
 )]
+#[allow(deprecated)]
 pub trait FromSocket {
     /// Constructs a new instance of `Self` from the given socket.
     fn from_socket(owned: OwnedSocket) -> Self;
