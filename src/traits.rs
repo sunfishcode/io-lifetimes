@@ -64,6 +64,10 @@ pub trait AsSocket {
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its file descriptor.
 #[cfg(any(unix, target_os = "wasi"))]
+#[deprecated(
+    since = "1.0.0",
+    note = "`IntoFd` is replaced by `From<...> for OwnedFd` or `Into<OwnedFd>`"
+)]
 pub trait IntoFd {
     /// Consumes this object, returning the underlying file descriptor.
     ///
@@ -78,16 +82,16 @@ pub trait IntoFd {
     /// let owned_fd: OwnedFd = f.into_fd();
     /// # Ok::<(), io::Error>(())
     /// ```
-    #[deprecated(
-        since = "1.0.0",
-        note = "`IntoFd` is replaced by `From<...> for OwnedFd` or `Into<OwnedFd>`"
-    )]
     fn into_fd(self) -> OwnedFd;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its handle.
 #[cfg(windows)]
+#[deprecated(
+    since = "1.0.0",
+    note = "`IntoHandle` is replaced by `From<...> for OwnedHandle` or `Into<OwnedHandle>`"
+)]
 pub trait IntoHandle {
     /// Consumes this object, returning the underlying handle.
     ///
@@ -102,22 +106,18 @@ pub trait IntoHandle {
     /// let owned_handle: OwnedHandle = f.into_handle();
     /// # Ok::<(), io::Error>(())
     /// ```
-    #[deprecated(
-        since = "1.0.0",
-        note = "`IntoHandle` is replaced by `From<...> for OwnedHandle` or `Into<OwnedHandle>`"
-    )]
     fn into_handle(self) -> OwnedHandle;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its socket.
 #[cfg(windows)]
+#[deprecated(
+    since = "1.0.0",
+    note = "`IntoSocket` is replaced by `From<...> for OwnedSocket` or `Into<OwnedSocket>`"
+)]
 pub trait IntoSocket {
     /// Consumes this object, returning the underlying socket.
-    #[deprecated(
-        since = "1.0.0",
-        note = "`IntoSocket` is replaced by `From<...> for OwnedSocket` or `Into<OwnedSocket>`"
-    )]
     fn into_socket(self) -> OwnedSocket;
 }
 
