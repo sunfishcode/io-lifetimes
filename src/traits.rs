@@ -139,7 +139,7 @@ pub trait FromFd {
     /// let f = File::from_fd(owned_fd);
     /// # Ok::<(), io::Error>(())
     /// ```
-    #[deprecated(since = "1.0.0", note = "`FromFd` is replaced by `From<OwnedFd>`")]
+    #[deprecated(since = "1.0.0", note = "`FromFd::from_fd` is replaced by `From<OwnedFd>::from`")]
     fn from_fd(owned: OwnedFd) -> Self;
 
     /// Constructs a new instance of `Self` from the given file descriptor
@@ -184,7 +184,7 @@ pub trait FromHandle {
     /// ```
     #[deprecated(
         since = "1.0.0",
-        note = "`FromHandle` is replaced by `From<OwnedHandle>`"
+        note = "`FromHandle::from_handle` is replaced by `From<OwnedHandle>::from`"
     )]
     fn from_handle(owned: OwnedHandle) -> Self;
 
@@ -217,7 +217,7 @@ pub trait FromSocket {
     /// Constructs a new instance of `Self` from the given socket.
     #[deprecated(
         since = "1.0.0",
-        note = "`FromSocket` is replaced by `From<OwnedSocket>`"
+        note = "`FromSocket::from_socket` is replaced by `From<OwnedSocket>::from`"
     )]
     fn from_socket(owned: OwnedSocket) -> Self;
 
