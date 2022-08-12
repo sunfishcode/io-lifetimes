@@ -101,6 +101,8 @@ pub trait AsFilelike: AsFd {
     /// ```
     ///
     /// [`File`]: std::fs::File
+    /// [`Read`]: std::io::Read
+    /// [`Write`]: std::io::Write
     fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target>;
 }
 
@@ -152,6 +154,8 @@ pub trait AsFilelike: AsHandle {
     /// ```
     ///
     /// [`File`]: std::fs::File
+    /// [`Read`]: std::io::Read
+    /// [`Write`]: std::io::Write
     fn as_filelike_view<Target: FilelikeViewType>(&self) -> FilelikeView<'_, Target>;
 }
 
@@ -192,6 +196,8 @@ pub trait AsSocketlike: AsFd {
     /// ```
     ///
     /// [`TcpStream`]: std::net::TcpStream
+    /// [`Read`]: std::io::Read
+    /// [`Write`]: std::io::Write
     fn as_socketlike_view<Target: SocketlikeViewType>(&self) -> SocketlikeView<'_, Target>;
 }
 
