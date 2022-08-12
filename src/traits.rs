@@ -139,7 +139,10 @@ pub trait FromFd {
     /// let f = File::from_fd(owned_fd);
     /// # Ok::<(), io::Error>(())
     /// ```
-    #[deprecated(since = "1.0.0", note = "`FromFd::from_fd` is replaced by `From<OwnedFd>::from`")]
+    #[deprecated(
+        since = "1.0.0",
+        note = "`FromFd::from_fd` is replaced by `From<OwnedFd>::from`"
+    )]
     fn from_fd(owned: OwnedFd) -> Self;
 
     /// Constructs a new instance of `Self` from the given file descriptor
