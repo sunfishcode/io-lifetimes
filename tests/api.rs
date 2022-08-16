@@ -1,6 +1,5 @@
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 #![cfg(feature = "close")]
-#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
 
 use io_lifetimes::raw::{AsRawFilelike, AsRawSocketlike};
 use io_lifetimes::views::{FilelikeView, SocketlikeView};

@@ -30,7 +30,6 @@
 #![deny(missing_docs)]
 #![cfg_attr(rustc_attrs, feature(rustc_attrs))]
 #![cfg_attr(all(io_lifetimes_use_std, target_os = "wasi"), feature(wasi_ext))]
-#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
 
 mod portability;
 mod traits;
@@ -48,8 +47,10 @@ pub use traits::AsFd;
 #[cfg(windows)]
 pub use traits::{AsHandle, AsSocket};
 #[cfg(any(unix, target_os = "wasi"))]
+#[allow(deprecated)]
 pub use traits::{FromFd, IntoFd};
 #[cfg(windows)]
+#[allow(deprecated)]
 pub use traits::{FromHandle, FromSocket, IntoHandle, IntoSocket};
 
 #[cfg(not(io_lifetimes_use_std))]
@@ -88,6 +89,7 @@ pub use std::os::windows::io::{
 // `From`/`Into`,
 #[cfg(io_lifetimes_use_std)]
 #[cfg(any(unix, target_os = "wasi"))]
+#[allow(deprecated)]
 impl<T: From<OwnedFd>> FromFd for T {
     #[inline]
     fn from_fd(owned_fd: OwnedFd) -> Self {
@@ -96,6 +98,7 @@ impl<T: From<OwnedFd>> FromFd for T {
 }
 #[cfg(io_lifetimes_use_std)]
 #[cfg(any(unix, target_os = "wasi"))]
+#[allow(deprecated)]
 impl<T> IntoFd for T
 where
     OwnedFd: From<T>,
@@ -108,6 +111,7 @@ where
 
 #[cfg(io_lifetimes_use_std)]
 #[cfg(windows)]
+#[allow(deprecated)]
 impl<T: From<OwnedHandle>> FromHandle for T {
     #[inline]
     fn from_handle(owned_handle: OwnedHandle) -> Self {
@@ -116,6 +120,7 @@ impl<T: From<OwnedHandle>> FromHandle for T {
 }
 #[cfg(io_lifetimes_use_std)]
 #[cfg(windows)]
+#[allow(deprecated)]
 impl<T> IntoHandle for T
 where
     OwnedHandle: From<T>,
@@ -128,6 +133,7 @@ where
 
 #[cfg(io_lifetimes_use_std)]
 #[cfg(windows)]
+#[allow(deprecated)]
 impl<T: From<OwnedSocket>> FromSocket for T {
     #[inline]
     fn from_socket(owned_socket: OwnedSocket) -> Self {
@@ -136,6 +142,7 @@ impl<T: From<OwnedSocket>> FromSocket for T {
 }
 #[cfg(io_lifetimes_use_std)]
 #[cfg(windows)]
+#[allow(deprecated)]
 impl<T> IntoSocket for T
 where
     OwnedSocket: From<T>,

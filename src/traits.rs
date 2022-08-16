@@ -22,7 +22,6 @@ pub trait AsFd {
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{AsFd, BorrowedFd};
@@ -43,7 +42,6 @@ pub trait AsHandle {
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{AsHandle, BorrowedHandle};
@@ -66,13 +64,16 @@ pub trait AsSocket {
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its file descriptor.
 #[cfg(any(unix, target_os = "wasi"))]
+#[deprecated(
+    since = "1.0.0",
+    note = "`IntoFd` is replaced by `From<...> for OwnedFd` or `Into<OwnedFd>`"
+)]
 pub trait IntoFd {
     /// Consumes this object, returning the underlying file descriptor.
     ///
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{IntoFd, OwnedFd};
@@ -87,13 +88,16 @@ pub trait IntoFd {
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its handle.
 #[cfg(windows)]
+#[deprecated(
+    since = "1.0.0",
+    note = "`IntoHandle` is replaced by `From<...> for OwnedHandle` or `Into<OwnedHandle>`"
+)]
 pub trait IntoHandle {
     /// Consumes this object, returning the underlying handle.
     ///
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{IntoHandle, OwnedHandle};
@@ -108,6 +112,10 @@ pub trait IntoHandle {
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its socket.
 #[cfg(windows)]
+#[deprecated(
+    since = "1.0.0",
+    note = "`IntoSocket` is replaced by `From<...> for OwnedSocket` or `Into<OwnedSocket>`"
+)]
 pub trait IntoSocket {
     /// Consumes this object, returning the underlying socket.
     fn into_socket(self) -> OwnedSocket;
@@ -122,7 +130,6 @@ pub trait FromFd {
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{FromFd, IntoFd, OwnedFd};
@@ -132,6 +139,10 @@ pub trait FromFd {
     /// let f = File::from_fd(owned_fd);
     /// # Ok::<(), io::Error>(())
     /// ```
+    #[deprecated(
+        since = "1.0.0",
+        note = "`FromFd::from_fd` is replaced by `From<OwnedFd>::from`"
+    )]
     fn from_fd(owned: OwnedFd) -> Self;
 
     /// Constructs a new instance of `Self` from the given file descriptor
@@ -140,7 +151,6 @@ pub trait FromFd {
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{FromFd, IntoFd};
@@ -150,11 +160,11 @@ pub trait FromFd {
     /// # Ok::<(), io::Error>(())
     /// ```
     #[inline]
-    fn from_into_fd<Owned: IntoFd>(into_owned: Owned) -> Self
+    fn from_into_fd<Owned: Into<OwnedFd>>(into_owned: Owned) -> Self
     where
-        Self: Sized,
+        Self: Sized + From<OwnedFd>,
     {
-        Self::from_fd(into_owned.into_fd())
+        Self::from(into_owned.into())
     }
 }
 
@@ -166,7 +176,6 @@ pub trait FromHandle {
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{FromHandle, IntoHandle, OwnedHandle};
@@ -176,6 +185,10 @@ pub trait FromHandle {
     /// let f = File::from_handle(owned_handle);
     /// # Ok::<(), io::Error>(())
     /// ```
+    #[deprecated(
+        since = "1.0.0",
+        note = "`FromHandle::from_handle` is replaced by `From<OwnedHandle>::from`"
+    )]
     fn from_handle(owned: OwnedHandle) -> Self;
 
     /// Constructs a new instance of `Self` from the given handle converted
@@ -184,7 +197,6 @@ pub trait FromHandle {
     /// # Example
     ///
     /// ```rust,no_run
-    /// # #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
     /// use std::fs::File;
     /// # use std::io;
     /// use io_lifetimes::{FromHandle, IntoHandle};
@@ -194,11 +206,11 @@ pub trait FromHandle {
     /// # Ok::<(), io::Error>(())
     /// ```
     #[inline]
-    fn from_into_handle<Owned: IntoHandle>(into_owned: Owned) -> Self
+    fn from_into_handle<Owned: Into<OwnedHandle>>(into_owned: Owned) -> Self
     where
-        Self: Sized,
+        Self: Sized + From<OwnedHandle>,
     {
-        Self::from_handle(into_owned.into_handle())
+        Self::from(into_owned.into())
     }
 }
 
@@ -206,16 +218,20 @@ pub trait FromHandle {
 #[cfg(windows)]
 pub trait FromSocket {
     /// Constructs a new instance of `Self` from the given socket.
+    #[deprecated(
+        since = "1.0.0",
+        note = "`FromSocket::from_socket` is replaced by `From<OwnedSocket>::from`"
+    )]
     fn from_socket(owned: OwnedSocket) -> Self;
 
     /// Constructs a new instance of `Self` from the given socket converted
     /// from `into_owned`.
     #[inline]
-    fn from_into_socket<Owned: IntoSocket>(into_owned: Owned) -> Self
+    fn from_into_socket<Owned: Into<OwnedSocket>>(into_owned: Owned) -> Self
     where
-        Self: Sized,
+        Self: Sized + From<OwnedSocket>,
     {
-        Self::from_socket(into_owned.into_socket())
+        Self::from(into_owned.into())
     }
 }
 

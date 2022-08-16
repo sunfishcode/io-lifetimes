@@ -4,10 +4,8 @@
 //! The following uses the POSIX-ish `Fd` types; similar considerations
 //! apply to the Windows and portable types.
 
-#![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
-
 #[cfg(all(feature = "close", not(windows)))]
-use io_lifetimes::{AsFd, BorrowedFd, IntoFd, OwnedFd};
+use io_lifetimes::{AsFd, BorrowedFd, OwnedFd};
 
 /// The simplest way to accept a borrowed I/O resource is to simply use a
 /// `BorrwedFd` as an argument. This doesn't require the function to have any
@@ -53,14 +51,14 @@ fn consume_fd_a(fd: OwnedFd) {
 /// has the advantage of allowing users to pass in any type implementing
 /// `IntoFd` directly.
 #[cfg(all(feature = "close", not(windows)))]
-fn consume_fd_b<Fd: IntoFd>(fd: Fd) {
-    let _ = fd.into_fd();
+fn consume_fd_b<Fd: Into<OwnedFd>>(fd: Fd) {
+    let _: OwnedFd = fd.into();
 }
 
 /// Another way to do this is to use an `impl IntoFd` parameter.
 #[cfg(all(feature = "close", not(windows)))]
-fn consume_fd_c(fd: impl IntoFd) {
-    let _ = fd.into_fd();
+fn consume_fd_c(fd: impl Into<OwnedFd>) {
+    let _: OwnedFd = fd.into();
 }
 
 /// Now let's see how the APIs look for users.
@@ -87,13 +85,13 @@ fn main() {
     let b = std::fs::File::open("Cargo.toml").unwrap();
     let c = std::fs::File::open("Cargo.toml").unwrap();
 
-    // The simple option requires an `.into_fd()` at the callsite.
-    consume_fd_a(a.into_fd());
+    // The simple option requires an `.into()` at the callsite.
+    consume_fd_a(a.into());
 
-    // Another option can take any `IntoFd` type directly.
+    // Another option can take any `Into<OwnedFd>` type directly.
     consume_fd_b(b);
 
-    // The other option can take any `IntoFd` type directly.
+    // The other option can take any `Into<OwnedFd>` type directly.
     consume_fd_c(c);
 }
 
