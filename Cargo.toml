@@ -18,10 +18,7 @@ include = ["src", "build.rs", "Cargo.toml", "COPYRIGHT", "LICENSE*", "/*.md"]
 # temporary measure.
 
 # Optionally depend on async-std just to provide impls for its types for now.
-#
-# Enable the "unstable" feature so that we can implement traits for
-# `process::ChildStdin` etc.
-async-std = { version = "1.9.0", features = ["unstable"], optional = true }
+async-std = { version = "1.12.0", default-features = false, optional = true }
 # Optionally depend on tokio to implement traits for its types for now.
 tokio = { version = "1.6.0", features = ["io-std", "fs", "net", "process"], optional = true }
 # Optionally depend on socket2 to implement traits for its types for now.
