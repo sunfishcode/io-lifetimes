@@ -170,6 +170,13 @@ they're simpler and safer to use. io-lifetimes doesn't include unsafe-io's
 `*ReadWrite*` or `*HandleOrSocket*` abstractions, and leaves these as features
 to be provided by separate layers on top.
 
+## Minimum Supported Rust Version (MSRV)
+
+This crate currently works on the version of [Rust on Debian stable], which is
+currently Rust 1.48. This policy may change in the future, in minor version
+releases, so users using a fixed version of Rust should pin to a specific
+version of this crate.
+
 [`OwnedFd`]: https://doc.rust-lang.org/stable/std/os/unix/io/struct.OwnedFd.html
 [`BorrowedFd`]: https://doc.rust-lang.org/stable/std/os/unix/io/struct.BorrowedFd.html
 [RFC 3128]: https://github.com/rust-lang/rfcs/blob/master/text/3128-io-safety.md
