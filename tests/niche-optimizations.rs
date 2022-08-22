@@ -12,7 +12,7 @@ use io_lifetimes::{BorrowedSocket, OwnedSocket};
 #[cfg(unix)]
 use std::os::unix::io::{FromRawFd, IntoRawFd, RawFd};
 #[cfg(target_os = "wasi")]
-use std::os::wasi::io::{FromRawSocket, IntoRawSocket, RawFd};
+use std::os::wasi::io::{FromRawFd, IntoRawFd, RawFd};
 #[cfg(windows)]
 use std::os::windows::io::{FromRawSocket, IntoRawSocket, RawSocket};
 
