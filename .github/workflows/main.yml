@@ -50,7 +50,7 @@ jobs:
     - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin
     - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin --all-features
 
-  check-1.48:
+  check-1_48:
     name: Check
     runs-on: ${{ matrix.os }}
     strategy:
@@ -104,7 +104,7 @@ jobs:
     - run: cargo check --workspace --release -vv
     - run: cargo check --workspace --release -vv --all-features
 
-  check-windows-1.48:
+  check-windows-1_48:
     name: Check Windows
     runs-on: ${{ matrix.os }}
     strategy:
