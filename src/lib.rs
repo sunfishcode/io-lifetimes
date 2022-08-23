@@ -29,7 +29,6 @@
 
 #![deny(missing_docs)]
 #![cfg_attr(rustc_attrs, feature(rustc_attrs))]
-#![cfg_attr(all(io_lifetimes_use_std, target_os = "wasi"), feature(wasi_ext))]
 
 mod portability;
 mod traits;

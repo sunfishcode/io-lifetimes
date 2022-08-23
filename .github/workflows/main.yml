@@ -19,6 +19,115 @@ jobs:
         toolchain: stable
     - run: cargo fmt --all -- --check
 
+  check:
+    name: Check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [stable, nightly]
+        include:
+          - build: stable
+            os: ubuntu-latest
+            rust: stable
+          - build: nightly
+            os: ubuntu-latest
+            rust: nightly
+
+    env:
+      # -D warnings is commented out in our install-rust action; re-add it here.
+      RUSTFLAGS: -D warnings
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: ${{ matrix.rust }}
+
+    - run: rustup target add x86_64-apple-darwin
+    - run: cargo check --workspace --release -vv
+    - run: cargo check --workspace --release -vv --all-features
+    - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin
+    - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin --all-features
+
+  check-1_48:
+    name: Check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [1.48]
+        include:
+          - build: 1.48
+            os: ubuntu-latest
+            rust: 1.48
+
+    env:
+      # -D warnings is commented out in our install-rust action; re-add it here.
+      RUSTFLAGS: -D warnings
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: ${{ matrix.rust }}
+
+    - run: rustup target add x86_64-apple-darwin
+    - run: cargo check --workspace --release -vv
+    - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin
+
+  check-windows:
+    name: Check Windows
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [stable, nightly]
+        include:
+          - build: stable
+            os: windows-latest
+            rust: stable
+          - build: nightly
+            os: windows-latest
+            rust: nightly
+
+    env:
+      # -D warnings is commented out in our install-rust action; re-add it here.
+      RUSTFLAGS: -D warnings
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: ${{ matrix.rust }}
+
+    - run: cargo check --workspace --release -vv
+    - run: cargo check --workspace --release -vv --all-features
+
+  check-windows-1_48:
+    name: Check Windows
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [1.48]
+        include:
+          - build: 1.48
+            os: windows-latest
+            rust: 1.48
+
+    env:
+      # -D warnings is commented out in our install-rust action; re-add it here.
+      RUSTFLAGS: -D warnings
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - uses: ./.github/actions/install-rust
+      with:
+        toolchain: ${{ matrix.rust }}
+
+    - run: cargo check --workspace --release -vv
+
   test:
     name: Test
     runs-on: ${{ matrix.os }}

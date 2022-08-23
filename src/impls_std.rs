@@ -1,3 +1,5 @@
+#![allow(deprecated)] // Don't warn on `IntoFd` and `FromFd` impls.
+
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, FromFd, IntoFd};
 #[cfg(windows)]
