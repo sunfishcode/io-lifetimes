@@ -11,6 +11,10 @@ fn main() {
     // which, outside of `std`, are only available on nightly.
     use_feature_or_nothing("rustc_attrs");
 
+    // Work around
+    // https://github.com/rust-lang/rust/issues/103306.
+    use_feature_or_nothing("wasi_ext");
+
     // Rust 1.56 and earlier don't support panic in const fn.
     if has_panic_in_const_fn() {
         use_feature("panic_in_const_fn")
@@ -35,10 +39,13 @@ fn use_feature(feature: &str) {
 fn has_feature(feature: &str) -> bool {
     let out_dir = var("OUT_DIR").unwrap();
     let rustc = var("RUSTC").unwrap();
+    let target = var("TARGET").unwrap();
 
     let mut child = std::process::Command::new(rustc)
         .arg("--crate-type=rlib") // Don't require `main`.
         .arg("--emit=metadata") // Do as little as possible but still parse.
+        .arg("--target")
+        .arg(target)
         .arg("--out-dir")
         .arg(out_dir) // Put the output somewhere inconsequential.
         .arg("-") // Read from stdin.
@@ -55,10 +62,13 @@ fn has_feature(feature: &str) -> bool {
 fn has_panic_in_const_fn() -> bool {
     let out_dir = var("OUT_DIR").unwrap();
     let rustc = var("RUSTC").unwrap();
+    let target = var("TARGET").unwrap();
 
     let mut child = std::process::Command::new(rustc)
         .arg("--crate-type=rlib") // Don't require `main`.
         .arg("--emit=metadata") // Do as little as possible but still parse.
+        .arg("--target")
+        .arg(target)
         .arg("--out-dir")
         .arg(out_dir) // Put the output somewhere inconsequential.
         .arg("-") // Read from stdin.
@@ -75,10 +85,13 @@ fn has_panic_in_const_fn() -> bool {
 fn has_io_safety() -> bool {
     let out_dir = var("OUT_DIR").unwrap();
     let rustc = var("RUSTC").unwrap();
+    let target = var("TARGET").unwrap();
 
     let mut child = std::process::Command::new(rustc)
         .arg("--crate-type=rlib") // Don't require `main`.
         .arg("--emit=metadata") // Do as little as possible but still parse.
+        .arg("--target")
+        .arg(target)
         .arg("--out-dir")
         .arg(out_dir) // Put the output somewhere inconsequential.
         .arg("-") // Read from stdin.
