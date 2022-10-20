@@ -29,6 +29,8 @@
 
 #![deny(missing_docs)]
 #![cfg_attr(rustc_attrs, feature(rustc_attrs))]
+// Work around https://github.com/rust-lang/rust/issues/103306.
+#![cfg_attr(all(wasi_ext, target_os = "wasi"), feature(wasi_ext))]
 
 mod portability;
 mod traits;
