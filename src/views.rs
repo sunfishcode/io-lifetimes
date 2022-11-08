@@ -9,10 +9,14 @@ use crate::raw::{
     AsRawFilelike, AsRawSocketlike, FromRawFilelike, FromRawSocketlike, IntoRawFilelike,
     IntoRawSocketlike, RawFilelike, RawSocketlike,
 };
+#[cfg(any(unix, target_os = "wasi"))]
+use crate::OwnedFd;
 use crate::{
     AsFilelike, AsSocketlike, FromFilelike, FromSocketlike, IntoFilelike, IntoSocketlike,
     OwnedFilelike, OwnedSocketlike,
 };
+#[cfg(windows)]
+use crate::{OwnedHandle, OwnedSocket};
 use std::fmt;
 use std::marker::PhantomData;
 use std::mem::ManuallyDrop;
@@ -202,3 +206,72 @@ impl<Target: SocketlikeViewType> fmt::Debug for SocketlikeView<'_, Target> {
             .finish()
     }
 }
+
+#[cfg(any(unix, target_os = "wasi"))]
+unsafe impl FilelikeViewType for OwnedFd {}
+#[cfg(windows)]
+unsafe impl FilelikeViewType for OwnedHandle {}
+#[cfg(windows)]
+unsafe impl SocketlikeViewType for OwnedSocket {}
+unsafe impl FilelikeViewType for std::fs::File {}
+unsafe impl SocketlikeViewType for std::net::TcpStream {}
+unsafe impl SocketlikeViewType for std::net::TcpListener {}
+unsafe impl SocketlikeViewType for std::net::UdpSocket {}
+#[cfg(unix)]
+unsafe impl SocketlikeViewType for std::os::unix::net::UnixStream {}
+#[cfg(unix)]
+unsafe impl SocketlikeViewType for std::os::unix::net::UnixListener {}
+
+#[cfg(unix)]
+unsafe impl SocketlikeViewType for std::os::unix::net::UnixDatagram {}
+#[cfg(not(target_os = "wasi"))]
+#[cfg(feature = "os_pipe")]
+unsafe impl FilelikeViewType for os_pipe::PipeWriter {}
+#[cfg(not(target_os = "wasi"))]
+#[cfg(feature = "os_pipe")]
+unsafe impl FilelikeViewType for os_pipe::PipeReader {}
+
+#[cfg(not(target_os = "wasi"))]
+#[cfg(feature = "socket2")]
+unsafe impl SocketlikeViewType for socket2::Socket {}
+
+#[cfg(not(target_os = "wasi"))]
+#[cfg(feature = "async_std")]
+unsafe impl SocketlikeViewType for async_std::net::TcpStream {}
+#[cfg(not(target_os = "wasi"))]
+#[cfg(feature = "async_std")]
+unsafe impl SocketlikeViewType for async_std::net::TcpListener {}
+#[cfg(not(target_os = "wasi"))]
+#[cfg(feature = "async_std")]
+unsafe impl SocketlikeViewType for async_std::net::UdpSocket {}
+#[cfg(unix)]
+#[cfg(feature = "async_std")]
+unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixStream {}
+#[cfg(unix)]
+#[cfg(feature = "async_std")]
+unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixListener {}
+#[cfg(unix)]
+#[cfg(feature = "async_std")]
+unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixDatagram {}
+
+#[cfg(feature = "mio")]
+unsafe impl SocketlikeViewType for mio::net::TcpStream {}
+#[cfg(feature = "mio")]
+unsafe impl SocketlikeViewType for mio::net::TcpListener {}
+#[cfg(feature = "mio")]
+unsafe impl SocketlikeViewType for mio::net::UdpSocket {}
+#[cfg(unix)]
+#[cfg(feature = "mio")]
+unsafe impl SocketlikeViewType for mio::net::UnixDatagram {}
+#[cfg(unix)]
+#[cfg(feature = "mio")]
+unsafe impl SocketlikeViewType for mio::net::UnixListener {}
+#[cfg(unix)]
+#[cfg(feature = "mio")]
+unsafe impl SocketlikeViewType for mio::net::UnixStream {}
+#[cfg(unix)]
+#[cfg(feature = "mio")]
+unsafe impl FilelikeViewType for mio::unix::pipe::Receiver {}
+#[cfg(unix)]
+#[cfg(feature = "mio")]
+unsafe impl FilelikeViewType for mio::unix::pipe::Sender {}

@@ -2,7 +2,6 @@
 //! future, we'll prefer to have crates provide their own impls; this is
 //! just a temporary measure.
 
-use crate::views::{FilelikeViewType, SocketlikeViewType};
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
@@ -101,8 +100,6 @@ impl From<OwnedHandle> for async_std::fs::File {
     }
 }
 
-unsafe impl SocketlikeViewType for async_std::net::TcpStream {}
-
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for async_std::net::TcpStream {
     #[inline]
@@ -183,8 +180,6 @@ impl From<OwnedSocket> for async_std::net::TcpStream {
     }
 }
 
-unsafe impl SocketlikeViewType for async_std::net::TcpListener {}
-
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for async_std::net::TcpListener {
     #[inline]
@@ -264,8 +259,6 @@ impl From<OwnedSocket> for async_std::net::TcpListener {
         unsafe { Self::from_raw_socket(owned.into_raw_socket()) }
     }
 }
-
-unsafe impl SocketlikeViewType for async_std::net::UdpSocket {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for async_std::net::UdpSocket {
@@ -396,9 +389,6 @@ impl AsHandle for async_std::io::Stderr {
 }
 
 #[cfg(unix)]
-unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixStream {}
-
-#[cfg(unix)]
 impl AsFd for async_std::os::unix::net::UnixStream {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -439,9 +429,6 @@ impl From<OwnedFd> for async_std::os::unix::net::UnixStream {
 }
 
 #[cfg(unix)]
-unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixListener {}
-
-#[cfg(unix)]
 impl AsFd for async_std::os::unix::net::UnixListener {
     #[inline]
     fn as_fd(&self) -> BorrowedFd<'_> {
@@ -480,9 +467,6 @@ impl From<OwnedFd> for async_std::os::unix::net::UnixListener {
         unsafe { Self::from_raw_fd(owned.into_raw_fd()) }
     }
 }
-
-#[cfg(unix)]
-unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixDatagram {}
 
 #[cfg(unix)]
 impl AsFd for async_std::os::unix::net::UnixDatagram {

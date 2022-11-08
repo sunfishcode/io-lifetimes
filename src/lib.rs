@@ -39,7 +39,6 @@ mod types;
 
 #[cfg(not(io_lifetimes_use_std))]
 mod impls_std;
-mod impls_std_views;
 
 #[cfg(not(io_lifetimes_use_std))]
 #[cfg(any(unix, target_os = "wasi"))]
