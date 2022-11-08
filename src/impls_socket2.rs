@@ -2,7 +2,6 @@
 //! future, we'll prefer to have crates provide their own impls; this is
 //! just a temporary measure.
 
-use crate::views::SocketlikeViewType;
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::{AsFd, BorrowedFd, FromFd, IntoFd, OwnedFd};
 #[cfg(windows)]
@@ -13,8 +12,6 @@ use std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd};
 use std::os::wasi::io::{AsRawFd, FromRawFd, IntoRawFd};
 #[cfg(windows)]
 use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket};
-
-unsafe impl SocketlikeViewType for socket2::Socket {}
 
 #[cfg(any(unix, target_os = "wasi"))]
 impl AsFd for socket2::Socket {

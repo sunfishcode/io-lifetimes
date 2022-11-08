@@ -46,9 +46,9 @@ jobs:
 
     - run: rustup target add x86_64-apple-darwin
     - run: cargo check --workspace --release -vv
-    - run: cargo check --workspace --release -vv --all-features
+    - run: cargo check --workspace --release -vv --features=fs-err,os_pipe # TODO: use --all-features
     - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin
-    - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin --all-features
+    - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin --features=fs-err,os_pipe # TODO: use --all-features
 
   check-1_48:
     name: Check
@@ -102,7 +102,7 @@ jobs:
         toolchain: ${{ matrix.rust }}
 
     - run: cargo check --workspace --release -vv
-    - run: cargo check --workspace --release -vv --all-features
+    - run: cargo check --workspace --release -vv --features=fs-err,os_pipe # TODO: use --all-features
 
   check-windows-1_48:
     name: Check Windows
@@ -155,7 +155,7 @@ jobs:
     - uses: ./.github/actions/install-rust
       with:
         toolchain: ${{ matrix.rust }}
-    - run: cargo test --workspace --all-features
+    - run: cargo test --workspace --features=fs-err,os_pipe # TODO: use --all-features
     - run: cargo test --workspace --no-default-features
 
   test_use_std:
@@ -183,7 +183,7 @@ jobs:
     - uses: ./.github/actions/install-rust
       with:
         toolchain: ${{ matrix.rust }}
-    - run: cargo test --workspace --all-features
+    - run: cargo test --workspace --features=fs-err,os_pipe # TODO: use --all-features
     - run: cargo test --workspace --no-default-features
 
   check_nightly:
