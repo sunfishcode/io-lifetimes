@@ -14,9 +14,9 @@ use std::{
 #[cfg(all(unix, feature = "close"))]
 use io_lifetimes::{AsFd, OwnedFd};
 
-#[cfg(windows)]
+#[cfg(all(windows, feature = "close"))]
 use io_lifetimes::{AsHandle, OwnedHandle};
-#[cfg(windows)]
+#[cfg(all(windows, feature = "close"))]
 use std::{convert::TryInto, os::windows::io::RawHandle, ptr::null_mut};
 
 #[cfg(all(io_safety_is_in_std, unix, feature = "close"))]
