@@ -7,10 +7,6 @@ fn main() {
         use_feature("io_lifetimes_use_std")
     }
 
-    // Niche optimizations for `Borrowed*` and `Owned*` depend on `rustc_attrs`
-    // which, outside of `std`, are only available on nightly.
-    use_feature_or_nothing("rustc_attrs");
-
     // Work around
     // https://github.com/rust-lang/rust/issues/103306.
     use_feature_or_nothing("wasi_ext");

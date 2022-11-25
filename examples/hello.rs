@@ -1,7 +1,7 @@
 //! A simple testcase that prints a few messages to the console, demonstrating
 //! the io-lifetimes API.
 
-#![cfg_attr(not(rustc_attrs), allow(unused_imports))]
+#![cfg_attr(not(io_lifetimes_use_std), allow(unused_imports))]
 
 #[cfg(feature = "close")]
 use io_lifetimes::example_ffi::*;
@@ -19,7 +19,7 @@ use io_lifetimes::{AsHandle, FromHandle, OwnedHandle};
 #[cfg(windows)]
 use std::{convert::TryInto, os::windows::io::RawHandle, ptr::null_mut};
 
-#[cfg(all(rustc_attrs, unix, feature = "close"))]
+#[cfg(all(io_lifetimes_use_std, unix, feature = "close"))]
 fn main() -> io::Result<()> {
     let fd = unsafe {
         // Open a file, which returns an `Option<OwnedFd>`, which we can
@@ -120,9 +120,9 @@ fn main() -> io::Result<()> {
 }
 
 #[cfg(all(
-    not(all(rustc_attrs, unix, feature = "close")),
+    not(all(io_lifetimes_use_std, unix, feature = "close")),
     not(all(windows, feature = "close"))
 ))]
 fn main() {
-    println!("On Unix, this example requires Rust nightly (for `rustc_attrs`) and the \"close\" feature.");
+    println!("On Unix, this example requires Rust nightly (for `io_lifetimes_use_std`) and the \"close\" feature.");
 }
