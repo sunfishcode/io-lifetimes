@@ -1,6 +1,6 @@
 //! This is just a sample of what FFI using this crate can look like.
 
-#![cfg_attr(not(rustc_attrs), allow(unused_imports))]
+#![cfg_attr(not(io_safety_is_in_std), allow(unused_imports))]
 #![allow(missing_docs)]
 
 #[cfg(any(unix, target_os = "wasi"))]
@@ -23,7 +23,7 @@ use {
 };
 
 // Declare a few FFI functions ourselves, to show off the FFI ergonomics.
-#[cfg(all(rustc_attrs, any(unix, target_os = "wasi")))]
+#[cfg(all(io_safety_is_in_std, any(unix, target_os = "wasi")))]
 extern "C" {
     pub fn open(pathname: *const c_char, flags: c_int, ...) -> Option<OwnedFd>;
 }

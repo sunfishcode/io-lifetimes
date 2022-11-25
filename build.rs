@@ -4,12 +4,8 @@ use std::io::Write;
 fn main() {
     // I/O safety is stabilized in Rust 1.63.
     if has_io_safety() {
-        use_feature("io_lifetimes_use_std")
+        use_feature("io_safety_is_in_std")
     }
-
-    // Niche optimizations for `Borrowed*` and `Owned*` depend on `rustc_attrs`
-    // which, outside of `std`, are only available on nightly.
-    use_feature_or_nothing("rustc_attrs");
 
     // Work around
     // https://github.com/rust-lang/rust/issues/103306.

@@ -28,22 +28,21 @@
 //! [from+into conversions]: FromFilelike::from_into_filelike
 
 #![deny(missing_docs)]
-#![cfg_attr(rustc_attrs, feature(rustc_attrs))]
 // Work around https://github.com/rust-lang/rust/issues/103306.
 #![cfg_attr(all(wasi_ext, target_os = "wasi"), feature(wasi_ext))]
 
 mod portability;
 mod traits;
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 mod types;
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 mod impls_std;
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(any(unix, target_os = "wasi"))]
 pub use traits::AsFd;
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 pub use traits::{AsHandle, AsSocket};
 #[cfg(any(unix, target_os = "wasi"))]
@@ -53,23 +52,23 @@ pub use traits::{FromFd, IntoFd};
 #[allow(deprecated)]
 pub use traits::{FromHandle, FromSocket, IntoHandle, IntoSocket};
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(any(unix, target_os = "wasi"))]
 pub use types::{BorrowedFd, OwnedFd};
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 pub use types::{
     BorrowedHandle, BorrowedSocket, HandleOrInvalid, InvalidHandleError, NullHandleError,
     OwnedHandle, OwnedSocket,
 };
 
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(unix)]
 pub use std::os::unix::io::{AsFd, BorrowedFd, OwnedFd};
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(target_os = "wasi")]
 pub use std::os::wasi::io::{AsFd, BorrowedFd, OwnedFd};
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(windows)]
 pub use std::os::windows::io::{
     AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, HandleOrInvalid, InvalidHandleError,
@@ -87,7 +86,7 @@ pub use std::os::windows::io::{
 //
 // So we define `FromFd`/`IntoFd` traits, and implement them in terms of
 // `From`/`Into`,
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(any(unix, target_os = "wasi"))]
 #[allow(deprecated)]
 impl<T: From<OwnedFd>> FromFd for T {
@@ -96,7 +95,7 @@ impl<T: From<OwnedFd>> FromFd for T {
         owned_fd.into()
     }
 }
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(any(unix, target_os = "wasi"))]
 #[allow(deprecated)]
 impl<T> IntoFd for T
@@ -109,7 +108,7 @@ where
     }
 }
 
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(windows)]
 #[allow(deprecated)]
 impl<T: From<OwnedHandle>> FromHandle for T {
@@ -118,7 +117,7 @@ impl<T: From<OwnedHandle>> FromHandle for T {
         owned_handle.into()
     }
 }
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(windows)]
 #[allow(deprecated)]
 impl<T> IntoHandle for T
@@ -131,7 +130,7 @@ where
     }
 }
 
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(windows)]
 #[allow(deprecated)]
 impl<T: From<OwnedSocket>> FromSocket for T {
@@ -140,7 +139,7 @@ impl<T: From<OwnedSocket>> FromSocket for T {
         owned_socket.into()
     }
 }
-#[cfg(io_lifetimes_use_std)]
+#[cfg(io_safety_is_in_std)]
 #[cfg(windows)]
 #[allow(deprecated)]
 impl<T> IntoSocket for T
@@ -165,22 +164,22 @@ pub mod views;
 
 // Ideally, we'd want crates to implement our traits themselves. But for now,
 // while we're prototyping, we provide a few impls on foreign types.
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(feature = "async-std")]
 mod impls_async_std;
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(feature = "fs-err")]
 mod impls_fs_err;
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(feature = "mio")]
 mod impls_mio;
 #[cfg(not(target_os = "wasi"))]
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(feature = "os_pipe")]
 mod impls_os_pipe;
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(feature = "socket2")]
 mod impls_socket2;
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(feature = "tokio")]
 mod impls_tokio;

@@ -1,16 +1,16 @@
 //! A simple example implementing the main traits for a type.
 
 #[cfg(not(windows))]
-#[cfg(any(feature = "close", not(io_lifetimes_use_std)))]
+#[cfg(any(feature = "close", not(io_safety_is_in_std)))]
 use io_lifetimes::FromFd;
 #[cfg(windows)]
-#[cfg(any(feature = "close", not(io_lifetimes_use_std)))]
+#[cfg(any(feature = "close", not(io_safety_is_in_std)))]
 use io_lifetimes::FromHandle;
 #[cfg(not(windows))]
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 use io_lifetimes::IntoFd;
 #[cfg(windows)]
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 use io_lifetimes::IntoHandle;
 use io_lifetimes::OwnedFilelike;
 #[cfg(not(windows))]
@@ -43,7 +43,7 @@ impl AsFd for Thing {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(not(windows))]
 impl IntoFd for Thing {
     #[inline]
@@ -60,7 +60,7 @@ impl From<Thing> for OwnedFd {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(not(windows))]
 impl FromFd for Thing {
     #[inline]
@@ -85,7 +85,7 @@ impl AsHandle for Thing {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 impl IntoHandle for Thing {
     #[inline]
@@ -102,7 +102,7 @@ impl From<Thing> for OwnedHandle {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 impl FromHandle for Thing {
     #[inline]

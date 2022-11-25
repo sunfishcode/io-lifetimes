@@ -20,9 +20,6 @@ This is associated with [RFC 3128], the I/O Safety RFC, which is now merged.
 Work is now underway to move the `OwnedFd` and `BorrowedFd` types and `AsFd`
 trait developed here into `std`.
 
-Some features currently require nightly Rust, as they depend on `rustc_attrs`
-to perform niche optimizations needed for FFI use cases.
-
 For a quick taste, check out the code examples:
 
  - [hello], a basic demo of this API, doing low-level I/O manually, using the
