@@ -1,4 +1,4 @@
-#![cfg_attr(not(io_lifetimes_use_std), allow(unused_imports))]
+#![cfg_attr(not(io_safety_is_in_std), allow(unused_imports))]
 #![cfg(feature = "close")]
 
 #[cfg(any(unix, windows))]
@@ -12,7 +12,7 @@ use windows_sys::Win32::Storage::FileSystem::{
     FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ, OPEN_EXISTING,
 };
 
-#[cfg(all(io_lifetimes_use_std, unix))]
+#[cfg(all(io_safety_is_in_std, unix))]
 #[test]
 fn test_file_not_found() {
     assert!(unsafe {
@@ -50,7 +50,7 @@ fn test_file_not_found() {
     );
 }
 
-#[cfg(all(io_lifetimes_use_std, unix))]
+#[cfg(all(io_safety_is_in_std, unix))]
 #[test]
 fn test_file_found() {
     assert!(unsafe { open("Cargo.toml\0".as_ptr() as *const _, O_RDONLY | O_CLOEXEC) }.is_some());

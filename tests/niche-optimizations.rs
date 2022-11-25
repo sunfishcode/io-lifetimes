@@ -1,4 +1,4 @@
-#![cfg_attr(not(io_lifetimes_use_std), allow(unused_imports))]
+#![cfg_attr(not(io_safety_is_in_std), allow(unused_imports))]
 #![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 
 use std::mem::size_of;
@@ -15,7 +15,7 @@ use std::os::wasi::io::{FromRawFd, IntoRawFd, RawFd};
 #[cfg(windows)]
 use std::os::windows::io::{FromRawSocket, IntoRawSocket, RawSocket};
 
-#[cfg(all(io_lifetimes_use_std, any(unix, target_os = "wasi")))]
+#[cfg(all(io_safety_is_in_std, any(unix, target_os = "wasi")))]
 #[test]
 fn test_niche_optimizations() {
     assert_eq!(size_of::<Option<OwnedFd>>(), size_of::<RawFd>());
@@ -38,7 +38,7 @@ fn test_niche_optimizations() {
     }
 }
 
-#[cfg(all(io_lifetimes_use_std, windows))]
+#[cfg(all(io_safety_is_in_std, windows))]
 #[test]
 fn test_niche_optimizations_socket() {
     assert_eq!(size_of::<Option<OwnedSocket>>(), size_of::<RawSocket>());

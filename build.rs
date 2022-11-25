@@ -4,7 +4,7 @@ use std::io::Write;
 fn main() {
     // I/O safety is stabilized in Rust 1.63.
     if has_io_safety() {
-        use_feature("io_lifetimes_use_std")
+        use_feature("io_safety_is_in_std")
     }
 
     // Work around

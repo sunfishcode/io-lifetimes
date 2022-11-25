@@ -1,9 +1,9 @@
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::BorrowedFd;
 #[cfg(any(unix, target_os = "wasi"))]
 use crate::OwnedFd;
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 use crate::{BorrowedHandle, BorrowedSocket};
 #[cfg(windows)]
@@ -14,7 +14,7 @@ use crate::{OwnedHandle, OwnedSocket};
 /// This is only available on unix platforms and must be imported in order to
 /// call the method. Windows platforms have a corresponding `AsHandle` and
 /// `AsSocket` set of traits.
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(any(unix, target_os = "wasi"))]
 pub trait AsFd {
     /// Borrows the file descriptor.
@@ -34,7 +34,7 @@ pub trait AsFd {
 }
 
 /// A trait to borrow the handle from an underlying object.
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 pub trait AsHandle {
     /// Borrows the handle.
@@ -54,7 +54,7 @@ pub trait AsHandle {
 }
 
 /// A trait to borrow the socket from an underlying object.
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 pub trait AsSocket {
     /// Borrows the socket.
@@ -235,7 +235,7 @@ pub trait FromSocket {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(any(unix, target_os = "wasi"))]
 impl<T: AsFd> AsFd for &T {
     #[inline]
@@ -244,7 +244,7 @@ impl<T: AsFd> AsFd for &T {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(any(unix, target_os = "wasi"))]
 impl<T: AsFd> AsFd for &mut T {
     #[inline]
@@ -253,7 +253,7 @@ impl<T: AsFd> AsFd for &mut T {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 impl<T: AsHandle> AsHandle for &T {
     #[inline]
@@ -262,7 +262,7 @@ impl<T: AsHandle> AsHandle for &T {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 impl<T: AsHandle> AsHandle for &mut T {
     #[inline]
@@ -271,7 +271,7 @@ impl<T: AsHandle> AsHandle for &mut T {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 impl<T: AsSocket> AsSocket for &T {
     #[inline]
@@ -280,7 +280,7 @@ impl<T: AsSocket> AsSocket for &T {
     }
 }
 
-#[cfg(not(io_lifetimes_use_std))]
+#[cfg(not(io_safety_is_in_std))]
 #[cfg(windows)]
 impl<T: AsSocket> AsSocket for &mut T {
     #[inline]

@@ -25,7 +25,7 @@ fs-err = { version = "2.6.0", optional = true }
 os_pipe = { version = "1.0.0", features = ["io_safety"], optional = true }
 
 # The following dependencies allow io-lifetimes to define impls for various
-# third-party traits. This is only done in not(io_lifetimes_use_std) mode,
+# third-party traits. This is only done in not(io_safety_is_in_std) mode,
 # because when we're using the std types and traits, we can't define impls
 # on third-party traits, due to the orphan rule. Work is ongoing to add
 # the needs impls upstream.
