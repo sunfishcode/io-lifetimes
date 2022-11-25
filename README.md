@@ -72,7 +72,7 @@ in the Windows API.
 
 Here's the fun part. `BorrowedFd` and `OwnedFd` are `repr(transparent)` and
 hold `RawFd` values, and `Option<BorrowedFd>` and `Option<OwnedFd>` are
-FFI-safe (on nightly Rust), so they can all be used in FFI [directly]:
+FFI-safe (on Rust >= 1.63), so they can all be used in FFI [directly]:
 
 [directly]: https://github.com/sunfishcode/io-lifetimes/blob/main/src/example_ffi.rs
 
@@ -124,7 +124,7 @@ be added.
 
 io-lifetimes's distinguishing features are its use of `repr(transparent)`
 to support direct FFI usage, niche optimizations so `Option` can support direct
-FFI usafe as well (on nightly Rust), lifetime-aware `As*`/`Into*`/`From*`
+FFI usafe as well (on Rust >= 1.63), lifetime-aware `As*`/`Into*`/`From*`
 traits which leverage Rust's lifetime system and allow safe and checked
 `from_*` and `as_*`/`into_*` functions, and powerful convenience features
 enabled by its underlying safety.
@@ -143,7 +143,7 @@ io-lifetimes's [`OwnedFd`] type is also similar to
 [filedesc](https://crates.io/crates/filedesc)'s
 [`FileDesc`](https://docs.rs/filedesc/0.3.0/filedesc/struct.FileDesc.html)
 io-lifetimes's `OwnedFd` reserves the value -1, so it doesn't need to test for
-`-1` in its `Drop`, and `Option<OwnedFd>` (on nightly Rust) is the same size
+`-1` in its `Drop`, and `Option<OwnedFd>` (on Rust >= 1.63) is the same size
 as `FileDesc`.
 
 io-lifetimes's [`OwnedFd`] type is also similar to

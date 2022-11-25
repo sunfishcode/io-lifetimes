@@ -124,5 +124,5 @@ fn main() -> io::Result<()> {
     not(all(windows, feature = "close"))
 ))]
 fn main() {
-    println!("On Unix, this example requires Rust nightly (for `io_safety_is_in_std`) and the \"close\" feature.");
+    println!("On Unix, this example requires Rust >= 1.63 and the \"close\" feature.");
 }
