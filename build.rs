@@ -31,8 +31,18 @@ fn use_feature(feature: &str) {
     println!("cargo:rustc-cfg={}", feature);
 }
 
-/// Test whether the rustc at `var("RUSTC")` can successfully compile the program.
-fn test_program<T: AsRef<str>>(test: T) -> bool {
+/// Test whether the rustc at `var("RUSTC")` supports the given feature.
+fn has_feature(feature: &str) -> bool {
+    can_compile(&format!(
+        "#![allow(stable_features)]\n#![feature({})]",
+        feature
+    ))
+}
+
+/// Test whether the rustc at `var("RUSTC")` can compile the given code.
+fn can_compile<T: AsRef<str>>(test: T) -> bool {
+    use std::process::Stdio;
+
     let out_dir = var("OUT_DIR").unwrap();
     let rustc = var("RUSTC").unwrap();
     let target = var("TARGET").unwrap();
@@ -51,7 +61,7 @@ fn test_program<T: AsRef<str>>(test: T) -> bool {
         .arg("--target")
         .arg(target)
         .arg("--out-dir")
-        .arg(out_dir);
+        .arg(out_dir); // Put the output somewhere inconsequential.
 
     // If Cargo wants to set RUSTFLAGS, use that.
     if let Ok(rustflags) = var("CARGO_ENCODED_RUSTFLAGS") {
@@ -64,7 +74,8 @@ fn test_program<T: AsRef<str>>(test: T) -> bool {
 
     let mut child = cmd
         .arg("-") // Read from stdin.
-        .stdin(std::process::Stdio::piped()) // Stdin is a pipe.
+        .stdin(Stdio::piped()) // Stdin is a pipe.
+        .stderr(Stdio::null()) // Errors from feature detection aren't interesting and can be confusing.
         .spawn()
         .unwrap();
 
@@ -73,19 +84,14 @@ fn test_program<T: AsRef<str>>(test: T) -> bool {
     child.wait().unwrap().success()
 }
 
-/// Test whether the rustc at `var("RUSTC")` supports the given feature.
-fn has_feature(feature: &str) -> bool {
-    test_program(format!("#![feature({})]", feature))
-}
-
 /// Test whether the rustc at `var("RUSTC")` supports panic in `const fn`.
 fn has_panic_in_const_fn() -> bool {
-    test_program("const fn foo() {{ panic!() }}")
+    can_compile("const fn foo() {{ panic!() }}")
 }
 
 /// Test whether the rustc at `var("RUSTC")` supports the I/O safety feature.
 fn has_io_safety() -> bool {
-    test_program(
+    can_compile(
         "\
     #[cfg(unix)]\n\
     use std::os::unix::io::OwnedFd as Owned;\n\
