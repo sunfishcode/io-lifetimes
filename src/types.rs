@@ -169,7 +169,7 @@ impl BorrowedFd<'_> {
         // `OwnedFd` instances, so that we don't have to call `fcntl`.
         #[cfg(not(feature = "close"))]
         {
-            unreachable!("try_clone called without the \"close\" feature in io-lifetimes");
+            unreachable!("try_clone_to_owned called without the \"close\" feature in io-lifetimes");
         }
     }
 }
@@ -224,7 +224,7 @@ impl BorrowedHandle<'_> {
         // `OwnedHandle` instances, so that we don't have to call `fcntl`.
         #[cfg(not(feature = "close"))]
         {
-            unreachable!("try_clone called without the \"close\" feature in io-lifetimes");
+            unreachable!("try_clone_to_owned called without the \"close\" feature in io-lifetimes");
         }
     }
 
@@ -361,7 +361,7 @@ impl BorrowedSocket<'_> {
         // `OwnedSocket` instances, so that we don't have to call `fcntl`.
         #[cfg(not(feature = "close"))]
         {
-            unreachable!("try_clone called without the \"close\" feature in io-lifetimes");
+            unreachable!("try_clone_to_owned called without the \"close\" feature in io-lifetimes");
         }
     }
 }
