@@ -2,19 +2,9 @@ use std::env::var;
 use std::io::Write;
 
 fn main() {
-    // I/O safety is stabilized in Rust 1.63.
-    if has_io_safety() {
-        use_feature("io_safety_is_in_std")
-    }
-
     // Work around
     // <https://github.com/rust-lang/rust/issues/103306>.
     use_feature_or_nothing("wasi_ext");
-
-    // Rust 1.56 and earlier don't support panic in const fn.
-    if has_panic_in_const_fn() {
-        use_feature("panic_in_const_fn")
-    }
 
     // Don't rerun this on changes other than build.rs, as we only depend on
     // the rustc version.
@@ -89,25 +79,4 @@ fn can_compile<T: AsRef<str>>(test: T) -> bool {
     writeln!(child.stdin.take().unwrap(), "{}", test.as_ref()).unwrap();
 
     child.wait().unwrap().success()
-}
-
-/// Test whether the rustc at `var("RUSTC")` supports panic in `const fn`.
-fn has_panic_in_const_fn() -> bool {
-    can_compile("const fn foo() {{ panic!() }}")
-}
-
-/// Test whether the rustc at `var("RUSTC")` supports the I/O safety feature.
-fn has_io_safety() -> bool {
-    can_compile(
-        "\
-    #[cfg(unix)]\n\
-    use std::os::unix::io::OwnedFd as Owned;\n\
-    #[cfg(target_os = \"wasi\")]\n\
-    use std::os::wasi::io::OwnedFd as Owned;\n\
-    #[cfg(windows)]\n\
-    use std::os::windows::io::OwnedHandle as Owned;\n\
-    \n\
-    pub type Success = Owned;\n\
-    ",
-    )
 }
