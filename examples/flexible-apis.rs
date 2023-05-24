@@ -4,7 +4,7 @@
 //! The following uses the POSIX-ish `Fd` types; similar considerations
 //! apply to the Windows and portable types.
 
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 use io_lifetimes::{AsFd, BorrowedFd, OwnedFd};
 
 /// The simplest way to accept a borrowed I/O resource is to simply use a
@@ -15,7 +15,7 @@ use io_lifetimes::{AsFd, BorrowedFd, OwnedFd};
 ///
 /// Callers with an `AsFd`-implementing type would call `.as_fd()` and pass
 /// the result.
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 fn use_fd_a(fd: BorrowedFd<'_>) {
     let _ = fd;
 }
@@ -24,13 +24,13 @@ fn use_fd_a(fd: BorrowedFd<'_>) {
 /// verbose at the function definition site, and entails monomorphization, but
 /// it has the advantage of allowing users to pass in any type implementing
 /// `AsFd` directly, without having to call `.as_fd()` themselves.
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 fn use_fd_b<Fd: AsFd>(fd: Fd) {
     let _ = fd.as_fd();
 }
 
 /// Another way to do this is to use an `impl AsFd` parameter.
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 fn use_fd_c(fd: impl AsFd) {
     let _ = fd.as_fd();
 }
@@ -41,7 +41,7 @@ fn use_fd_c(fd: impl AsFd) {
 ///
 /// Callers with an `IntoFd`-implementing type would call `.into_fd()` and pass
 /// the result.
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 fn consume_fd_a(fd: OwnedFd) {
     let _ = fd;
 }
@@ -50,19 +50,19 @@ fn consume_fd_a(fd: OwnedFd) {
 /// `use_fd_b`, this is more verbose here and entails monomorphization, but it
 /// has the advantage of allowing users to pass in any type implementing
 /// `IntoFd` directly.
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 fn consume_fd_b<Fd: Into<OwnedFd>>(fd: Fd) {
     let _: OwnedFd = fd.into();
 }
 
 /// Another way to do this is to use an `impl IntoFd` parameter.
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 fn consume_fd_c(fd: impl Into<OwnedFd>) {
     let _: OwnedFd = fd.into();
 }
 
 /// Now let's see how the APIs look for users.
-#[cfg(all(feature = "close", not(windows)))]
+#[cfg(not(windows))]
 fn main() {
     let f = std::fs::File::open("Cargo.toml").unwrap();
 
@@ -98,9 +98,4 @@ fn main() {
 #[cfg(windows)]
 fn main() {
     println!("This example uses non-Windows APIs.");
-}
-
-#[cfg(all(not(feature = "close"), not(windows)))]
-fn main() {
-    println!("This example requires the \"close\" feature.");
 }

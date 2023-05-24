@@ -46,20 +46,20 @@ jobs:
 
     - run: rustup target add x86_64-apple-darwin
     - run: cargo check --workspace --release -vv
-    - run: cargo check --workspace --release -vv --features=fs-err,os_pipe # TODO: use --all-features
+    - run: cargo check --workspace --release -vv --no-default-features
     - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin
-    - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin --features=fs-err,os_pipe # TODO: use --all-features
+    - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin --no-default-features
 
-  check-1_48:
+  check-1_63:
     name: Check
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [1.48]
+        build: [1.63]
         include:
-          - build: 1.48
+          - build: 1.63
             os: ubuntu-latest
-            rust: 1.48
+            rust: 1.63
 
     env:
       # -D warnings is commented out in our install-rust action; re-add it here.
@@ -102,18 +102,18 @@ jobs:
         toolchain: ${{ matrix.rust }}
 
     - run: cargo check --workspace --release -vv
-    - run: cargo check --workspace --release -vv --features=fs-err,os_pipe # TODO: use --all-features
+    - run: cargo check --workspace --release -vv --no-default-features
 
-  check-windows-1_48:
+  check-windows-1_63:
     name: Check Windows
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [1.48]
+        build: [1.63]
         include:
-          - build: 1.48
+          - build: 1.63
             os: windows-latest
-            rust: 1.48
+            rust: 1.63
 
     env:
       # -D warnings is commented out in our install-rust action; re-add it here.
@@ -155,7 +155,7 @@ jobs:
     - uses: ./.github/actions/install-rust
       with:
         toolchain: ${{ matrix.rust }}
-    - run: cargo test --workspace --features=fs-err,os_pipe # TODO: use --all-features
+    - run: cargo test --workspace
     - run: cargo test --workspace --no-default-features
 
   check_nightly:

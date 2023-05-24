@@ -170,7 +170,7 @@ to be provided by separate layers on top.
 ## Minimum Supported Rust Version (MSRV)
 
 This crate currently works on the version of [Rust on Debian stable], which is
-currently Rust 1.48. This policy may change in the future, in minor version
+currently Rust 1.63. This policy may change in the future, in minor version
 releases, so users using a fixed version of Rust should pin to a specific
 version of this crate.
 

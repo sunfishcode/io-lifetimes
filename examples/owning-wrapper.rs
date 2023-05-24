@@ -1,28 +1,16 @@
 //! A simple example implementing the main traits for a type.
 
-#[cfg(not(windows))]
-#[cfg(any(feature = "close", not(io_safety_is_in_std)))]
-use io_lifetimes::FromFd;
-#[cfg(windows)]
-#[cfg(any(feature = "close", not(io_safety_is_in_std)))]
-use io_lifetimes::FromHandle;
-#[cfg(not(windows))]
-#[cfg(not(io_safety_is_in_std))]
-use io_lifetimes::IntoFd;
-#[cfg(windows)]
-#[cfg(not(io_safety_is_in_std))]
-use io_lifetimes::IntoHandle;
 use io_lifetimes::OwnedFilelike;
 #[cfg(not(windows))]
-use io_lifetimes::{AsFd, BorrowedFd, OwnedFd};
+use io_lifetimes::{AsFd, BorrowedFd, FromFd, OwnedFd};
 #[cfg(windows)]
-use io_lifetimes::{AsHandle, BorrowedHandle, OwnedHandle};
+use io_lifetimes::{AsHandle, BorrowedHandle, FromHandle, OwnedHandle};
 
 /// A wrapper around a file descriptor.
 ///
-/// Implementing `AsFd`, `IntoFd`, and `FromFd` for a type that wraps an
-/// `Owned*` is straightforward. `Owned*` types also automatically close the
-/// handle in its `Drop`.
+/// Implementing `AsFd`, `Into<OwnedFd>`, and `From<OwnedFd>` for a type that
+/// wraps an `Owned*` is straightforward. `Owned*` types also automatically
+/// close the handle in its `Drop`.
 ///
 /// Should owning wrappers implement `AsRawFd`, `IntoRawFd`, and `FromRawFd`
 /// too? They can, and there's no need to remove them from a type that already
@@ -43,29 +31,11 @@ impl AsFd for Thing {
     }
 }
 
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(not(windows))]
-impl IntoFd for Thing {
-    #[inline]
-    fn into_fd(self) -> OwnedFd {
-        self.filelike
-    }
-}
-
 #[cfg(not(windows))]
 impl From<Thing> for OwnedFd {
     #[inline]
     fn from(owned: Thing) -> Self {
         owned.filelike
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(not(windows))]
-impl FromFd for Thing {
-    #[inline]
-    fn from_fd(filelike: OwnedFd) -> Self {
-        Self { filelike }
     }
 }
 
@@ -85,29 +55,11 @@ impl AsHandle for Thing {
     }
 }
 
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-impl IntoHandle for Thing {
-    #[inline]
-    fn into_handle(self) -> OwnedHandle {
-        self.filelike
-    }
-}
-
 #[cfg(windows)]
 impl From<Thing> for OwnedHandle {
     #[inline]
     fn from(owned: Thing) -> Self {
         owned.filelike
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-impl FromHandle for Thing {
-    #[inline]
-    fn from_handle(filelike: OwnedHandle) -> Self {
-        Self { filelike }
     }
 }
 
@@ -119,7 +71,6 @@ impl From<OwnedHandle> for Thing {
     }
 }
 
-#[cfg(feature = "close")]
 fn main() {
     use io_lifetimes::{AsFilelike, FromFilelike, IntoFilelike};
 
@@ -149,9 +100,4 @@ fn main() {
         let _ = thing.as_filelike();
         let _ = thing.into_filelike();
     }
-}
-
-#[cfg(not(feature = "close"))]
-fn main() {
-    println!("This example requires the \"close\" feature.");
 }

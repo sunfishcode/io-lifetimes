@@ -1,65 +1,7 @@
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(any(unix, target_os = "wasi", target_os = "hermit"))]
-use crate::BorrowedFd;
 #[cfg(any(unix, target_os = "wasi", target_os = "hermit"))]
 use crate::OwnedFd;
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-use crate::{BorrowedHandle, BorrowedSocket};
 #[cfg(windows)]
 use crate::{OwnedHandle, OwnedSocket};
-
-/// A trait to borrow the file descriptor from an underlying object.
-///
-/// This is only available on unix platforms and must be imported in order to
-/// call the method. Windows platforms have a corresponding `AsHandle` and
-/// `AsSocket` set of traits.
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(any(unix, target_os = "wasi", target_os = "hermit"))]
-pub trait AsFd {
-    /// Borrows the file descriptor.
-    ///
-    /// # Example
-    ///
-    /// ```rust,no_run
-    /// use std::fs::File;
-    /// # use std::io;
-    /// use io_lifetimes::{AsFd, BorrowedFd};
-    ///
-    /// let mut f = File::open("foo.txt")?;
-    /// let borrowed_fd: BorrowedFd<'_> = f.as_fd();
-    /// # Ok::<(), io::Error>(())
-    /// ```
-    fn as_fd(&self) -> BorrowedFd<'_>;
-}
-
-/// A trait to borrow the handle from an underlying object.
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-pub trait AsHandle {
-    /// Borrows the handle.
-    ///
-    /// # Example
-    ///
-    /// ```rust,no_run
-    /// use std::fs::File;
-    /// # use std::io;
-    /// use io_lifetimes::{AsHandle, BorrowedHandle};
-    ///
-    /// let mut f = File::open("foo.txt")?;
-    /// let borrowed_handle: BorrowedHandle<'_> = f.as_handle();
-    /// # Ok::<(), io::Error>(())
-    /// ```
-    fn as_handle(&self) -> BorrowedHandle<'_>;
-}
-
-/// A trait to borrow the socket from an underlying object.
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-pub trait AsSocket {
-    /// Borrows the socket.
-    fn as_socket(&self) -> BorrowedSocket<'_>;
-}
 
 /// A trait to express the ability to consume an object and acquire ownership
 /// of its file descriptor.
@@ -232,59 +174,5 @@ pub trait FromSocket {
         Self: Sized + From<OwnedSocket>,
     {
         Self::from(into_owned.into())
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(any(unix, target_os = "wasi", target_os = "hermit"))]
-impl<T: AsFd> AsFd for &T {
-    #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
-        T::as_fd(self)
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(any(unix, target_os = "wasi", target_os = "hermit"))]
-impl<T: AsFd> AsFd for &mut T {
-    #[inline]
-    fn as_fd(&self) -> BorrowedFd<'_> {
-        T::as_fd(self)
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-impl<T: AsHandle> AsHandle for &T {
-    #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
-        T::as_handle(self)
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-impl<T: AsHandle> AsHandle for &mut T {
-    #[inline]
-    fn as_handle(&self) -> BorrowedHandle<'_> {
-        T::as_handle(self)
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-impl<T: AsSocket> AsSocket for &T {
-    #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
-        T::as_socket(self)
-    }
-}
-
-#[cfg(not(io_safety_is_in_std))]
-#[cfg(windows)]
-impl<T: AsSocket> AsSocket for &mut T {
-    #[inline]
-    fn as_socket(&self) -> BorrowedSocket<'_> {
-        T::as_socket(self)
     }
 }
