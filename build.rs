@@ -2,9 +2,13 @@ use std::env::var;
 use std::io::Write;
 
 fn main() {
+    let target_os = var("CARGO_CFG_TARGET_OS").unwrap();
+
     // Work around
     // <https://github.com/rust-lang/rust/issues/103306>.
-    use_feature_or_nothing("wasi_ext");
+    if target_os == "wasi" {
+        use_feature_or_nothing("wasi_ext");
+    }
 
     // Don't rerun this on changes other than build.rs, as we only depend on
     // the rustc version.
