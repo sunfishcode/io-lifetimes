@@ -32,6 +32,7 @@
 #![cfg_attr(all(wasi_ext, target_os = "wasi"), feature(wasi_ext))]
 // Currently supported platforms.
 #![cfg(any(unix, windows, target_os = "wasi", target_os = "hermit"))]
+#![cfg_attr(doc_cfg, feature(doc_cfg))]
 
 mod portability;
 mod traits;
