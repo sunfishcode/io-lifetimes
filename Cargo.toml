@@ -21,7 +21,7 @@ rust-version = "1.63"
 os_pipe = { version = "1.0.0", features = ["io_safety"], optional = true }
 
 # Optionally depend on async-std just to provide impls for its types.
-async-std = { version = ">=1.12, <=1.13", optional = true }
+async-std = { version = "1.13.0", optional = true, features = ["io_safety"] }
 # Optionally depend on tokio to implement traits for its types.
 tokio = { version = "1.6.0", features = ["io-std", "fs", "net", "process"], optional = true }
 # Optionally depend on socket2 to implement traits for its types.
@@ -48,8 +48,13 @@ features = [
 
 [package.metadata.docs.rs]
 features = ["close"]
-rustdoc-args = ["--cfg", "doc_cfg"]
 
 [features]
 default = []
 close = ["libc", "hermit-abi", "windows-sys"]
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = [
+    'cfg(wasi_ext)',
+]

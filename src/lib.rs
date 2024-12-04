@@ -32,7 +32,7 @@
 #![cfg_attr(all(wasi_ext, target_os = "wasi"), feature(wasi_ext))]
 // Currently supported platforms.
 #![cfg(any(unix, windows, target_os = "wasi", target_os = "hermit"))]
-#![cfg_attr(doc_cfg, feature(doc_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 mod portability;
 mod traits;
@@ -133,7 +133,7 @@ pub use portability::{
 };
 
 #[cfg(feature = "close")]
-#[cfg_attr(doc_cfg, doc(cfg(feature = "close")))]
+#[cfg_attr(docsrs, doc(cfg(feature = "close")))]
 pub mod example_ffi;
 pub mod raw;
 pub mod views;

@@ -236,22 +236,22 @@ unsafe impl FilelikeViewType for os_pipe::PipeReader {}
 unsafe impl SocketlikeViewType for socket2::Socket {}
 
 #[cfg(not(any(target_os = "wasi", target_os = "hermit")))]
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async-std")]
 unsafe impl SocketlikeViewType for async_std::net::TcpStream {}
 #[cfg(not(any(target_os = "wasi", target_os = "hermit")))]
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async-std")]
 unsafe impl SocketlikeViewType for async_std::net::TcpListener {}
 #[cfg(not(any(target_os = "wasi", target_os = "hermit")))]
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async-std")]
 unsafe impl SocketlikeViewType for async_std::net::UdpSocket {}
 #[cfg(unix)]
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async-std")]
 unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixStream {}
 #[cfg(unix)]
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async-std")]
 unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixListener {}
 #[cfg(unix)]
-#[cfg(feature = "async_std")]
+#[cfg(feature = "async-std")]
 unsafe impl SocketlikeViewType for async_std::os::unix::net::UnixDatagram {}
 
 #[cfg(feature = "mio")]
