@@ -178,5 +178,5 @@ jobs:
         toolchain: ${{ matrix.rust }}
     - run: >
         rustup target add
-        wasm32-wasi
-    - run: cargo check --workspace --release -vv --target=wasm32-wasi
+        wasm32-wasip1
+    - run: cargo check --workspace --release -vv --target=wasm32-wasip1
