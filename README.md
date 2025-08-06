@@ -169,10 +169,9 @@ to be provided by separate layers on top.
 
 ## Minimum Supported Rust Version (MSRV)
 
-This crate currently works on the version of [Rust on Debian stable], which is
-currently Rust 1.63. This policy may change in the future, in minor version
-releases, so users using a fixed version of Rust should pin to a specific
-version of this crate.
+This crate currently works on Rust 1.70. This policy may change in the future,
+in minor version releases, so users using a fixed version of Rust should pin to
+a specific version of this crate.
 
 [`OwnedFd`]: https://doc.rust-lang.org/stable/std/os/fd/struct.OwnedFd.html
 [`BorrowedFd`]: https://doc.rust-lang.org/stable/std/os/fd/struct.BorrowedFd.html
