@@ -226,7 +226,7 @@ impl<T: AsFd> AsSocketlike for T {
 #[cfg(windows)]
 pub trait AsSocketlike: AsSocket {
     /// Borrows the reference.
-    fn as_socketlike(&self) -> BorrowedSocketlike;
+    fn as_socketlike(&self) -> BorrowedSocketlike<'_>;
 
     /// Return a borrowing view of a resource which dereferences to a
     /// `&Target`.
