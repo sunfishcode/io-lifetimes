@@ -50,16 +50,16 @@ jobs:
     - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin
     - run: cargo check --workspace --release -vv --target=x86_64-apple-darwin --no-default-features
 
-  check-1_63:
+  check-1_70:
     name: Check
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [1.63]
+        build: [1.70]
         include:
-          - build: 1.63
+          - build: 1.70
             os: ubuntu-latest
-            rust: 1.63
+            rust: 1.70
 
     env:
       # -D warnings is commented out in our install-rust action; re-add it here.
@@ -104,16 +104,16 @@ jobs:
     - run: cargo check --workspace --release -vv
     - run: cargo check --workspace --release -vv --no-default-features
 
-  check-windows-1_63:
+  check-windows-1_70:
     name: Check Windows
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [1.63]
+        build: [1.70]
         include:
-          - build: 1.63
+          - build: 1.70
             os: windows-latest
-            rust: 1.63
+            rust: 1.70
 
     env:
       # -D warnings is commented out in our install-rust action; re-add it here.
