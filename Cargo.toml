@@ -36,7 +36,7 @@ hermit-abi = { version = ">=0.3, <=0.5", optional = true }
 libc = { version = "0.2.96", optional = true }
 
 [target.'cfg(windows)'.dependencies.windows-sys]
-version = ">=0.52, <=0.60"
+version = ">=0.52, <=0.61"
 optional = true
 features = [
     "Win32_Foundation",
