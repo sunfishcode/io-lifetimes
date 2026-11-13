@@ -1,6 +1,7 @@
 //! This is just a sample of what FFI using this crate can look like.
 
 #![allow(missing_docs)]
+#![allow(suspicious_runtime_symbol_definitions)]
 
 #[cfg(any(unix, target_os = "wasi", target_os = "hermit"))]
 use crate::{BorrowedFd, OwnedFd};
