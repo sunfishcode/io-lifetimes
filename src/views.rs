@@ -193,7 +193,7 @@ impl<Target: FilelikeViewType> fmt::Debug for FilelikeView<'_, Target> {
     #[allow(clippy::missing_inline_in_public_items)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("FilelikeView")
-            .field("target", &*self)
+            .field("target", self)
             .finish()
     }
 }
@@ -202,7 +202,7 @@ impl<Target: SocketlikeViewType> fmt::Debug for SocketlikeView<'_, Target> {
     #[allow(clippy::missing_inline_in_public_items)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("SocketlikeView")
-            .field("target", &*self)
+            .field("target", self)
             .finish()
     }
 }
